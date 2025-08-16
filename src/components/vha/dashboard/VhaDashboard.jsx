@@ -1,6 +1,8 @@
 import React from "react";
 import { LuUserRound } from "react-icons/lu";
 import { CardSection } from "../../common/Card";
+import RecentActivity from "./RecentActivity";
+import TodaysSession from "./TodaysSession";
 
 function VhaDashboard() {
   const vhaCards = [
@@ -40,8 +42,18 @@ function VhaDashboard() {
         </p>
       </div>
       <CardSection cards={vhaCards} />
+      <ActivitySection />
     </>
   );
 }
 
 export default VhaDashboard;
+
+const ActivitySection = () => {
+  return (
+    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+      <RecentActivity />
+      <TodaysSession />
+    </div>
+  );
+};
