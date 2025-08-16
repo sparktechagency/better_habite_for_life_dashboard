@@ -4,6 +4,7 @@ import { CardSection } from "../../common/Card";
 import RecentActivity from "./RecentActivity";
 import TodaysSession from "./TodaysSession";
 import PrioritySection from "./PrioritySection";
+import SmallPageInfo from "@/components/common/SmallPageInfo";
 
 function VhaDashboard() {
   const vhaCards = [
@@ -36,12 +37,10 @@ function VhaDashboard() {
   ];
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold">Welcome Back !</h1>
-        <p className="text-base text-gray-500">
-          Here is an overview of your store
-        </p>
-      </div>
+      <SmallPageInfo
+        title="Welcome Back !"
+        description="Here is an overview of your store"
+      />
       <CardSection cards={vhaCards} />
       <ActivitySection />
       <PrioritySection />
@@ -53,7 +52,7 @@ export default VhaDashboard;
 
 const ActivitySection = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
       <RecentActivity />
       <TodaysSession />
     </div>

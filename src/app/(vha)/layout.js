@@ -7,7 +7,7 @@ export default function Layout({ children }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="bg-gray-100 h-full w-screen flex flex-col gap-4">
+      <main className="bg-gray-100 min-h-full w-screen flex flex-col gap-4">
         <Header />
 
         {children}
