@@ -37,7 +37,7 @@ const items = [
   },
   {
     title: "Tasks and Goals",
-    url: "/vha/task-and-goals",
+    url: "/vha/tasks-and-goals",
     icon: GrTask,
   },
   {
