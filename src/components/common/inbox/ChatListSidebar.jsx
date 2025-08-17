@@ -35,7 +35,7 @@ function ChatListSidebar() {
   return (
     <div className="lg:w-[30rem] bg-white flex flex-col h-auto lg:h-full border-b lg:border-b-0 lg:border-r border-gray-200">
       {/* Mobile Header with Search */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-5 border-b border-gray-200">
         <SearchBar
           searchQuery={searchQuery}
           onSearchChange={handleSearchChange}
@@ -43,7 +43,7 @@ function ChatListSidebar() {
       </div>
 
       {/* Mobile: Horizontal Scrollable Chat List */}
-      <div className="lg:hidden h-32">
+      <div className="lg:hidden h-fit">
         <ScrollArea className="w-full h-full">
           <HorizontalChatList
             chats={displayChatList}
@@ -108,7 +108,7 @@ function SearchBar({ searchQuery, onSearchChange }) {
 function HorizontalChatList({ chats, selectedChat, onChatSelect, isLoading }) {
   if (isLoading) {
     return (
-      <div className="p-4">
+      <div className="p-2">
         <div className="flex space-x-4 animate-pulse">
           {[1, 2, 3, 4].map((i) => (
             <div

@@ -8,36 +8,16 @@ import {
   setTypingIndicator,
   fetchChatMessages,
 } from "@/redux/features/chat/chatSlice";
-import { Button } from "@/components/ui/button";
-import { Dialog } from "@radix-ui/react-dialog";
-import {
-  DialogContent,
-  DialogTrigger,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import ReportFreeLancer from "./ReportFreeLancer";
-import Link from "next/link";
-import { useSelector } from "react-redux";
-import { getCurrentUser } from "@/redux/features/currentUser/currentuserSlice";
+
 const ChatInterface = () => {
   const dispatch = useAppDispatch();
   const { selectedChat, messages, isSendingMessage, typingUsers } = useChat();
-  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
-  const { type } = useSelector((state) => state.currentUser.currentUser || {});
-
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-
   // Get messages for selected chat
   const currentMessages = selectedChat ? messages[selectedChat.id] || [] : [];
 
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
-  const currentUser = "user2"; // Current user identifier
+  const currentUser = "user2";
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -156,9 +136,9 @@ const ChatInterface = () => {
           <Image
             src="/images/logo.png"
             alt="logo"
-            width={40}
-            height={40}
-            className="rounded-full"
+            width={46}
+            height={46}
+            className="rounded-full border-2 "
           />
           <div className="hidden md:block">
             <h2 className="font-semibold text-gray-900">

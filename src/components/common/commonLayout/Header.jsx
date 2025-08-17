@@ -1,16 +1,19 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { IoIosNotificationsOutline } from "react-icons/io";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 export default function Header() {
   return (
     <div className="w-full mx-auto px-4 bg-sidebar border-b">
@@ -22,20 +25,37 @@ export default function Header() {
           <Button className="p-0 border bg-transparent">
             <IoIosNotificationsOutline size={28} className="text-black" />
           </Button>
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-              <SelectValue placeholder="Theme" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-              <SelectItem value="system">System</SelectItem>
-            </SelectContent>
-          </Select>
+
+          {/* Shadcn Dropdown Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex h-10 w-[180px] items-center justify-between px-3 py-2"
+              >
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm">Profile</span>
+                </div>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[180px]" align="end">
+              <DropdownMenuItem asChild>
+                <Link href="/vha/my-profile/1" className="cursor-pointer">
+                  My Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-red-500 focus:text-red-500">
+                Log Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
     </div>
