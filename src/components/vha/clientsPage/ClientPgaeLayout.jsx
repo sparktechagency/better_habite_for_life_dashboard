@@ -1,6 +1,6 @@
 import SearchFilterButton from "@/components/common/SearchFilterButton";
 import SmallPageInfo from "@/components/common/SmallPageInfo";
-import { ClientTable } from "./ClientTable";
+import { ClientTable } from "@/components/common/clientTable/ClientTable";
 import React from "react";
 
 function ClientPgaeLayout() {

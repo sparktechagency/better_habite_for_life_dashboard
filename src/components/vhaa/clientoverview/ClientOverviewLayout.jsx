@@ -1,37 +1,38 @@
 import SmallPageInfo from "@/components/common/SmallPageInfo";
-import React from "react";
-import TaskMonitorTable from "./TaskMonitorTable";
-import SearchFilterButton from "@/components/common/SearchFilterButton";
-import { CardSection } from "@/components/common/Card";
-import { CgLoadbarDoc } from "react-icons/cg";
 
-function TaskMonitorLayout() {
-  const taskMonitorStats = [
+import React from "react";
+import SearchFilterButton from "@/components/common/SearchFilterButton";
+import ClientTable from "@/components/common/clientTable/ClientTable";
+import { CardSection } from "@/components/common/Card";
+import { LuUserRound } from "react-icons/lu";
+
+function ClientOverviewLayout() {
+  const clientOverviewStats = [
     {
-      title: "Completed Tasks",
+      title: "Total Clients",
       value: 6,
-      icon: <CgLoadbarDoc size={20} />,
+      icon: <LuUserRound size={20} />,
       iconTextColor: "text-red-500",
       iconBgColor: "bg-red-500/10",
     },
     {
-      title: "Pending Tasks",
+      title: "Avg Completion",
       value: 6,
-      icon: <CgLoadbarDoc size={20} />,
+      icon: <LuUserRound size={20} />,
       iconTextColor: "text-red-500",
       iconBgColor: "bg-red-500/10",
     },
     {
-      title: "Overdue Tasks",
+      title: "Active ",
       value: 6,
-      icon: <CgLoadbarDoc size={20} />,
+      icon: <LuUserRound size={20} />,
       iconTextColor: "text-red-500",
       iconBgColor: "bg-red-500/10",
     },
     {
-      title: "Active Clients",
+      title: "Flaged",
       value: 6,
-      icon: <CgLoadbarDoc size={20} />,
+      icon: <LuUserRound size={20} />,
       iconTextColor: "text-red-500",
       iconBgColor: "bg-red-500/10",
     },
@@ -39,14 +40,14 @@ function TaskMonitorLayout() {
   return (
     <div className="space-y-4">
       <SmallPageInfo
-        title="Task Monitor"
-        description="Here is an overview of your task monitor"
+        title="Client Overview"
+        description="Here is an overview of your clients"
       />
-      <CardSection cards={taskMonitorStats} footer={false} />
-      <SearchFilterButton />
-      <TaskMonitorTable />
+      <CardSection cards={clientOverviewStats} footer={false} />
+      <SearchFilterButton showAddButton={false} />
+      <ClientTable />
     </div>
   );
 }
 
-export default TaskMonitorLayout;
+export default ClientOverviewLayout;
