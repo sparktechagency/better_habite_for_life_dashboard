@@ -7,12 +7,37 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { TbFileSearch } from "react-icons/tb";
+import { TbEye, TbFileSearch } from "react-icons/tb";
 import { LuCalendar, LuUserRound } from "react-icons/lu";
 import { CgLoadbarDoc } from "react-icons/cg";
 import { Button } from "@/components/ui/button";
-
-function RecentReports({ recentReports }) {
+function Reports() {
+  const recentReports = [
+    {
+      title: "Week Progress Report - Sarah Johnson",
+      person: "John Doe",
+      viewLink: "/vha/reports/1",
+      date: "2025-08-17",
+    },
+    {
+      title: "Week Progress Report - Sarah Johnson",
+      person: "John Doe",
+      viewLink: "/vha/reports/1",
+      date: "2025-08-17",
+    },
+    {
+      title: "Week Progress Report - Sarah Johnson",
+      person: "John Doe",
+      viewLink: "/vha/reports/1",
+      date: "2025-08-17",
+    },
+    {
+      title: "Week Progress Report - Sarah Johnson",
+      person: "John Doe",
+      viewLink: "/vha/reports/1",
+      date: "2025-08-17",
+    },
+  ];
   return (
     <Card>
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -26,51 +51,43 @@ function RecentReports({ recentReports }) {
           </p>
         </CardAction>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 ">
         {recentReports.map((report, index) => (
           <div
             key={index}
-            className="flex flex-col md:flex-row md:items-center gap-4 justify-between bg-gray-100 rounded-lg p-3 border"
+            className="flex flex-col md:flex-row md:items-center gap-4 justify-between bg-gray-100 rounded-lg p-3 border border-gray-300 bg-orange-50"
           >
-            {/* Icon */}
-            <div className="bg-violet-500/10 text-violet-500 rounded-lg p-2 self-start md:self-center hidden md:block">
-              <CgLoadbarDoc size={30} />
-            </div>
-
-            {/* Text */}
             <div className="flex items-start flex-1 gap-1 ">
-              <div className="bg-violet-500/10 text-violet-500 rounded-lg p-2 self-start md:self-center block md:hidden">
-                <CgLoadbarDoc size={30} />
-              </div>
-              <div className="flex flex-col items-end md:items-start flex-1 gap-1">
+              <div className="flex flex-col items-start  flex-1 gap-1">
                 <h3 className="text-base sm:text-lg font-semibold">
                   {report.title}
                 </h3>
                 <div className="flex  sm:items-center gap-2 gap-6 sm:gap-4">
-                  <p className="text-sm text-gray-500 flex items-center gap-2">
+                  <p className="text-sm text-gray-900 text-semibold flex items-center gap-2">
                     <LuUserRound size={15} />
                     {report.person}
                   </p>
-                  <p className="text-sm text-gray-500 flex items-center gap-2">
+                  <p className="text-sm text-gray-900 text-semibold flex items-center gap-2">
                     <LuCalendar size={15} />
                     {report.date}
                   </p>
                 </div>
+                <p className="text-xs text-gray-500">1 hours ago</p>
               </div>
             </div>
             {/* Buttons */}
             <div className="flex flex-row  items-stretch md:items-end gap-2 w-full md:w-auto">
               <Button
                 variant="outline"
-                className="border-2 border-black h-8 text-xs sm:text-sm flex-1 md:flex-none"
+                className="border border-gray-400 h-10 text-xs sm:text-sm flex-1 md:flex-none"
               >
-                Add Notes
+                <TbEye size={15} /> Preview
               </Button>
               <Button
                 variant="outline"
-                className="border-2 border-black h-8 text-xs sm:text-sm flex-1 md:flex-none"
+                className="border border-orange-400/50  bg-orange-500/70 hover:bg-orange-500/80 hover:text-gray-50 text-white h-10 text-xs sm:text-sm flex-1 md:flex-none"
               >
-                View
+                Download
               </Button>
             </div>
           </div>
@@ -80,4 +97,4 @@ function RecentReports({ recentReports }) {
   );
 }
 
-export default RecentReports;
+export default Reports;

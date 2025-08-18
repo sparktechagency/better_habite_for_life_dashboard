@@ -41,7 +41,7 @@ function VhaDashboard() {
         title="Welcome Back !"
         description="Here is an overview of your store"
       />
-      <CardSection cards={vhaCards} />
+      <CardSection cards={vhaCards} footer={true} />
       <ActivitySection />
       <PrioritySection />
     </div>

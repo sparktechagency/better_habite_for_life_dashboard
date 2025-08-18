@@ -121,7 +121,7 @@ export function ClientTable() {
               <TableCell className="w-1/6">{data.lastSession}</TableCell>
               <TableCell className="w-1/6">{data.nextSession}</TableCell>
               <TableCell className="w-1/6  text-right">
-                <Button variant="outline" className="border-2 border-gray-400">
+                <Button variant="outline" className="border border-gray-400">
                   View Details
                 </Button>
               </TableCell>

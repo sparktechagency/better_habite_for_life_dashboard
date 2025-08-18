@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { HiPlus } from "react-icons/hi";
-function SearchFilterButton() {
+function SearchFilterButton({ showAddButton = true }) {
   return (
     <div className="flex items-center gap-2 ">
       <Input
@@ -25,9 +25,11 @@ function SearchFilterButton() {
           <SelectItem value="inactive">Inactive</SelectItem>
         </SelectContent>
       </Select>
-      <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-        <HiPlus /> Add New Client
-      </Button>
+      {showAddButton && (
+        <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+          <HiPlus /> Add New Client
+        </Button>
+      )}
     </div>
   );
 }

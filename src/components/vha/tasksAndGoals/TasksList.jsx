@@ -48,10 +48,10 @@ function TasksList() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              className={`h-7 border-2 border-black ${
+              className={`h-8 border border-black ${
                 task.markAsComplete
                   ? "bg-green-400 hover:bg-green-500"
-                  : "bg-gray-400 hover:bg-gray-500"
+                  : "bg-gray-200 hover:bg-gray-300"
               }`}
               size="sm"
               onClick={() => handleMarkAsComplete(index)}
@@ -60,7 +60,7 @@ function TasksList() {
             </Button>
             <Button
               variant="outline"
-              className="h-7 border-2 border-black"
+              className="h-8 border border-black"
               size="sm"
             >
               Cancel
