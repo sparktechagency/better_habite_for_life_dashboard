@@ -48,7 +48,7 @@ const subscription = [
   {
     id: 3,
     name: "Elevate",
-    image: "/subscriptions/image_1.png",
+    image: "/subscriptions/image_3.png",
     pricing: "7",
     originalPrice: "9",
     duration: "days free - Then $9/Month",
@@ -68,7 +68,7 @@ const subscription = [
   {
     id: 4,
     name: "Ignite",
-    image: "/subscriptions/image_1.png",
+    image: "/subscriptions/image_4.png",
     pricing: "7",
     originalPrice: "9",
     duration: "days free - Then $9/Month",
