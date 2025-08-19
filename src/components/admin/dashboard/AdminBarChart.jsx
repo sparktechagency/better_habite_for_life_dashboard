@@ -9,27 +9,28 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-
-function VhaaBarChart() {
+import { BsBarChartFill } from "react-icons/bs";
+function AdminBarChart() {
   const totalUsersByMonth = [
-    { month: "Jan", users: 120, guest: 80 },
-    { month: "Feb", users: 80, guest: 90 },
-    { month: "Mar", users: 150, guest: 130 },
-    { month: "Apr", users: 100, guest: 70 },
-    { month: "May", users: 200, guest: 160 },
-    { month: "Jun", users: 170, guest: 120 },
-    { month: "Jul", users: 220, guest: 150 },
-    { month: "Aug", users: 190, guest: 140 },
-    { month: "Sep", users: 140, guest: 100 },
-    { month: "Oct", users: 180, guest: 130 },
-    { month: "Nov", users: 210, guest: 160 },
-    { month: "Dec", users: 250, guest: 190 },
+    { month: "Jan", users: 120 },
+    { month: "Feb", users: 80 },
+    { month: "Mar", users: 150 },
+    { month: "Apr", users: 100 },
+    { month: "May", users: 200 },
+    { month: "Jun", users: 170 },
+    { month: "Jul", users: 220 },
+    { month: "Aug", users: 190 },
+    { month: "Sep", users: 140 },
+    { month: "Oct", users: 180 },
+    { month: "Nov", users: 210 },
+    { month: "Dec", users: 250 },
   ];
 
   return (
     <Card className="p-0">
-      <div className="flex items-center justify-between px-6 mt-5 relative">
-        <h1 className="text-2xl font-semibold">User Engagements</h1>
+      <div className="flex items-center gap-2 px-6 mt-5 relative">
+        <BsBarChartFill size={20} className="text-green-500" />
+        <h1 className="text-xl font-semibold">User Growth</h1>
       </div>
 
       <div className="w-full h-[400px] py-1">
@@ -52,14 +53,8 @@ function VhaaBarChart() {
             />
             <Bar
               dataKey="users"
-              fill="#5c3b1c"
-              barSize={35}
-              radius={[4, 4, 0, 0]}
-            />{" "}
-            <Bar
-              dataKey="guest"
-              fill="#dc8c45"
-              barSize={35}
+              fill="#000000"
+              barSize={30}
               radius={[4, 4, 0, 0]}
             />
           </BarChart>
@@ -69,7 +64,7 @@ function VhaaBarChart() {
   );
 }
 
-export default VhaaBarChart;
+export default AdminBarChart;
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {

@@ -4,6 +4,7 @@ import React from "react";
 import { LuUserRound } from "react-icons/lu";
 import VhaaBarChart from "./VhaaBarChart";
 import RecentAlerts from "./RecentAlerts";
+import ClinetStatusOverview from "./ClinetStatusOverview";
 
 function VhaaDashboardLayout() {
   const vhaaDashboardCards = [
@@ -51,6 +52,7 @@ function VhaaDashboardLayout() {
         <VhaaBarChart />
         <RecentAlerts />
       </div>
+      <ClinetStatusOverview />
     </div>
   );
 }

@@ -10,7 +10,7 @@ import { LuUserRound } from "react-icons/lu";
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-function RecentAlerts() {
+function RecentActivity() {
   const recentAlerts = [
     {
       title: "Client requires immediate attention",
@@ -81,4 +81,4 @@ function RecentAlerts() {
   );
 }
 
-export default RecentAlerts;
+export default RecentActivity;
