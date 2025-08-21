@@ -1,5 +1,7 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+"use client";
 
+import { Calendar, Home, Inbox, LogOut, Search, Settings } from "lucide-react";
+import Link from "next/link";
 import {
   Sidebar,
   SidebarContent,
@@ -15,49 +17,89 @@ import Image from "next/image";
 import { AiOutlineMessage } from "react-icons/ai";
 import { CgFileDocument } from "react-icons/cg";
 import { GrTask } from "react-icons/gr";
-import { LuCalendarDays } from "react-icons/lu";
+import { LuBookOpen, LuCalendarDays } from "react-icons/lu";
 import { LuSquareUserRound } from "react-icons/lu";
 import { RxDashboard } from "react-icons/rx";
-// Menu items.
-const items = [
-  {
-    title: "Dashboard",
-    url: "/vha/dashboard",
-    icon: RxDashboard,
-  },
-  {
-    title: "Client",
-    url: "/vha/clients",
-    icon: LuSquareUserRound,
-  },
-  {
-    title: "Calendar",
-    url: "/vha/calendar",
-    icon: LuCalendarDays,
-  },
-  {
-    title: "Tasks and Goals",
-    url: "/vha/tasks-and-goals",
-    icon: GrTask,
-  },
-  {
-    title: "Reports",
-    url: "/vha/reports",
-    icon: CgFileDocument,
-  },
-  {
-    title: "Messages",
-    url: "/vha/messages",
-    icon: AiOutlineMessage,
-  },
-  {
-    title: "Settings    ",
-    url: "/vha/settings",
-    icon: Settings,
-  },
-];
+import { FaUsers } from "react-icons/fa";
+import { TiGift } from "react-icons/ti";
+import { LuFileCheck } from "react-icons/lu";
+import { LuFileLock2 } from "react-icons/lu";
+const sidebars = {
+  admin: [
+    { name: "Dashboard", path: "/admin/dashboard", icon: RxDashboard },
+    {
+      name: "BHA Management",
+      path: "/admin/bha-management",
+      icon: LuSquareUserRound,
+    },
+    {
+      name: "BHAA Management",
+      path: "/admin/bhaa-management",
+      icon: LuSquareUserRound,
+    },
+    {
+      name: "Client Management",
+      path: "/admin/client-management",
+      icon: LuSquareUserRound,
+    },
+    {
+      name: "Reports",
+      path: "/admin/reports",
+      icon: CgFileDocument,
+    },
+    {
+      name: "Community",
+      path: "/admin/community-management",
+      icon: FaUsers,
+    },
+    {
+      name: "Learning Materials",
+      path: "/admin/learning-materials",
+      icon: LuBookOpen,
+    },
+    {
+      name: "Subscriptions",
+      path: "/admin/subscriptions",
+      icon: TiGift,
+    },
+    {
+      name: "Terms and Conditions",
+      path: "/admin/terms-and-conditions",
+      icon: LuFileCheck,
+    },
+    {
+      name: "Privacy Policy",
+      path: "/admin/privacy-policy",
+      icon: LuFileLock2,
+    },
+
+    { name: "Settings", path: "/admin/settings", icon: Settings },
+  ],
+  bha: [
+    { name: "Dashboard", path: "/bha/dashboard", icon: RxDashboard },
+    { name: "Clients", path: "/bha/clients", icon: LuSquareUserRound },
+    { name: "Calendar", path: "/bha/calendar", icon: LuCalendarDays },
+    { name: "Tasks and Goals", path: "/bha/tasks-and-goals", icon: GrTask },
+    { name: "Reports", path: "/bha/reports", icon: CgFileDocument },
+    { name: "Messages", path: "/bha/messages", icon: AiOutlineMessage },
+    { name: "Settings", path: "/bha/settings", icon: Settings },
+  ],
+  bhaa: [
+    { name: "Dashboard", path: "/bhaa/dashboard", icon: RxDashboard },
+    { name: "Clients", path: "/bhaa/client-overview", icon: LuSquareUserRound },
+    { name: "Reports", path: "/bhaa/reports", icon: CgFileDocument },
+    { name: "Task Monitor", path: "/bhaa/task-monitor", icon: GrTask },
+    { name: "Task Prompts", path: "/bhaa/task-promts", icon: CgFileDocument },
+    { name: "Messages", path: "/bhaa/messages", icon: AiOutlineMessage },
+    { name: "Settings", path: "/bhaa/settings", icon: Settings },
+  ],
+};
+import { useSelector } from "react-redux";
 
 export function AppSidebar() {
+  // Get role from Redux store
+  const currentRole = useSelector((state) => state.userRole.role);
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -74,13 +116,13 @@ export function AppSidebar() {
 
           <SidebarGroupContent className="mt-10">
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+              {sidebars[currentRole].map((item) => (
+                <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link href={item.path}>
                       <item.icon />
-                      <span>{item.title}</span>
-                    </a>
+                      <span>{item.name}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -89,8 +131,8 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarGroupLabel className=" mx-auto text-bold text-2xl mb-4">
-          VHA Dashboard
+        <SidebarGroupLabel className="mx-auto text-bold text-2xl mb-4">
+          {currentRole.toUpperCase()} Dashboard
         </SidebarGroupLabel>
       </SidebarFooter>
     </Sidebar>

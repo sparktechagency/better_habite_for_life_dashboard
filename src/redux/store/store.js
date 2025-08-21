@@ -6,11 +6,13 @@ import { combineReducers } from "redux";
 // Import your slices here
 import chatSlice from "../features/chat/chatSlice";
 import currentUserSlice from "../features/currentUser/currentuserSlice";
+import userRoleSlice from "../features/role/userRole";
 
 // Root reducer
 const rootReducer = combineReducers({
   chat: chatSlice,
   currentUser: currentUserSlice,
+  userRole: userRoleSlice,
   // project: projectSlice,
 });
 
@@ -18,7 +20,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["chat", "currentUser"], // Only persist these reducers
+  whitelist: ["chat", "currentUser", "userRole"], // Only persist these reducers
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
