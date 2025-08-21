@@ -49,7 +49,7 @@ const sidebars = {
     },
     {
       name: "Community",
-      path: "/admin/community-management",
+      path: "/admin/community",
       icon: FaUsers,
     },
     {
