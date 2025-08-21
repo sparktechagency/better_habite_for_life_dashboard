@@ -11,45 +11,53 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
-import { Checkbox } from "../ui/checkbox";
 import { useRouter } from "next/navigation";
+import useToast from "@/hooks/useToast";
 
-export default function Login() {
+export default function ResetPassword() {
+  const { success, error } = useToast();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
+    if (newPassword !== confirmPassword) {
+      error("Passwords do not match");
+    } else {
+      success("Password reset successfully");
+      router.push("/auth/login");
+    }
   };
 
   return (
     <Card className="w-full max-w-md backdrop-blur-md bg-card/80 border-border/50 shadow-2xl">
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-2xl font-bold text-card-foreground">
-          Welcome Back
+          Reset Password
         </CardTitle>
         <CardDescription className="text-muted-foreground">
-          Sign in to your account to continue
+          Enter your new password
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-card-foreground font-medium">
-              Email
+            <Label
+              htmlFor="newPassword"
+              className="text-card-foreground font-medium"
+            >
+              New Password
             </Label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 h-4 w-4" />
               <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="newPassword"
+                type="password"
+                placeholder="Enter your new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
                 className="pl-10 bg-input/60 backdrop-blur-sm border-border/50 text-card-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200"
                 required
               />
@@ -61,16 +69,16 @@ export default function Login() {
               htmlFor="password"
               className="text-card-foreground font-medium"
             >
-              Password
+              Confirm Password
             </Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 " />
               <Input
-                id="password"
+                id="confirmPassword"
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="pl-10 pr-10 bg-input/60 backdrop-blur-sm border-border/50 text-card-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200"
                 required
               />
@@ -90,33 +98,12 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="remember"
-                className="h-4 w-4 rounded border-border/50 bg-input/60 text-secondary focus:ring-2 focus:ring-ring"
-              />
-              <Label
-                htmlFor="remember"
-                className="text-sm text-muted-foreground"
-              >
-                Remember me
-              </Label>
-            </div>
-            <Button
-              variant="link"
-              className="px-0 text-sm text-gray-500 hover:text-gray-600/80 cursor-pointer"
-              onClick={() => router.push("/auth/forgot-password")}
-            >
-              Forgot password?
-            </Button>
-          </div>
-
           <Button
             type="submit"
+            disabled={newPassword !== confirmPassword}
             className="w-full bg-black/70 hover:bg-black text-white hover:text-white  font-medium py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/25"
           >
-            Sign In
+            Reset Password
           </Button>
         </form>
       </CardContent>
