@@ -72,11 +72,11 @@ function ManagementTable() {
         <TableHeader>
           <TableRow className="bg-gray-200">
             <TableHead className="w-1/6">Client Name</TableHead>
-            <TableHead className="w-1/6">Status</TableHead>
-            <TableHead className="w-1/6">Join Date</TableHead>
+            <TableHead className="w-1/6">Email</TableHead>
             <TableHead className="w-1/6">Address</TableHead>
             <TableHead className="w-1/6">Contact Number</TableHead>
-            <TableHead className="w-1/6">Email</TableHead>
+            <TableHead className="w-1/6">Join Date</TableHead>
+            <TableHead className="w-1/6">Status</TableHead>
 
             <TableHead className="w-1/6 text-right">Actions</TableHead>
           </TableRow>
@@ -93,6 +93,11 @@ function ManagementTable() {
                   {data.clientName}
                 </div>
               </TableCell>
+              <TableCell className="w-1/6">{data.emial}</TableCell>
+
+              <TableCell className="w-1/6">{data.address}</TableCell>
+              <TableCell className="w-1/6">{data.contactBumber}</TableCell>
+              <TableCell className="w-1/6">{data.joindate}</TableCell>
               <TableCell className="w-1/6">
                 <p
                   className={`${
@@ -104,10 +109,6 @@ function ManagementTable() {
                   {data.status}
                 </p>
               </TableCell>
-              <TableCell className="w-1/6">{data.joindate}</TableCell>
-              <TableCell className="w-1/6">{data.address}</TableCell>
-              <TableCell className="w-1/6">{data.contactBumber}</TableCell>
-              <TableCell className="w-1/6">{data.emial}</TableCell>
               <TableCell className="w-1/6  text-right flex gap-2">
                 <Button
                   variant="outline"

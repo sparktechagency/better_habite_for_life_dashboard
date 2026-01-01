@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import CommentTreeExample from "./CommentTreeExample";
 import SmallPageInfo from "../SmallPageInfo";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import CreateNewPostModal from "./CreateNewModal";
 
 const initialComments = [
   {
@@ -69,6 +70,14 @@ const initialComments = [
 
 export default function CommunityLayout() {
   const [comments, setComments] = useState(initialComments);
+  const [openCreateNewPostModal, setOpenCreateNewPostModal] = useState(false);
+  const handleOpenCreateNewPostModal = useCallback(() => {
+    setOpenCreateNewPostModal(true);
+  }, []);
+
+  const handleCloseCreateNewPostModal = useCallback((value) => {
+    setOpenCreateNewPostModal(value);
+  }, []);
 
   const handleReply = (commentId, content) => {
     const newReply = {
@@ -147,7 +156,7 @@ export default function CommunityLayout() {
                 <SelectItem value="oldest">Oldest</SelectItem>
               </SelectContent>
             </Select>
-            <Button>
+            <Button onClick={handleOpenCreateNewPostModal}>
               <HiPlus size={15} /> Add New Community Post
             </Button>
           </div>
@@ -162,6 +171,11 @@ export default function CommunityLayout() {
           onToggleLike={handleLike}
         />
       </div>
+      <CreateNewPostModal
+        openModal={openCreateNewPostModal}
+        setOpenModal={handleCloseCreateNewPostModal}
+        handleCloseCreateNewPostModal={handleCloseCreateNewPostModal}
+      />
     </div>
   );
 }
