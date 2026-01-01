@@ -21,11 +21,6 @@ function RecentArticles({ recentArticles }) {
           <TbFileSearch size={20} />
           Recent Articles
         </CardTitle>
-        <CardAction>
-          <p className="font-semibold underline text-sky-500 cursor-pointer text-sm sm:text-base">
-            View All
-          </p>
-        </CardAction>
       </CardHeader>
       <CardContent className="space-y-4">
         {recentArticles.map((article, index) => (
@@ -61,13 +56,13 @@ function RecentArticles({ recentArticles }) {
             </div>
             {/* Buttons */}
             <div className="flex flex-row  items-stretch md:items-end gap-2 w-full md:w-auto">
-              <Button className="">
+              <Button variant="outline">
                 <TbEye size={30} />
               </Button>
-              <Button className="">
+              <Button variant="outline">
                 <FiEdit3 size={30} />
               </Button>
-              <Button className="">
+              <Button variant="outline">
                 <RiDeleteBin6Line size={30} />
               </Button>
             </div>

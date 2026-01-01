@@ -1,11 +1,28 @@
+"use client";
 import SmallPageInfo from "@/components/common/SmallPageInfo";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import RecentCourses from "./RecentCourses";
 import RecentArticles from "./RecentArticles";
 import { Button } from "@/components/ui/button";
 import { HiPlus } from "react-icons/hi";
+import AddArticleModal from "./AddArticleModal";
+import AddNewMaterialModal from "./AddNewMaterialModal";
 
 function LearningMaterialsLayout() {
+  const [openAddArticleModal, setOpenAddArticleModal] = useState(false);
+  const [openAddNewMaterialModal, setOpenAddNewMaterialModal] = useState(false);
+  const handleOpenAddNewMaterialModal = useCallback(() => {
+    setOpenAddNewMaterialModal(true);
+  }, []);
+  const handleCloseAddNewMaterialModal = useCallback(() => {
+    setOpenAddNewMaterialModal(false);
+  }, []);
+  const handleOpenAddArticleModal = useCallback(() => {
+    setOpenAddArticleModal(true);
+  }, []);
+  const handleCloseAddArticleModal = useCallback(() => {
+    setOpenAddArticleModal(false);
+  }, []);
   const recentArticles = [
     {
       title: "Article 1",
@@ -31,10 +48,10 @@ function LearningMaterialsLayout() {
           description="Here is an overview of your learning materials"
         />
         <div className="flex items-center gap-2">
-          <Button className="">
+          <Button className="" onClick={handleOpenAddArticleModal}>
             <HiPlus /> Upload Articles
           </Button>
-          <Button className="">
+          <Button className="" onClick={handleOpenAddNewMaterialModal}>
             <HiPlus /> Upload Course Media
           </Button>
         </div>
@@ -52,6 +69,14 @@ function LearningMaterialsLayout() {
         <RecentCourses />
       </div>
       <RecentArticles recentArticles={recentArticles} />
+      <AddArticleModal
+        openModal={openAddArticleModal}
+        setOpenModal={handleCloseAddArticleModal}
+      />
+      <AddNewMaterialModal
+        openModal={openAddNewMaterialModal}
+        setOpenModal={handleCloseAddNewMaterialModal}
+      />
     </div>
   );
 }

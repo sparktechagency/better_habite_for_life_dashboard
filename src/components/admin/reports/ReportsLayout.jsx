@@ -10,7 +10,7 @@ function ReportsLayout() {
         title="Reports"
         description="Here is an overview of your reports"
       />
-      <SearchFilterButton />
+      <SearchFilterButton showAddButton={false} />
       <Reports />
     </div>
   );
