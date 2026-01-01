@@ -2,7 +2,7 @@ import React from "react";
 
 function GetPolicy({ getPolicy }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 border bg-white p-4 rounded-lg min-h-[700px]">
       <h1 className="text-2xl font-bold">{getPolicy}</h1>
       <p className="text-base text-gray-500">
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
