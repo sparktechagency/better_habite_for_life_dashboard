@@ -24,6 +24,7 @@ import { FaUsers } from "react-icons/fa";
 import { TiGift } from "react-icons/ti";
 import { LuFileCheck } from "react-icons/lu";
 import { LuFileLock2 } from "react-icons/lu";
+import { RiArticleLine } from "react-icons/ri";
 const sidebars = {
   admin: [
     { name: "Dashboard", path: "/admin/dashboard", icon: RxDashboard },
@@ -53,9 +54,14 @@ const sidebars = {
       icon: FaUsers,
     },
     {
-      name: "Learning Materials",
-      path: "/admin/learning-materials",
+      name: "Learning Management",
+      path: "/admin/learning-management",
       icon: LuBookOpen,
+    },
+    {
+      name: "Article Management",
+      path: "/admin/article-management",
+      icon: RiArticleLine,
     },
     {
       name: "Subscriptions",

@@ -304,7 +304,7 @@ function PostDetails({ postId }) {
 
               {/* Load More Comments Button */}
               {hasMoreComments && (
-                <div className="mt-6 flex justify-center pb-4">
+                <div className=" flex justify-center ">
                   <Button
                     variant="outline"
                     onClick={handleLoadMore}

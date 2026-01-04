@@ -5,7 +5,7 @@ import RecentCourses from "./RecentCourses";
 import RecentArticles from "./RecentArticles";
 import { Button } from "@/components/ui/button";
 import { HiPlus } from "react-icons/hi";
-import AddArticleModal from "./AddArticleModal";
+
 import AddNewMaterialModal from "./AddNewMaterialModal";
 
 function LearningMaterialsLayout() {
@@ -17,12 +17,7 @@ function LearningMaterialsLayout() {
   const handleCloseAddNewMaterialModal = useCallback(() => {
     setOpenAddNewMaterialModal(false);
   }, []);
-  const handleOpenAddArticleModal = useCallback(() => {
-    setOpenAddArticleModal(true);
-  }, []);
-  const handleCloseAddArticleModal = useCallback(() => {
-    setOpenAddArticleModal(false);
-  }, []);
+
   const recentArticles = [
     {
       title: "Article 1",
@@ -48,9 +43,6 @@ function LearningMaterialsLayout() {
           description="Here is an overview of your learning materials"
         />
         <div className="flex items-center gap-2">
-          <Button className="" onClick={handleOpenAddArticleModal}>
-            <HiPlus /> Upload Articles
-          </Button>
           <Button className="" onClick={handleOpenAddNewMaterialModal}>
             <HiPlus /> Upload Course Media
           </Button>
@@ -69,10 +61,7 @@ function LearningMaterialsLayout() {
         <RecentCourses />
       </div>
       <RecentArticles recentArticles={recentArticles} />
-      <AddArticleModal
-        openModal={openAddArticleModal}
-        setOpenModal={handleCloseAddArticleModal}
-      />
+
       <AddNewMaterialModal
         openModal={openAddNewMaterialModal}
         setOpenModal={handleCloseAddNewMaterialModal}
