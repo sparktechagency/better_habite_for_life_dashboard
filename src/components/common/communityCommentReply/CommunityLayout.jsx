@@ -25,6 +25,45 @@ export default function CommunityLayout() {
     setOpenCreateNewPostModal(value);
   }, []);
 
+  const posts = [
+    {
+      id: 1,
+      title: "Post 1",
+      description: "Post 1 description",
+      author: "John Doe",
+      date: "2021-01-01",
+      likes: 10,
+      comments: 5,
+    },
+    {
+      id: 2,
+      title: "Post 2",
+      description: "Post 2 description",
+      author: "Jane Doe",
+      date: "2021-01-02",
+      likes: 15,
+      comments: 10,
+    },
+    {
+      id: 3,
+      title: "Post 3",
+      description: "Post 3 description",
+      author: "Jim Doe",
+      date: "2021-01-03",
+      likes: 20,
+      comments: 15,
+    },
+    {
+      id: 4,
+      title: "Post 4",
+      description: "Post 4 description",
+      author: "Jill Doe",
+      date: "2021-01-04",
+      likes: 25,
+      comments: 20,
+    },
+  ];
+
   return (
     <div className="min-h-screen space-y-4  ">
       <div className="max-w-full mx-auto space-y-4">
@@ -50,18 +89,9 @@ export default function CommunityLayout() {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <PostCard />
-        <PostCard />
-        <PostCard />
-        <PostCard />
-        <PostCard />
-        <PostCard />
-        <PostCard />
-        <PostCard />
-        <PostCard />
-        <PostCard />
-        <PostCard />
-        <PostCard />
+        {posts.map((post) => (
+          <PostCard key={post.id} post={post} />
+        ))}
       </div>
       <CreateNewPostModal
         openModal={openCreateNewPostModal}
