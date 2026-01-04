@@ -2,7 +2,6 @@ import React from "react";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableFooter,
   TableHead,
@@ -12,58 +11,45 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
-import { AiFillAlert } from "react-icons/ai";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
 
 const tableData = [
   {
-    clientName: "John Doe",
-    emial: "john.doe@example.com",
-    lastSession: "2025-05-12",
-    nextSession: "2025-05-12",
+    userName: "John Doe",
+    email: "john.doe@example.com",
+    joinedDate: "2025-05-12",
+
     status: "Active",
-    progress: 33,
   },
   {
-    clientName: "John Doe",
-    emial: "john.doe@example.com",
-    lastSession: "2025-05-12",
-    nextSession: "2025-05-12",
-    status: "Active",
-    progress: 33,
+    userName: "John Doe",
+    email: "john.doe@example.com",
+    joinedDate: "2025-05-12",
+    status: "Inactive",
   },
   {
-    clientName: "John Doe",
-    emial: "john.doe@example.com",
-    lastSession: "2025-05-12",
-    nextSession: "2025-05-12",
+    userName: "John Doe",
+    email: "john.doe@example.com",
+    joinedDate: "2025-05-12",
     status: "Active",
-    progress: 33,
   },
   {
-    clientName: "John Doe",
-    emial: "john.doe@example.com",
-    lastSession: "2025-05-12",
-    nextSession: "2025-05-12",
+    userName: "John Doe",
+    email: "john.doe@example.com",
+    joinedDate: "2025-05-12",
     status: "Active",
-    progress: 33,
   },
   {
-    clientName: "John Doe",
-    emial: "john.doe@example.com",
-    lastSession: "2025-05-12",
-    nextSession: "2025-05-12",
-    status: "Active",
-    progress: 33,
+    userName: "John Doe",
+    email: "john.doe@example.com",
+    joinedDate: "2025-05-12",
+    status: "Inactive",
   },
   {
-    clientName: "John Doe",
-    emial: "john.doe@example.com",
-    lastSession: "2025-05-12",
-    nextSession: "2025-05-12",
-    status: "Active",
-    progress: 33,
+    userName: "John Doe",
+    email: "john.doe@example.com",
+    joinedDate: "2025-05-12",
+    status: "Inactive",
   },
 ];
 function ClientManagementTable() {
@@ -72,11 +58,9 @@ function ClientManagementTable() {
       <Table className="bg-white">
         <TableHeader>
           <TableRow className="bg-gray-200">
-            <TableHead className="w-1/6">Client Name</TableHead>
+            <TableHead className="w-1/6">User Name</TableHead>
+            <TableHead className="w-1/6">Joined Date</TableHead>
             <TableHead className="w-1/6">Status</TableHead>
-            <TableHead className="w-1/6">Progress</TableHead>
-            <TableHead className="w-1/6">Last Session</TableHead>
-            <TableHead className="w-1/6">Next Session</TableHead>
             <TableHead className="w-1/6 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -90,41 +74,40 @@ function ClientManagementTable() {
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium">
-                      {data.clientName}
-                    </span>
-                    <span className="text-xs text-gray-500">{data.emial}</span>
+                    <span className="text-sm font-medium">{data.userName}</span>
+                    <span className="text-xs text-gray-500">{data.email}</span>
                   </div>
                 </div>
               </TableCell>
+              <TableCell className="w-1/6">{data.joinedDate}</TableCell>
               <TableCell className="w-1/6">
                 <p
                   className={`${
                     data.status === "Active"
-                      ? "bg-lime-500/50 text-gray-500"
+                      ? "bg-lime-500/50 text-black"
+                      : data.status === "Inactive"
+                      ? "bg-red-500/50 text-white"
                       : "bg-yellow-500/55 text-gray-500"
                   } px-2 py-1 rounded-full text-center font-medium text-xs inline-block w-20`}
                 >
                   {data.status}
                 </p>
               </TableCell>
-              <TableCell className="w-1/6">
-                <div className="flex items-center gap-2 w-40">
-                  <Progress value={data.progress} />
-                  <span className="text-sm whitespace-nowrap">
-                    {data.progress}%
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="w-1/6">{data.lastSession}</TableCell>
-              <TableCell className="w-1/6">{data.nextSession}</TableCell>
               <TableCell className="w-1/6 text-right">
-                <Button
-                  variant="outline"
-                  className="border border-gray-400 h-8"
-                >
-                  View
-                </Button>
+                <div className="flex items-center gap-2 justify-end">
+                  <Button
+                    variant="outline"
+                    className="border border-gray-400 h-8"
+                  >
+                    View Details
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border border-red-400 h-8 text-red-500"
+                  >
+                    Block
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
