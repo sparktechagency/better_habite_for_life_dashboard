@@ -26,7 +26,11 @@ function BhaaManagementLayout() {
           </Button>
         </div>
       </div>
-      <SearchFilterButton showAddButton={false} />
+      <SearchFilterButton
+        showAddButton={false}
+        selectOptions={["All Status", "Active", "Blocked"]}
+        placeholder="Search BHAA"
+      />
       <ManagementTable />
       <BhaaCreateModal
         openModal={openBhaaCreateModal}

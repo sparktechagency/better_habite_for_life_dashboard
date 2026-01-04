@@ -14,21 +14,24 @@ import { BiSolidNetworkChart } from "react-icons/bi";
 const renderCustomizedLabel = (props) => <CustomLabel {...props} />;
 
 const data = [
-  { name: "Basic", value: 60, color: "#6366f1" },
-  { name: "Premium", value: 20, color: "#f4a261" },
-  { name: "Enterprise", value: 20, color: "#4ecdc4" },
+  { name: "Ascend", value: 60, color: "#3b82f6" },
+  { name: "Accelerate", value: 20, color: "#4ecdc4" },
+  { name: "Elevate", value: 20, color: "#f4a261" },
+  { name: "Ignite", value: 60, color: "#84cc16" },
 ];
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const data = payload[0];
+    const total = payload.reduce((sum, item) => sum + item.value, 0);
+    const percentage = ((data.value / total) * 100).toFixed(2);
     return (
       <div className="bg-white p-3 shadow-lg rounded-lg border border-gray-100">
         <p className="font-medium text-gray-900">{data.name}</p>
         <p className="text-sm text-gray-700">
           <span className="font-bold">{data.value}</span> subscribers
         </p>
-        <p className="text-xs text-gray-500">{data.value}% of total</p>
+        <p className="text-xs text-gray-500">{percentage}% of total</p>
       </div>
     );
   }

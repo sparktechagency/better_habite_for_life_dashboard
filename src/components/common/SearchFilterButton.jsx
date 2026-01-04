@@ -9,20 +9,27 @@ import {
   SelectValue,
 } from "../ui/select";
 import { HiPlus } from "react-icons/hi";
-function SearchFilterButton({ showAddButton = true }) {
+function SearchFilterButton({
+  showAddButton = true,
+  selectOptions = ["All Status"],
+  placeholder = "Search Client",
+}) {
   return (
     <div className="flex items-center gap-2 ">
       <Input
-        className="flex-1 bg-gray-200 border-gray-300"
-        placeholder="Search Client"
+        className="flex-1 bg-white border-gray-300"
+        placeholder={placeholder}
       />
       <Select>
-        <SelectTrigger className="bg-gray-200 border-gray-300">
+        <SelectTrigger className="bg-white border-gray-300">
           <SelectValue placeholder="All Status" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="active">Active</SelectItem>
-          <SelectItem value="inactive">Inactive</SelectItem>
+          {selectOptions.map((option, index) => (
+            <SelectItem key={index} value={option}>
+              {option}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
       {showAddButton && (

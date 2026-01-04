@@ -4,6 +4,7 @@ import AdminBarChart from "./AdminBarChart";
 import ClinetStatusOverview from "./ClinetStatusOverview";
 import RecentActivity from "./RecentActivity";
 import SubscriptionPieChart from "./SubscriptionPieChart";
+import UserStats from "./UserStats";
 
 function AdminDashboardLayout() {
   return (
@@ -12,6 +13,7 @@ function AdminDashboardLayout() {
         title="Dashboard"
         description="Here is an overview of your dashboard"
       />
+      <UserStats />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="col-span-2">
           <AdminBarChart />
@@ -20,13 +22,13 @@ function AdminDashboardLayout() {
           <SubscriptionPieChart />
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1  gap-4">
         <div className="col-span-2">
           <ClinetStatusOverview />
         </div>
-        <div className="col-span-1 h-full">
+        {/* <div className="col-span-1 h-full">
           <RecentActivity />
-        </div>
+        </div> */}
       </div>
     </div>
   );

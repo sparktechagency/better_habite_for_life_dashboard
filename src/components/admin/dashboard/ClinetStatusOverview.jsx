@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
@@ -20,50 +19,57 @@ const tableData = [
     clientName: "John Doe",
     clientEmail: "john.doe@example.com",
     progress: 90,
-    lastActivity: "Last Activity 4 days ago",
-    status: "On Time",
+    joindDate: "2025-05-12",
+    status: "Active",
+    role: "BHA",
   },
   {
     clientName: "Jane Doe",
     clientEmail: "jane.doe@example.com",
     progress: 70,
-    lastActivity: "Last Activity 1 days ago",
-    status: "On Time",
+    joindDate: "2025-05-12",
+    status: "Active",
+    role: "User",
   },
   {
     clientName: "John Doe",
     clientEmail: "john.doe@example.com",
     progress: 40,
-    lastActivity: "Last Activity 4 days ago",
-    status: "On Time",
+    joindDate: "2025-05-12",
+    status: "Active",
+    role: "User",
   },
   {
     clientName: "Jane Doe",
     clientEmail: "jane.doe@example.com",
     progress: 80,
-    lastActivity: "Last Activity 4 days ago",
-    status: "Overdue",
+    joindDate: "2025-05-12",
+    status: "Inactive",
+    role: "BHAA",
   },
   {
     clientName: "John Doe",
     clientEmail: "john.doe@example.com",
     progress: 33,
-    lastActivity: "Last Activity 10 days ago",
-    status: "Overdue",
+    joindDate: "2025-05-12",
+    status: "Inactive",
+    role: "BHA",
   },
   {
     clientName: "Jane Doe",
     clientEmail: "jane.doe@example.com",
     progress: 50,
-    lastActivity: "Last Activity 7 days ago",
-    status: "Overdue",
+    joindDate: "2025-05-12",
+    status: "Inactive",
+    role: "User",
   },
   {
     clientName: "Jane Doe",
     clientEmail: "jane.doe@example.com",
     progress: 10,
-    lastActivity: "Last Activity 20 days ago",
-    status: "Overdue",
+    joindDate: "2025-05-12",
+    status: "Inactive",
+    role: "BHAA",
   },
 ];
 
@@ -77,7 +83,7 @@ export function ClinetStatusOverview() {
               <div className="flex items-center w-full justify-between">
                 <div className="flex items-center gap-2">
                   <HiOutlineRectangleStack size={20} />
-                  <p className="text-sm font-medium">Client Status Overview</p>
+                  <p className="text-sm font-medium">User Status Overview</p>
                 </div>
                 <p className="font-semibold text-normal text-orange-500 underline cursor-pointer">
                   View All
@@ -87,8 +93,8 @@ export function ClinetStatusOverview() {
           </TableRow>
           <TableRow>
             <TableHead className="w-1/6">Client Name</TableHead>
-            <TableHead className="w-1/6">Progress</TableHead>
-            <TableHead className="w-1/6">Last Activity</TableHead>
+            <TableHead className="w-1/6">Role</TableHead>
+            <TableHead className="w-1/6">Join Date</TableHead>
             <TableHead className="w-1/6">Status</TableHead>
             <TableHead className="w-1/6 text-right">Actions</TableHead>
           </TableRow>
@@ -112,19 +118,13 @@ export function ClinetStatusOverview() {
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="w-1/6">
-                <div className="flex items-center gap-2 w-40">
-                  <Progress value={data.progress} className="" />
-                  <span className="text-sm whitespace-nowrap">
-                    {data.progress}%
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="w-1/6">{data.lastActivity}</TableCell>
+
+              <TableCell className="w-1/6">{data.role}</TableCell>
+              <TableCell className="w-1/6">{data.joindDate}</TableCell>
               <TableCell className="w-1/6">
                 <p
                   className={`${
-                    data.status === "Overdue"
+                    data.status === "Inactive"
                       ? "bg-red-500/50 text-white"
                       : "bg-lime-500/50 text-black"
                   } px-2 py-1 rounded-full text-center font-medium text-xs inline-block w-20  shadow-md`}
@@ -138,7 +138,13 @@ export function ClinetStatusOverview() {
                   variant="outline"
                   className="border border-gray-400 h-8"
                 >
-                  View
+                  View Details
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border border-red-400 h-8 text-red-500"
+                >
+                  Block
                 </Button>
               </TableCell>
             </TableRow>

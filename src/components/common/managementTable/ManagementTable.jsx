@@ -30,7 +30,7 @@ const tableData = [
     joindate: "2025-05-12",
     contactBumber: "01781576822",
     address: "12th Apt South Goran, Gasabo",
-    status: "Active",
+    status: "Blocked",
   },
   {
     clientName: "John Doe",
@@ -46,7 +46,7 @@ const tableData = [
     joindate: "2025-05-12",
     contactBumber: "01781576822",
     address: "12th Apt South Goran, Gasabo",
-    status: "Active",
+    status: "Blocked",
   },
   {
     clientName: "John Doe",
@@ -54,7 +54,7 @@ const tableData = [
     joindate: "2025-05-12",
     contactBumber: "01781576822",
     address: "12th Apt South Goran, Gasabo",
-    status: "Active",
+    status: "Blocked",
   },
   {
     clientName: "John Doe",
@@ -62,7 +62,7 @@ const tableData = [
     joindate: "2025-05-12",
     contactBumber: "01781576822",
     address: "12th Apt South Goran, Gasabo",
-    status: "Active",
+    status: "Blocked",
   },
 ];
 function ManagementTable() {
@@ -102,7 +102,9 @@ function ManagementTable() {
                 <p
                   className={`${
                     data.status === "Active"
-                      ? "bg-lime-500/50 text-gray-500"
+                      ? "bg-lime-500/50 text-black"
+                      : data.status === "Blocked"
+                      ? "bg-red-500/50 text-white"
                       : "bg-yellow-500/55 text-gray-500"
                   } px-2 py-1 rounded-full text-center font-medium text-xs inline-block w-20`}
                 >
@@ -115,6 +117,12 @@ function ManagementTable() {
                   className="border border-gray-400 h-8"
                 >
                   View
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border border-red-400 h-8 text-red-500"
+                >
+                  Block
                 </Button>
               </TableCell>
             </TableRow>
