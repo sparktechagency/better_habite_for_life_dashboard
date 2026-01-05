@@ -11,6 +11,7 @@ import {
 import { HiPlus } from "react-icons/hi";
 function SearchFilterButton({
   showAddButton = true,
+  showFilterButton = true,
   selectOptions = ["All Status"],
   placeholder = "Search Client",
 }) {
@@ -20,18 +21,20 @@ function SearchFilterButton({
         className="flex-1 bg-white border-gray-300"
         placeholder={placeholder}
       />
-      <Select>
-        <SelectTrigger className="bg-white border-gray-300">
-          <SelectValue placeholder="All Status" />
-        </SelectTrigger>
-        <SelectContent>
-          {selectOptions.map((option, index) => (
-            <SelectItem key={index} value={option}>
-              {option}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {showFilterButton && (
+        <Select>
+          <SelectTrigger className="bg-white border-gray-300">
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent>
+            {selectOptions.map((option, index) => (
+              <SelectItem key={index} value={option}>
+                {option}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
       {showAddButton && (
         <Button className="bg-blue-500 hover:bg-blue-600 text-white">
           <HiPlus /> Add New Client

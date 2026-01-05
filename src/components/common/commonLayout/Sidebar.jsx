@@ -25,6 +25,9 @@ import { TiGift } from "react-icons/ti";
 import { LuFileCheck } from "react-icons/lu";
 import { LuFileLock2 } from "react-icons/lu";
 import { RiArticleLine } from "react-icons/ri";
+import { BiCategory } from "react-icons/bi";
+import { FaQuoteRight } from "react-icons/fa6";
+
 const sidebars = {
   admin: [
     { name: "Dashboard", path: "/admin/dashboard", icon: RxDashboard },
@@ -64,6 +67,11 @@ const sidebars = {
       icon: RiArticleLine,
     },
     {
+      name: "Category Management",
+      path: "/admin/category-management",
+      icon: BiCategory,
+    },
+    {
       name: "Subscriptions",
       path: "/admin/subscriptions",
       icon: TiGift,
@@ -77,6 +85,11 @@ const sidebars = {
       name: "Privacy Policy",
       path: "/admin/privacy-policy",
       icon: LuFileLock2,
+    },
+    {
+      name: "Faqs",
+      path: "/admin/faqs",
+      icon: FaQuoteRight,
     },
 
     { name: "Settings", path: "/admin/settings", icon: Settings },

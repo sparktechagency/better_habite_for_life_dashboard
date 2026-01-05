@@ -10,7 +10,11 @@ function ReportsLayout() {
         title="Reports"
         description="Here is an overview of your reports"
       />
-      <SearchFilterButton showAddButton={false} />
+      <SearchFilterButton
+        showAddButton={false}
+        placeholder="Search Report"
+        selectOptions={["Recent", "Oldest"]}
+      />
       <Reports />
     </div>
   );
