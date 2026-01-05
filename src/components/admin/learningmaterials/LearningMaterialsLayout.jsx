@@ -2,14 +2,12 @@
 import SmallPageInfo from "@/components/common/SmallPageInfo";
 import React, { useCallback, useState } from "react";
 import RecentCourses from "./RecentCourses";
-import RecentArticles from "./RecentArticles";
 import { Button } from "@/components/ui/button";
 import { HiPlus } from "react-icons/hi";
 
 import AddNewMaterialModal from "./AddNewMaterialModal";
 
 function LearningMaterialsLayout() {
-  const [openAddArticleModal, setOpenAddArticleModal] = useState(false);
   const [openAddNewMaterialModal, setOpenAddNewMaterialModal] = useState(false);
   const handleOpenAddNewMaterialModal = useCallback(() => {
     setOpenAddNewMaterialModal(true);
@@ -18,23 +16,6 @@ function LearningMaterialsLayout() {
     setOpenAddNewMaterialModal(false);
   }, []);
 
-  const recentArticles = [
-    {
-      title: "Article 1",
-      person: "John Doe",
-      date: "2025-08-17",
-    },
-    {
-      title: "Article 1",
-      person: "John Doe",
-      date: "2025-08-17",
-    },
-    {
-      title: "Article 1",
-      person: "John Doe",
-      date: "2025-08-17",
-    },
-  ];
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -55,12 +36,19 @@ function LearningMaterialsLayout() {
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <RecentCourses />
-        <RecentCourses />
-        <RecentCourses />
-        <RecentCourses />
+        <RecentCourses id={1} />
+        <RecentCourses id={2} />
+        <RecentCourses id={3} />
+        <RecentCourses id={4} />
+        <RecentCourses id={5} />
+        <RecentCourses id={6} />
+        <RecentCourses id={7} />
+        <RecentCourses id={8} />
+        <RecentCourses id={9} />
+        <RecentCourses id={10} />
+        <RecentCourses id={11} />
+        <RecentCourses id={12} />
       </div>
-      <RecentArticles recentArticles={recentArticles} />
 
       <AddNewMaterialModal
         openModal={openAddNewMaterialModal}

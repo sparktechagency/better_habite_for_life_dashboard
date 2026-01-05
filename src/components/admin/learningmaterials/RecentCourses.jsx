@@ -1,12 +1,23 @@
+"use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import Image from "next/image";
 import { Rating, RatingButton } from "@/components/ui/shadcn-io/rating";
 import { VscEye } from "react-icons/vsc";
 
-function RecentCourses() {
+function RecentCourses({ id = 1 }) {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    router.push(`/admin/learning-management/materials/${id}`);
+  };
+
   return (
-    <Card className="py-0 relative overflow-hidden gap-1">
+    <Card
+      className="py-0 relative overflow-hidden gap-1 hover:cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={handleCardClick}
+    >
       <CardContent className="p-0 relative h-[10rem] md:h-[12rem]">
         <Image
           src="/course_thumbnail.png"

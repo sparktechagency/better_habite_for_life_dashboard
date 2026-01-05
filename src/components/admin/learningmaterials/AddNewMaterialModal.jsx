@@ -27,6 +27,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
   openModal,
   setOpenModal,
+  isEdit = false,
+  materialData = null,
 }) {
   const form = useForm({
     defaultValues: {
@@ -47,6 +49,29 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
   const videoInputRef = useRef(null);
 
   const tags = form.watch("tags") || [];
+
+  // Load material data when in edit mode
+  useEffect(() => {
+    if (isEdit && materialData && openModal) {
+      form.reset({
+        materialTitle: materialData.title || "",
+        materialDescription: materialData.description || "",
+        tags: materialData.tags || [],
+        courseImage: null, // Keep as null, user can upload new image
+        courseVideo: null, // Keep as null, user can upload new video
+      });
+
+      // Set previews if URLs are provided (these are regular URLs, not object URLs)
+      if (materialData.imageUrl) {
+        setImagePreview(materialData.imageUrl);
+        // Don't set imagePreviewRef for regular URLs
+      }
+      if (materialData.videoUrl) {
+        setVideoPreview(materialData.videoUrl);
+        // Don't set videoPreviewRef for regular URLs
+      }
+    }
+  }, [isEdit, materialData, openModal, form]);
 
   // Clean up object URLs on unmount
   useEffect(() => {
@@ -129,21 +154,31 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
 
   const onSubmit = useCallback(
     (data) => {
-      console.log(data);
+      console.log(isEdit ? "Editing material:" : "Adding material:", data);
       // Handle form submission here
+      // If isEdit, include materialData.id in the submission
+      if (isEdit && materialData?.id) {
+        console.log("Material ID:", materialData.id);
+      }
       setOpenModal(false);
       // Form will be reset by useEffect when openModal becomes false
     },
-    [setOpenModal]
+    [setOpenModal, isEdit, materialData]
   );
 
   const resetForm = useCallback(() => {
-    // Clean up previews
-    if (imagePreviewRef.current) {
+    // Clean up object URLs only (not regular URLs from edit mode)
+    if (
+      imagePreviewRef.current &&
+      imagePreviewRef.current.startsWith("blob:")
+    ) {
       URL.revokeObjectURL(imagePreviewRef.current);
       imagePreviewRef.current = "";
     }
-    if (videoPreviewRef.current) {
+    if (
+      videoPreviewRef.current &&
+      videoPreviewRef.current.startsWith("blob:")
+    ) {
       URL.revokeObjectURL(videoPreviewRef.current);
       videoPreviewRef.current = "";
     }
@@ -190,9 +225,13 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
     <Dialog open={openModal} onOpenChange={handleOpenChange}>
       <DialogContent className="flex flex-col max-w-[90vw] sm:max-w-lg md:max-w-2xl max-h-[90vh] sm:max-h-[85vh] p-0 overflow-hidden">
         <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4 border-b">
-          <DialogTitle>Upload Course Media</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Edit Course Material" : "Upload Course Media"}
+          </DialogTitle>
           <DialogDescription>
-            Enter the details to upload a new course media.
+            {isEdit
+              ? "Update the course material details below."
+              : "Enter the details to upload a new course media."}
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="flex-1 min-h-0 overflow-y-auto">
@@ -351,7 +390,7 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
             Cancel
           </Button>
           <Button type="submit" form="upload-course-media-form">
-            Submit
+            {isEdit ? "Update" : "Submit"}
           </Button>
         </DialogFooter>
       </DialogContent>
