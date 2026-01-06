@@ -1,19 +1,20 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { TbWallpaper } from "react-icons/tb";
 import { Clock, Calendar } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 function TodaysSession() {
+  const router = useRouter();
   const todaysSessions = [
     {
+      id: 1,
       name: "Abir Dehrun",
       role: "Maintainace Support",
       time: "10:01 AM",
@@ -21,6 +22,7 @@ function TodaysSession() {
       viewLink: "/vha/session/123",
     },
     {
+      id: 2,
       name: "Sarah Johnson",
       role: "Technical Support",
       time: "11:30 AM",
@@ -28,6 +30,7 @@ function TodaysSession() {
       viewLink: "/vha/session/124",
     },
     {
+      id: 3,
       name: "Michael Brown",
       role: "Customer Support",
       time: "02:15 PM",
@@ -35,6 +38,7 @@ function TodaysSession() {
       viewLink: "/vha/session/125",
     },
     {
+      id: 4,
       name: "Emily Davis",
       role: "Maintenance Support",
       time: "03:45 PM",
@@ -49,7 +53,10 @@ function TodaysSession() {
           <TbWallpaper size={20} />
           Todays Session
         </CardTitle>
-        <CardAction className="font-semibold underline text-sky-500">
+        <CardAction
+          className="font-semibold underline text-sky-500 cursor-pointer"
+          onClick={() => router.push("/bha/calendar/view-details")}
+        >
           View All
         </CardAction>
       </CardHeader>
@@ -73,7 +80,10 @@ function TodaysSession() {
                 </div>
               </div>
             </div>
-            <Button className="bg-sky-100 hover:bg-sky-200 text-sky-600 border-0">
+            <Button
+              className="bg-sky-100 hover:bg-sky-200 text-sky-600 border-0"
+              onClick={() => router.push(`/bha/clients/details/${session.id}`)}
+            >
               View
             </Button>
           </div>

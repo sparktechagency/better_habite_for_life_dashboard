@@ -12,6 +12,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { AiOutlineMessage } from "react-icons/ai";
@@ -102,10 +104,27 @@ const sidebars = {
       icon: LuSquareUserRound,
     },
     { name: "Calendar", path: "/bha/calendar", icon: LuCalendarDays },
+    { name: "VHA Schedule", path: "/bha/bha-schedule", icon: LuCalendarDays },
     { name: "Tasks and Goals", path: "/bha/tasks-and-goals", icon: GrTask },
     { name: "Reports", path: "/bha/reports", icon: CgFileDocument },
     { name: "Messages", path: "/bha/messages", icon: AiOutlineMessage },
-    { name: "Settings", path: "/bha/settings", icon: Settings },
+    {
+      name: "Settings",
+      icon: Settings,
+      subItems: [
+        { name: "Faqs", path: "/bha/faqs", icon: FaQuoteRight },
+        {
+          name: "Terms and Conditions",
+          path: "/bha/terms-and-conditions",
+          icon: LuFileCheck,
+        },
+        {
+          name: "Privacy Policy",
+          path: "/bha/privacy-policy",
+          icon: LuFileLock2,
+        },
+      ],
+    },
   ],
   bhaa: [
     { name: "Dashboard", path: "/bhaa/dashboard", icon: RxDashboard },
@@ -141,12 +160,33 @@ export function AppSidebar() {
             <SidebarMenu>
               {sidebars[currentRole].map((item) => (
                 <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.path}>
-                      <item.icon />
-                      <span>{item.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
+                  {item.subItems ? (
+                    <>
+                      <SidebarMenuButton>
+                        <item.icon />
+                        <span>{item.name}</span>
+                      </SidebarMenuButton>
+                      <SidebarMenuSub>
+                        {item.subItems.map((subItem) => (
+                          <SidebarMenuSubItem key={subItem.name}>
+                            <SidebarMenuButton asChild>
+                              <Link href={subItem.path}>
+                                <subItem.icon />
+                                <span>{subItem.name}</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </>
+                  ) : (
+                    <SidebarMenuButton asChild>
+                      <Link href={item.path}>
+                        <item.icon />
+                        <span>{item.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
