@@ -1,6 +1,6 @@
 import SearchFilterButton from "@/components/common/SearchFilterButton";
 import SmallPageInfo from "@/components/common/SmallPageInfo";
-import { ClientTable } from "@/components/common/clientTable/ClientTable";
+import { ClientTaskTable } from "./ClientTaskTable";
 import React from "react";
 
 function ClientPgaeLayout() {
@@ -10,8 +10,12 @@ function ClientPgaeLayout() {
         title="Client Management"
         description="Here is an overview of your clients"
       />
-      <SearchFilterButton />
-      <ClientTable />
+      <SearchFilterButton
+        showAddButton={false}
+        selectOptions={["All Status", "Active", "Inactive"]}
+        placeholder="Search Client"
+      />
+      <ClientTaskTable />
     </div>
   );
 }

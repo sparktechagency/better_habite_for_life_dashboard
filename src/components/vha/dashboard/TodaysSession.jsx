@@ -9,27 +9,37 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TbWallpaper } from "react-icons/tb";
+import { Clock, Calendar } from "lucide-react";
+
 function TodaysSession() {
-  const recentActivity = [
+  const todaysSessions = [
     {
-      title: "Session completed with Sarah Johnson",
-      hoursAgo: "10 hours ago",
+      name: "Abir Dehrun",
+      role: "Maintainace Support",
+      time: "10:01 AM",
+      date: "2025-05-12",
       viewLink: "/vha/session/123",
     },
     {
-      title: "Session completed with Sarah Johnson",
-      hoursAgo: "10 hours ago",
-      viewLink: "/vha/session/123",
+      name: "Sarah Johnson",
+      role: "Technical Support",
+      time: "11:30 AM",
+      date: "2025-05-12",
+      viewLink: "/vha/session/124",
     },
     {
-      title: "Session completed with Sarah Johnson",
-      hoursAgo: "10 hours ago",
-      viewLink: "/vha/session/123",
+      name: "Michael Brown",
+      role: "Customer Support",
+      time: "02:15 PM",
+      date: "2025-05-12",
+      viewLink: "/vha/session/125",
     },
     {
-      title: "Session completed with Sarah Johnson",
-      hoursAgo: "10 hours ago",
-      viewLink: "/vha/session/123",
+      name: "Emily Davis",
+      role: "Maintenance Support",
+      time: "03:45 PM",
+      date: "2025-05-12",
+      viewLink: "/vha/session/126",
     },
   ];
   return (
@@ -44,17 +54,28 @@ function TodaysSession() {
         </CardAction>
       </CardHeader>
       <CardContent>
-        {recentActivity.map((activity, index) => (
+        {todaysSessions.map((session, index) => (
           <div
             key={index}
-            className="flex items-center gap-4  bg-gray-100 rounded-lg mb-2 px-4 py-2"
+            className="flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-lg mb-3 px-4 py-3"
           >
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-            <div className="flex flex-col items-start gap-1 flex-1 ">
-              <h3>{activity.title}</h3>
-              <p className="text-sm text-gray-500">{activity.hoursAgo}</p>
+            <div className="flex flex-col items-start gap-1 flex-1">
+              <h3 className="font-bold text-gray-900">{session.name}</h3>
+              <p className="text-sm text-gray-600">{session.role}</p>
+              <div className="flex items-center gap-4 mt-1">
+                <div className="flex items-center gap-1.5">
+                  <Clock size={14} className="text-gray-500" />
+                  <p className="text-sm text-gray-500">{session.time}</p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Calendar size={14} className="text-gray-500" />
+                  <p className="text-sm text-gray-500">{session.date}</p>
+                </div>
+              </div>
             </div>
-            <Button className="bg-sky-500 text-white">Join Now</Button>
+            <Button className="bg-sky-100 hover:bg-sky-200 text-sky-600 border-0">
+              View
+            </Button>
           </div>
         ))}
       </CardContent>

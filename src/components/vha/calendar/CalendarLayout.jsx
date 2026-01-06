@@ -13,9 +13,6 @@ function CalendarLayout() {
           title="Calendar"
           description="Here is an overview of your calendar"
         />
-        <Button className="bg-sky-500 hover:bg-sky-600 text-white">
-          <HiPlus /> Schedule New Session
-        </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-10 w-full  ">
         <CalenderComponent />

@@ -47,7 +47,7 @@ function VhaaDashboardLayout() {
         title="Dashboard"
         description="Here is an overview of your dashboard"
       />
-      <CardSection cards={vhaaDashboardCards} footer={true} />
+      <CardSection cards={vhaaDashboardCards} footer={false} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <VhaaBarChart />
         <RecentAlerts />

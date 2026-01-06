@@ -1,0 +1,84 @@
+"use client";
+import React from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Clock, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const ClientDetailsLayout = () => {
+  return (
+    <div className="flex flex-col md:flex-row items-center  md:items-start lg:justify-between gap-4 md:gap-6 bg-white border border-gray-300 rounded-lg p-4 md:p-6">
+      <ClientProfile />
+      <div className="w-full lg:w-1/2">
+        <Session />
+      </div>
+    </div>
+  );
+};
+
+export default ClientDetailsLayout;
+
+const ClientProfile = () => {
+  return (
+    <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto md:min-w-[280px]">
+      <Avatar className="size-16 sm:size-20 flex-shrink-0">
+        <AvatarImage src="https://github.com/shadcn.png" />
+        <AvatarFallback>CN</AvatarFallback>
+      </Avatar>
+      <div className="flex flex-col gap-2 text-center sm:text-left">
+        <p className="text-xl sm:text-2xl font-bold">John Doe</p>
+        <p className="text-sm text-gray-500">john.doe@example.com</p>
+      </div>
+    </div>
+  );
+};
+const Session = () => {
+  const sessionData = {
+    time: "10:01 AM",
+    date: "2025-05-12",
+  };
+
+  const handleReschedule = () => {
+    console.log("Reschedule session");
+    // Handle reschedule logic
+  };
+
+  const handleJoinNow = () => {
+    console.log("Join session");
+    // Handle join logic
+  };
+
+  return (
+    <div className="bg-gray-200 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-2 flex-1">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-800">
+          Coaching Session
+        </h3>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1.5">
+            <Clock size={16} className="text-gray-700 flex-shrink-0" />
+            <p className="text-sm text-gray-700">{sessionData.time}</p>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Calendar size={16} className="text-gray-700 flex-shrink-0" />
+            <p className="text-sm text-gray-700">{sessionData.date}</p>
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+        <Button
+          variant="outline"
+          onClick={handleReschedule}
+          className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto"
+        >
+          Reschedule
+        </Button>
+        <Button
+          onClick={handleJoinNow}
+          className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+        >
+          Join Now
+        </Button>
+      </div>
+    </div>
+  );
+};

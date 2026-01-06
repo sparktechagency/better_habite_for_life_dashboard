@@ -1,162 +1,122 @@
+"use client";
+
 import React from "react";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TbWallpaper } from "react-icons/tb";
-import { LiaStopwatchSolid } from "react-icons/lia";
+import { Clock, Calendar } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { TbWallpaper } from "react-icons/tb";
+import { CardTitle, CardAction } from "@/components/ui/card";
 function TodaySession() {
-  const todaySession = [
+  const router = useRouter();
+
+  const sessions = [
     {
-      name: "Session completed with Sarah Johnson",
+      id: 1,
+      name: "Abir Dehrun",
       reason: "Maintainace Support",
-      time: "10:00 AM",
-      isScheduled: true,
-      isCompleted: false,
-      isCancelled: false,
-      isRescheduled: false,
+      time: "10:01 AM",
+      date: "2025-05-12",
     },
     {
-      name: "Session completed with Sarah Johnson",
+      id: 2,
+      name: "Abir Dehrun",
       reason: "Maintainace Support",
-      time: "10:00 AM",
-      isScheduled: false,
-      isCompleted: true,
-      isCancelled: false,
-      isRescheduled: false,
+      time: "10:01 AM",
+      date: "2025-05-12",
     },
     {
-      name: "Session completed with Sarah Johnson",
+      id: 3,
+      name: "Abir Dehrun",
       reason: "Maintainace Support",
-      time: "10:00 AM",
-      isScheduled: false,
-      isCompleted: false,
-      isCancelled: false,
-      isRescheduled: true,
+      time: "10:01 AM",
+      date: "2025-05-12",
     },
     {
-      name: "Session completed with Sarah Johnson",
+      id: 4,
+      name: "Abir Dehrun",
       reason: "Maintainace Support",
-      time: "10:00 AM",
-      isScheduled: false,
-      isCompleted: false,
-      isCancelled: true,
-      isRescheduled: false,
+      time: "10:01 AM",
+      date: "2025-05-12",
     },
     {
-      name: "Session completed with Sarah Johnson",
+      id: 5,
+      name: "Abir Dehrun",
       reason: "Maintainace Support",
-      time: "10:00 AM",
-      isScheduled: false,
-      isCompleted: false,
-      isCancelled: true,
-      isRescheduled: false,
+      time: "10:01 AM",
+      date: "2025-05-12",
     },
     {
-      name: "Session completed with Sarah Johnson",
+      id: 6,
+      name: "Abir Dehrun",
       reason: "Maintainace Support",
-      time: "10:00 AM",
-      isScheduled: false,
-      isCompleted: false,
-      isCancelled: true,
-      isRescheduled: false,
+      time: "10:01 AM",
+      date: "2025-05-12",
     },
     {
-      name: "Session completed with Sarah Johnson",
+      id: 7,
+      name: "Abir Dehrun",
       reason: "Maintainace Support",
-      time: "10:00 AM",
-      isScheduled: false,
-      isCompleted: false,
-      isCancelled: true,
-      isRescheduled: false,
-    },
-    {
-      name: "Session completed with Sarah Johnson",
-      reason: "Maintainace Support",
-      time: "10:00 AM",
-      isScheduled: false,
-      isCompleted: false,
-      isCancelled: true,
-      isRescheduled: false,
+      time: "10:01 AM",
+      date: "2025-05-12",
     },
   ];
+
+  const handleView = (id) => {
+    router.push(`/bha/calendar/view-details?id=${id}`);
+  };
+
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <CardTitle className="flex items-center gap-2">
           <TbWallpaper size={20} />
-          <span>Today's Session</span>
+          Todays Session
         </CardTitle>
         <CardAction>
-          <p className="font-semibold text-sky-500 underline cursor-pointer">
-            View All
+          <p
+            onClick={() => router.push("/bha/calendar/view-details")}
+            className="font-semibold underline text-sky-500 cursor-pointer text-sm sm:text-base"
+          >
+            View All Session
           </p>
         </CardAction>
       </CardHeader>
-      <ScrollArea className="h-[calc(90vh-200px)]">
-        <CardContent className="space-y-2">
-          {todaySession.map((item, index) => {
-            return (
-              <Card key={index} className="">
-                <CardHeader>
-                  <CardTitle>{item.name}</CardTitle>
-                  <CardDescription className="flex items-center gap-2">
-                    {item.reason}{" "}
+      <CardContent className="px-4">
+        <ScrollArea className="h-[660px] pr-2">
+          <div className="space-y-3">
+            {sessions.map((session) => (
+              <div
+                key={session.id}
+                className="flex items-center justify-between gap-4 border border-gray-200 rounded-lg px-4 py-3 bg-white"
+              >
+                <div className="flex flex-col gap-1">
+                  <p className="text-base font-semibold text-gray-900">
+                    {session.name}
+                  </p>
+                  <p className="text-sm text-gray-600">{session.reason}</p>
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
                     <span className="flex items-center gap-1">
-                      <LiaStopwatchSolid size={16} /> {item.time}
+                      <Clock size={14} /> {session.time}
                     </span>
-                  </CardDescription>
-                  <CardAction>
-                    <span
-                      className={`text-sm text-white px-2 py-1 rounded-md ${
-                        item.isScheduled
-                          ? "bg-sky-400"
-                          : item.isCompleted
-                          ? "bg-green-400"
-                          : item.isCancelled
-                          ? "bg-red-400"
-                          : "bg-gray-400"
-                      }`}
-                    >
-                      {item.isScheduled
-                        ? "Scheduled"
-                        : item.isCompleted
-                        ? "Completed"
-                        : item.isCancelled
-                        ? "Cancelled"
-                        : item.isRescheduled
-                        ? "Rescheduled"
-                        : null}
+                    <span className="flex items-center gap-1">
+                      <Calendar size={14} /> {session.date}
                     </span>
-                  </CardAction>
-                </CardHeader>
-                <CardContent className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    className="border-2 border-gray-400 p-2"
-                  >
-                    Reschedule
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-2 border-gray-400 p-2"
-                  >
-                    Cancel
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </CardContent>
-        <ScrollBar orientation="horizontal" className="h-2 w-full" />
-      </ScrollArea>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => handleView(session.id)}
+                  className="bg-blue-100 text-blue-600 hover:bg-blue-200 border border-blue-200"
+                >
+                  View
+                </Button>
+              </div>
+            ))}
+          </div>
+          <ScrollBar orientation="vertical" />
+        </ScrollArea>
+      </CardContent>
     </Card>
   );
 }

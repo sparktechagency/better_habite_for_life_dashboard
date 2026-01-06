@@ -10,7 +10,11 @@ function TasksAndGoalsLayout() {
         title="Tasks and Goals"
         description="Here is an overview of your tasks and goals"
       />
-      <SearchFilterButton />
+      <SearchFilterButton
+        showAddButton={false}
+        placeholder="Search Task"
+        selectOptions={["All Status", "Active", "Inactive"]}
+      />
       <TasksList />
     </div>
   );

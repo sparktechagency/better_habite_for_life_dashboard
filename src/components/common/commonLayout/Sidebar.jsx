@@ -96,7 +96,11 @@ const sidebars = {
   ],
   bha: [
     { name: "Dashboard", path: "/bha/dashboard", icon: RxDashboard },
-    { name: "Clients", path: "/bha/clients", icon: LuSquareUserRound },
+    {
+      name: "Session Management",
+      path: "/bha/clients",
+      icon: LuSquareUserRound,
+    },
     { name: "Calendar", path: "/bha/calendar", icon: LuCalendarDays },
     { name: "Tasks and Goals", path: "/bha/tasks-and-goals", icon: GrTask },
     { name: "Reports", path: "/bha/reports", icon: CgFileDocument },

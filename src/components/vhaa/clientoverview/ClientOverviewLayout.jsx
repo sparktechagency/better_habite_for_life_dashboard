@@ -44,7 +44,11 @@ function ClientOverviewLayout() {
         description="Here is an overview of your clients"
       />
       <CardSection cards={clientOverviewStats} footer={false} />
-      <SearchFilterButton showAddButton={false} />
+      <SearchFilterButton
+        showAddButton={false}
+        selectOptions={["All Status", "Active", "Inactive"]}
+        placeholder="Search Client"
+      />
       <ClientTable />
     </div>
   );

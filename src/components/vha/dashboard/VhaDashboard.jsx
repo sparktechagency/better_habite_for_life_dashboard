@@ -15,20 +15,20 @@ function VhaDashboard() {
       status: "Added 4 New Last Week",
     },
     {
-      title: "Total Clients",
+      title: "Upcoming Sessions",
       value: "100",
       icon: <LuUserRound size={20} />,
       status: "Added 4 New Last Week",
     },
 
     {
-      title: "Total Clients",
+      title: "Overdue Task",
       value: "100",
       icon: <LuUserRound size={20} />,
       status: "Added 4 New Last Week",
     },
     {
-      title: "Total Clients",
+      title: "Total Tasks",
       value: "100",
       icon: <LuUserRound size={20} />,
       goto: "Added 4 New Last Week",
@@ -41,7 +41,7 @@ function VhaDashboard() {
         title="Welcome Back !"
         description="Here is an overview of your store"
       />
-      <CardSection cards={vhaCards} footer={true} />
+      <CardSection cards={vhaCards} footer={false} />
       <ActivitySection />
       <PrioritySection />
     </div>

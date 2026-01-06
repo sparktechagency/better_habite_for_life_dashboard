@@ -14,6 +14,7 @@ function SearchFilterButton({
   showFilterButton = true,
   selectOptions = ["All Status"],
   placeholder = "Search Client",
+  searchByDate = false,
 }) {
   return (
     <div className="flex items-center gap-2 ">
@@ -39,6 +40,12 @@ function SearchFilterButton({
         <Button className="bg-blue-500 hover:bg-blue-600 text-white">
           <HiPlus /> Add New Client
         </Button>
+      )}
+
+      {searchByDate && (
+        <div className="flex items-center gap-2">
+          <Input type="date" className="bg-white border-gray-300" />
+        </div>
       )}
     </div>
   );
