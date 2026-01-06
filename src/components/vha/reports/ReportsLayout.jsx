@@ -7,6 +7,7 @@ import { LuUserRound } from "react-icons/lu";
 import { CgLoadbarDoc } from "react-icons/cg";
 import { Input } from "@/components/ui/input";
 import RecentReports from "./RecentReports";
+import ClientOverviewReport from "./ClientOverviewReport";
 
 function ReportsLayout() {
   const statCards = [
@@ -35,39 +36,45 @@ function ReportsLayout() {
   const recentReports = [
     {
       title: "Week Progress",
-      person: "John Doe",
+      description: "Week Progress, Complete Weekly Exercise Tracking...",
+      person: "Michael Chen",
       viewLink: "/vha/reports/1",
-      date: "2025-08-17",
+      date: "2024-06-01",
     },
     {
       title: "Week Progress",
-      person: "John Doe",
-      viewLink: "/vha/reports/1",
-      date: "2025-08-17",
+      description: "Week Progress, Complete Weekly Exercise Tracking...",
+      person: "Michael Chen",
+      viewLink: "/vha/reports/2",
+      date: "2024-06-01",
     },
     {
       title: "Week Progress",
-      person: "John Doe",
-      viewLink: "/vha/reports/1",
-      date: "2025-08-17",
+      description: "Week Progress, Complete Weekly Exercise Tracking...",
+      person: "Michael Chen",
+      viewLink: "/vha/reports/3",
+      date: "2024-06-01",
     },
     {
       title: "Week Progress",
-      person: "John Doe",
-      viewLink: "/vha/reports/1",
-      date: "2025-08-17",
+      description: "Week Progress, Complete Weekly Exercise Tracking...",
+      person: "Michael Chen",
+      viewLink: "/vha/reports/4",
+      date: "2024-06-01",
     },
     {
       title: "Week Progress",
-      person: "John Doe",
-      viewLink: "/vha/reports/1",
-      date: "2025-08-17",
+      description: "Week Progress, Complete Weekly Exercise Tracking...",
+      person: "Michael Chen",
+      viewLink: "/vha/reports/5",
+      date: "2024-06-01",
     },
     {
       title: "Week Progress",
-      person: "John Doe",
-      viewLink: "/vha/reports/1",
-      date: "2025-08-17",
+      description: "Week Progress, Complete Weekly Exercise Tracking...",
+      person: "Michael Chen",
+      viewLink: "/vha/reports/6",
+      date: "2024-06-01",
     },
   ];
   return (
@@ -77,16 +84,9 @@ function ReportsLayout() {
           title="Reports"
           description="Here is an overview of your reports"
         />
-        <Button className="bg-sky-500 hover:bg-sky-600 text-white">
-          <HiPlus /> Add New Report
-        </Button>
       </div>
-      <ReportStatCards statCards={statCards} />
-      <Input
-        type="text"
-        placeholder="Search Report"
-        className="w-full bg-white border"
-      />
+      {/* <ReportStatCards statCards={statCards} /> */}
+      <ClientOverviewReport />
       <RecentReports recentReports={recentReports} />
     </div>
   );
