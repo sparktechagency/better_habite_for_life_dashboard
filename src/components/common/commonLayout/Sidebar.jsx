@@ -29,7 +29,7 @@ import { LuFileLock2 } from "react-icons/lu";
 import { RiArticleLine } from "react-icons/ri";
 import { BiCategory } from "react-icons/bi";
 import { FaQuoteRight } from "react-icons/fa6";
-
+import { LuBotMessageSquare } from "react-icons/lu";
 const sidebars = {
   admin: [
     { name: "Dashboard", path: "/admin/dashboard", icon: RxDashboard },
@@ -129,9 +129,13 @@ const sidebars = {
   bhaa: [
     { name: "Dashboard", path: "/bhaa/dashboard", icon: RxDashboard },
     { name: "Clients", path: "/bhaa/client-overview", icon: LuSquareUserRound },
-    { name: "Reports", path: "/bhaa/reports", icon: CgFileDocument },
+    // { name: "Reports", path: "/bhaa/reports", icon: CgFileDocument }, // this page removed from bhaa app because it is not used
     { name: "Task Monitor", path: "/bhaa/task-monitor", icon: GrTask },
-    { name: "Task Prompts", path: "/bhaa/task-promts", icon: CgFileDocument },
+    {
+      name: "Reminder Prompts",
+      path: "/bhaa/task-promts",
+      icon: LuBotMessageSquare,
+    },
     { name: "Messages", path: "/bhaa/messages", icon: AiOutlineMessage },
     { name: "Settings", path: "/bhaa/settings", icon: Settings },
   ],

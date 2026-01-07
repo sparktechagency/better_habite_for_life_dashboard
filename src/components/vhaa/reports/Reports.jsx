@@ -3,13 +3,12 @@ import {
   Card,
   CardAction,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { TbEye, TbFileSearch } from "react-icons/tb";
 import { LuCalendar, LuUserRound } from "react-icons/lu";
-import { CgLoadbarDoc } from "react-icons/cg";
+
 import { Button } from "@/components/ui/button";
 function Reports() {
   const recentReports = [
@@ -55,14 +54,14 @@ function Reports() {
         {recentReports.map((report, index) => (
           <div
             key={index}
-            className="flex flex-col md:flex-row md:items-center gap-4 justify-between bg-gray-100 rounded-lg p-3 border border-gray-300 bg-orange-50"
+            className="flex flex-col md:flex-row md:items-center gap-4 justify-between  rounded-lg p-3 border border-gray-300 bg-orange-50"
           >
             <div className="flex items-start flex-1 gap-1 ">
               <div className="flex flex-col items-start  flex-1 gap-1">
                 <h3 className="text-base sm:text-lg font-semibold">
                   {report.title}
                 </h3>
-                <div className="flex  sm:items-center gap-2 gap-6 sm:gap-4">
+                <div className="flex  sm:items-center gap-6 sm:gap-4">
                   <p className="text-sm text-gray-900 text-semibold flex items-center gap-2">
                     <LuUserRound size={15} />
                     {report.person}

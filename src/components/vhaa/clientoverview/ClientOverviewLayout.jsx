@@ -1,55 +1,62 @@
+"use client";
 import SmallPageInfo from "@/components/common/SmallPageInfo";
 
 import React from "react";
 import SearchFilterButton from "@/components/common/SearchFilterButton";
 import ClientTable from "@/components/common/clientTable/ClientTable";
-import { CardSection } from "@/components/common/Card";
-import { LuUserRound } from "react-icons/lu";
-
+import { formatContactInfo } from "../dashboard/ClinetStatusOverview";
 function ClientOverviewLayout() {
-  const clientOverviewStats = [
+  const tableData = [
     {
-      title: "Total Clients",
-      value: 6,
-      icon: <LuUserRound size={20} />,
-      iconTextColor: "text-red-500",
-      iconBgColor: "bg-red-500/10",
+      clientName: "John Doe",
+      clientEmail: "john.doe@example.com",
+      contactInfo: "01717171717",
+      address: "Dhaka, Bangladesh",
+      status: "Active",
+      joinedOn: "2025-05-12",
     },
     {
-      title: "Avg Completion",
-      value: 6,
-      icon: <LuUserRound size={20} />,
-      iconTextColor: "text-red-500",
-      iconBgColor: "bg-red-500/10",
+      clientName: "John Doe",
+      clientEmail: "john.doe@example.com",
+      contactInfo: "01717171717",
+      address: "Dhaka, Bangladesh",
+      status: "Active",
+      joinedOn: "2025-05-12",
     },
     {
-      title: "Active ",
-      value: 6,
-      icon: <LuUserRound size={20} />,
-      iconTextColor: "text-red-500",
-      iconBgColor: "bg-red-500/10",
+      clientName: "John Doe",
+      clientEmail: "john.doe@example.com",
+      contactInfo: "01717171717",
+      address: "Dhaka, Bangladesh",
+      status: "Inactive",
+      joinedOn: "2025-05-12",
     },
     {
-      title: "Flaged",
-      value: 6,
-      icon: <LuUserRound size={20} />,
-      iconTextColor: "text-red-500",
-      iconBgColor: "bg-red-500/10",
+      clientName: "John Doe",
+      clientEmail: "john.doe@example.com",
+      contactInfo: "01717171717",
+      address: "Dhaka, Bangladesh",
+      status: "Inactive",
+      joinedOn: "2025-05-12",
     },
   ];
+  const formattedTableData = tableData.map((data) => ({
+    ...data,
+    contactInfo: formatContactInfo(data.contactInfo, data.address),
+  }));
   return (
     <div className="space-y-4">
       <SmallPageInfo
         title="Client Overview"
         description="Here is an overview of your clients"
       />
-      <CardSection cards={clientOverviewStats} footer={false} />
+      {/* <CardSection cards={clientOverviewStats} footer={false} /> */}
       <SearchFilterButton
         showAddButton={false}
         selectOptions={["All Status", "Active", "Inactive"]}
         placeholder="Search Client"
       />
-      <ClientTable />
+      <ClientTable tableData={formattedTableData} />
     </div>
   );
 }
