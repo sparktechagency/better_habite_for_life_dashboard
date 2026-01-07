@@ -51,7 +51,6 @@ function PolicyModal({
       }
       setOpenModal(false);
     } catch (error) {
-      console.error("Error saving policy:", error);
     } finally {
       setIsSaving(false);
     }

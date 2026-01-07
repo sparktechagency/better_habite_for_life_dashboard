@@ -15,8 +15,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+
 export default function Header() {
   const router = useRouter();
+  const userRole = localStorage.getItem("userRole");
+
+  const handleProfileRedirect = () => {
+    if (userRole === "admin") {
+      router.push("/admin/my-profile");
+    } else if (userRole === "doctor") {
+      router.push("/bha/my-profile");
+    } else if (userRole === "assistant") {
+      router.push("/bhaa/my-profile");
+    } else {
+      router.push("/auth/login");
+    }
+  };
   return (
     <div className="w-full mx-auto px-4 bg-sidebar border-b">
       <header className="flex h-20 w-full shrink-0 items-center ">
@@ -50,13 +64,22 @@ export default function Header() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-[180px]" align="end">
-              <DropdownMenuItem asChild>
-                <Link href="/bha/my-profile/1" className="cursor-pointer">
-                  My Profile
-                </Link>
+              <DropdownMenuItem onClick={handleProfileRedirect}>
+                My Profile
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/bha/change-password" className="cursor-pointer">
+                <Link
+                  href={
+                    userRole === "admin"
+                      ? "/admin/change-password"
+                      : userRole === "doctor"
+                      ? "/bha/change-password"
+                      : userRole === "assistant"
+                      ? "/bhaa/change-password"
+                      : "/auth/login"
+                  }
+                  className="cursor-pointer"
+                >
                   Change Password
                 </Link>
               </DropdownMenuItem>

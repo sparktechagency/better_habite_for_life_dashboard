@@ -15,7 +15,13 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { X, Upload } from "lucide-react";
 
-function ProfileEdit({ openModal, setOpenModal, onSave, initialData = null }) {
+function ProfileEdit({
+  openModal,
+  setOpenModal,
+  onSave,
+  initialData = null,
+  isLoading = false,
+}) {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -104,7 +110,7 @@ function ProfileEdit({ openModal, setOpenModal, onSave, initialData = null }) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name.trim()) {
       return;
     }
@@ -114,11 +120,18 @@ function ProfileEdit({ openModal, setOpenModal, onSave, initialData = null }) {
       id: initialData?.id,
     };
 
-    if (onSave) {
-      onSave(payload);
-    }
+    // Debug: Check if profileImage is in payload
+    console.log("ProfileEdit - formData:", formData);
+    console.log("ProfileEdit - payload:", payload);
+    console.log("ProfileEdit - profileImage in payload:", payload.profileImage);
+    console.log(
+      "ProfileEdit - Is profileImage a File?",
+      payload.profileImage instanceof File
+    );
 
-    setOpenModal(false);
+    if (onSave) {
+      await onSave(payload);
+    }
   };
 
   return (
@@ -231,14 +244,19 @@ function ProfileEdit({ openModal, setOpenModal, onSave, initialData = null }) {
         </div>
 
         <DialogFooter className="px-6 pb-6 pt-4">
-          <Button variant="outline" onClick={() => setOpenModal(false)}>
+          <Button
+            variant="outline"
+            onClick={() => setOpenModal(false)}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={isLoading}
+            className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save Changes
+            {isLoading ? "Saving..." : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>

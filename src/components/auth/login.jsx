@@ -15,13 +15,7 @@ import { Checkbox } from "../ui/checkbox";
 import { useRouter } from "next/navigation";
 import { useLoginMutation } from "@/redux/Apis/authApi/authApi";
 import useToast from "@/hooks/useToast";
-
-// Cookie utility functions
-const setCookie = (name, value, days = 7) => {
-  const expires = new Date();
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
-};
+import { setCookie } from "@/utils/cookies";
 
 export default function Login() {
   const router = useRouter();
@@ -57,12 +51,12 @@ export default function Login() {
         // Show success toast
         toast.success(response.message || "Logged in successfully");
 
-        // Navigate based on role (you can adjust this logic)
+        // Navigate based on role
         if (user?.role === "admin") {
           router.push("/admin/dashboard");
-        } else if (user?.role === "bha") {
+        } else if (user?.role === "doctor") {
           router.push("/bha/dashboard");
-        } else if (user?.role === "bhaa") {
+        } else if (user?.role === "assistant") {
           router.push("/bhaa/dashboard");
         } else {
           // Default redirect or handle other roles
@@ -78,7 +72,6 @@ export default function Login() {
         error?.message ||
         "An error occurred during login. Please try again.";
       toast.error(errorMessage);
-      console.error("Login error:", error);
     }
   };
 

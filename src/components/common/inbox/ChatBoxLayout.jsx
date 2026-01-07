@@ -79,7 +79,6 @@ const ChatInterface = () => {
         dispatch(addMessage({ chatId: selectedChat.id, message: autoReply }));
       }, 1500);
     } catch (error) {
-      console.error("Failed to send message:", error);
       // Restore the message if sending failed
       setNewMessage(messageText);
     }
