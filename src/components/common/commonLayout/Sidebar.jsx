@@ -137,7 +137,24 @@ const sidebars = {
       icon: LuBotMessageSquare,
     },
     { name: "Messages", path: "/bhaa/messages", icon: AiOutlineMessage },
-    { name: "Settings", path: "/bhaa/settings", icon: Settings },
+    {
+      name: "Settings",
+      path: "/bhaa/settings",
+      icon: Settings,
+      subItems: [
+        { name: "Faqs", path: "/bha/faqs", icon: FaQuoteRight },
+        {
+          name: "Terms and Conditions",
+          path: "/bhaa/terms-and-conditions",
+          icon: LuFileCheck,
+        },
+        {
+          name: "Privacy Policy",
+          path: "/bhaa/privacy-policy",
+          icon: LuFileLock2,
+        },
+      ],
+    },
   ],
 };
 import { useSelector } from "react-redux";

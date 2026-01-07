@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -11,6 +12,8 @@ import {
 import { HiPlus } from "react-icons/hi";
 function SearchFilterButton({
   showAddButton = true,
+  onClickAddButton = () => {},
+  addButtonText = "Add New Client",
   showFilterButton = true,
   selectOptions = ["All Status"],
   placeholder = "Search Client",
@@ -37,8 +40,11 @@ function SearchFilterButton({
         </Select>
       )}
       {showAddButton && (
-        <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-          <HiPlus /> Add New Client
+        <Button
+          className="bg-blue-500 hover:bg-blue-600 text-white"
+          onClick={onClickAddButton}
+        >
+          <HiPlus /> {addButtonText}
         </Button>
       )}
 

@@ -1,15 +1,16 @@
+"use client";
 import {
   Card,
   CardAction,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { LuActivity } from "react-icons/lu";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 function RecentActivity() {
+  const router = useRouter();
   const recentActivity = [
     {
       title: "Session completed with Sarah Johnson",
@@ -43,7 +44,10 @@ function RecentActivity() {
           <LuActivity size={20} />
           Recent Activity
         </CardTitle>
-        <CardAction className="font-semibold underline text-sky-500 cursor-pointer">
+        <CardAction
+          className="font-semibold underline text-sky-500 cursor-pointer"
+          onClick={() => router.push("/bha/tasks-and-goals")}
+        >
           View All
         </CardAction>
       </CardHeader>

@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import SmallPageInfo from "@/components/common/SmallPageInfo";
 import { CardSection } from "@/components/common/Card";
 import { LuUserRound } from "react-icons/lu";
@@ -7,7 +8,9 @@ import { RiCalendarScheduleLine } from "react-icons/ri";
 import { TbChartDotsFilled } from "react-icons/tb";
 import SearchFilterButton from "@/components/common/SearchFilterButton";
 import RecentAlertsTable from "./RecentAlertsTable";
+import BhaaNewTaskPromptAddEdit from "./BhaaNewTaskPromptAddEdit";
 function TaskPromtLayout() {
+  const [isAddPromptModalOpen, setIsAddPromptModalOpen] = useState(false);
   const vhaCards = [
     {
       title: "Total Prompts",
@@ -41,13 +44,20 @@ function TaskPromtLayout() {
   ];
   return (
     <div className="space-y-4">
-      <SmallPageInfo
-        title="Dashboard Overview"
-        description="Here is an overview of your store"
-      />
+      <SmallPageInfo title="Reminder Prompts Management" />
       <CardSection cards={vhaCards} footer={false} />
-      <SearchFilterButton showAddButton={false} />
+      <SearchFilterButton
+        onClickAddButton={() => setIsAddPromptModalOpen(true)}
+        showAddButton={true}
+        addButtonText="Add New Prompt"
+        placeholder="Search Prompt"
+        selectOptions={["All Status", "Active", "Pasued"]}
+      />
       <RecentAlertsTable />
+      <BhaaNewTaskPromptAddEdit
+        openModal={isAddPromptModalOpen}
+        setOpenModal={setIsAddPromptModalOpen}
+      />
     </div>
   );
 }
