@@ -18,37 +18,42 @@ const tableData = [
     userName: "John Doe",
     email: "john.doe@example.com",
     joinedDate: "2025-05-12",
-
+    role: "BHA",
     status: "Active",
   },
   {
     userName: "John Doe",
     email: "john.doe@example.com",
     joinedDate: "2025-05-12",
+    role: "BHA",
     status: "Inactive",
   },
   {
     userName: "John Doe",
     email: "john.doe@example.com",
     joinedDate: "2025-05-12",
+    role: "User",
     status: "Active",
   },
   {
     userName: "John Doe",
     email: "john.doe@example.com",
     joinedDate: "2025-05-12",
+    role: "User",
     status: "Active",
   },
   {
     userName: "John Doe",
     email: "john.doe@example.com",
     joinedDate: "2025-05-12",
+    role: "BHAA",
     status: "Inactive",
   },
   {
     userName: "John Doe",
     email: "john.doe@example.com",
     joinedDate: "2025-05-12",
+    role: "BHAA",
     status: "Inactive",
   },
 ];
@@ -59,6 +64,7 @@ function ClientManagementTable() {
         <TableHeader>
           <TableRow className="bg-gray-200">
             <TableHead className="w-1/6">User Name</TableHead>
+            <TableHead className="w-1/6">Role</TableHead>
             <TableHead className="w-1/6">Joined Date</TableHead>
             <TableHead className="w-1/6">Status</TableHead>
             <TableHead className="w-1/6 text-right">Actions</TableHead>
@@ -79,6 +85,7 @@ function ClientManagementTable() {
                   </div>
                 </div>
               </TableCell>
+              <TableCell className="w-1/6">{data.role}</TableCell>
               <TableCell className="w-1/6">{data.joinedDate}</TableCell>
               <TableCell className="w-1/6">
                 <p

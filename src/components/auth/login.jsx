@@ -50,7 +50,7 @@ export default function Login() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-10 bg-input/60 backdrop-blur-sm border-border/50 text-card-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200"
+                className="pl-10 bg-input/60  border-border/50 text-card-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200"
                 required
               />
             </div>
@@ -71,7 +71,7 @@ export default function Login() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 pr-10 bg-input/60 backdrop-blur-sm border-border/50 text-card-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200"
+                className="pl-10 pr-10 bg-input/60  border-border/50 text-card-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200"
                 required
               />
               <Button
@@ -94,7 +94,7 @@ export default function Login() {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="remember"
-                className="h-4 w-4 rounded border-border/50 bg-input/60 text-secondary focus:ring-2 focus:ring-ring"
+                className="h-4 w-4 rounded border-border/50 bg-input/60 text-secondary "
               />
               <Label
                 htmlFor="remember"

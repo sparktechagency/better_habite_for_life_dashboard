@@ -45,7 +45,7 @@ export default function ForgotPassword() {
                 placeholder="Enter your email to reset your password"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-10 bg-input/60 backdrop-blur-sm border-border/50 text-card-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200"
+                className="pl-10 bg-input/60 border-border/50 text-card-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200"
                 required
               />
             </div>
