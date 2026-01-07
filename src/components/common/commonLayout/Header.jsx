@@ -14,7 +14,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 export default function Header() {
+  const router = useRouter();
   return (
     <div className="w-full mx-auto px-4 bg-sidebar border-b">
       <header className="flex h-20 w-full shrink-0 items-center ">
@@ -22,7 +24,11 @@ export default function Header() {
 
         <div className="ml-auto flex gap-2">
           <Input type="text" placeholder="Search" className="w-full max-w-sm" />
-          <Button className="p-0 border bg-transparent">
+          <Button
+            variant="ghost"
+            className="p-0 border bg-transparent"
+            onClick={() => router.push("/bha/notifications")}
+          >
             <IoIosNotificationsOutline size={28} className="text-black" />
           </Button>
 
@@ -45,11 +51,15 @@ export default function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-[180px]" align="end">
               <DropdownMenuItem asChild>
-                <Link href="/vha/my-profile/1" className="cursor-pointer">
+                <Link href="/bha/my-profile/1" className="cursor-pointer">
                   My Profile
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/bha/change-password" className="cursor-pointer">
+                  Change Password
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-500 focus:text-red-500">
                 Log Out
