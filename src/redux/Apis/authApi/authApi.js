@@ -1,12 +1,19 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-export const changePasswordApi = createApi({
-  reducerPath: "changePasswordApi",
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_URL }),
+export const authApi = createApi({
+  reducerPath: "authApi",
+  baseQuery: fetchBaseQuery({ baseUrl: process.env.BASE_URL }),
   endpoints: (builder) => ({
+    login: builder.mutation({
+      query: (data) => ({
+        url: "/auth/login",
+        method: "POST",
+        body: data,
+      }),
+    }),
     changePassword: builder.mutation({
       query: (data) => ({
-        url: "/api/v1/auth/change-password",
+        url: "/auth/change-password",
         method: "POST",
         body: data,
       }),
@@ -14,4 +21,4 @@ export const changePasswordApi = createApi({
   }),
 });
 
-export const { useChangePasswordMutation } = changePasswordApi;
+export const { useLoginMutation, useChangePasswordMutation } = authApi;

@@ -13,17 +13,73 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import { useRouter } from "next/navigation";
+import { useLoginMutation } from "@/redux/Apis/authApi/authApi";
+import useToast from "@/hooks/useToast";
+
+// Cookie utility functions
+const setCookie = (name, value, days = 7) => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+};
 
 export default function Login() {
   const router = useRouter();
+  const [login, { isLoading }] = useLoginMutation();
+  const toast = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
+
+    try {
+      const response = await login({ email, password }).unwrap();
+
+      // Check if response is successful
+      if (response?.success && response?.data) {
+        const { accessToken, refreshToken, user } = response.data;
+
+        // Save tokens to cookies
+        if (accessToken) {
+          setCookie("accessToken", accessToken, 7); // 7 days expiry
+        }
+        if (refreshToken) {
+          setCookie("refreshToken", refreshToken, 30); // 30 days expiry
+        }
+
+        // Save user role to localStorage
+        if (user?.role) {
+          localStorage.setItem("userRole", user.role);
+        }
+
+        // Show success toast
+        toast.success(response.message || "Logged in successfully");
+
+        // Navigate based on role (you can adjust this logic)
+        if (user?.role === "admin") {
+          router.push("/admin/dashboard");
+        } else if (user?.role === "bha") {
+          router.push("/bha/dashboard");
+        } else if (user?.role === "bhaa") {
+          router.push("/bhaa/dashboard");
+        } else {
+          // Default redirect or handle other roles
+          router.push("/dashboard");
+        }
+      } else {
+        throw new Error(response?.message || "Login failed");
+      }
+    } catch (error) {
+      // Handle error
+      const errorMessage =
+        error?.data?.message ||
+        error?.message ||
+        "An error occurred during login. Please try again.";
+      toast.error(errorMessage);
+      console.error("Login error:", error);
+    }
   };
 
   return (
@@ -114,9 +170,10 @@ export default function Login() {
 
           <Button
             type="submit"
-            className="w-full bg-black/70 hover:bg-black text-white hover:text-white  font-medium py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/25"
+            disabled={isLoading}
+            className="w-full bg-black/70 hover:bg-black text-white hover:text-white  font-medium py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            {isLoading ? "Signing In..." : "Sign In"}
           </Button>
         </form>
       </CardContent>

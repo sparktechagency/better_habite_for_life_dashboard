@@ -1,5 +1,5 @@
 import "@/app/globals.css";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/common/commonLayout/Sidebar";
 import Header from "@/components/common/commonLayout/Header";
 
