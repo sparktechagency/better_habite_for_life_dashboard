@@ -21,28 +21,57 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  useCreateArticleMutation,
+  useUpdateArticleMutation,
+} from "@/redux/Apis/admin/articleApi/articleApi";
+import useToast from "@/hooks/useToast";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 const AddArticleModal = React.memo(function AddArticleModal({
   openModal,
   setOpenModal,
+  isEdit = false,
+  articleData = null,
 }) {
   const form = useForm({
     defaultValues: {
-      threadTitle: "",
-      threadDescription: "",
-      tags: [],
+      title: "",
+      description: "",
+      sourseName: "",
+      readTime: "",
       articleImage: null,
     },
   });
 
-  const [tagInput, setTagInput] = useState("");
   const [imagePreview, setImagePreview] = useState("");
   const imagePreviewRef = useRef("");
   const imageInputRef = useRef(null);
 
-  const tags = form.watch("tags") || [];
+  const [createArticle, { isLoading: isCreating }] = useCreateArticleMutation();
+  const [updateArticle, { isLoading: isUpdating }] = useUpdateArticleMutation();
+  const toast = useToast();
+
+  const isSubmitting = isCreating || isUpdating;
+
+  // Load article data when in edit mode
+  useEffect(() => {
+    if (isEdit && articleData && openModal) {
+      form.reset({
+        title: articleData.title || "",
+        description: articleData.description || "",
+        sourseName: articleData.sourseName || "",
+        readTime: articleData.readTime || "",
+        articleImage: null,
+      });
+
+      // Set image preview if URL is provided
+      if (articleData.image) {
+        setImagePreview(getImageUrl(articleData.image));
+      }
+    }
+  }, [isEdit, articleData, openModal, form]);
 
   // Clean up object URL on unmount or when image changes
   useEffect(() => {
@@ -71,59 +100,102 @@ const AddArticleModal = React.memo(function AddArticleModal({
     [form]
   );
 
-  const handleAddTag = useCallback(
-    (e) => {
-      e.preventDefault();
-      const trimmedTag = tagInput.trim();
-      if (trimmedTag && !tags.includes(trimmedTag)) {
-        form.setValue("tags", [...tags, trimmedTag]);
-        setTagInput("");
-      }
-    },
-    [tagInput, tags, form]
-  );
-
-  const handleRemoveTag = useCallback(
-    (tagToRemove) => {
-      form.setValue(
-        "tags",
-        tags.filter((tag) => tag !== tagToRemove)
-      );
-    },
-    [tags, form]
-  );
-
-  const handleTagInputKeyDown = useCallback(
-    (e) => {
-      if (e.key === "Enter") {
-        handleAddTag(e);
-      }
-    },
-    [handleAddTag]
-  );
-
   const onSubmit = useCallback(
-    (data) => {
-      console.log(data);
-      // Handle form submission here
-      setOpenModal(false);
-      // Form will be reset by useEffect when openModal becomes false
+    async (data) => {
+      try {
+        // Create FormData for file upload
+        const formData = new FormData();
+
+        // Append title
+        formData.append("title", data.title || "");
+
+        // Append description
+        formData.append("description", data.description || "");
+
+        // Append sourseName
+        formData.append("sourseName", data.sourseName || "");
+
+        // Append readTime
+        formData.append("readTime", data.readTime || "");
+
+        // Append image file if provided
+        const imageFile = form.getValues("articleImage");
+        if (imageFile && imageFile instanceof File) {
+          formData.append("image", imageFile);
+        }
+
+        // Debug: Log FormData contents
+        console.log("FormData entries:");
+        for (const [key, value] of formData.entries()) {
+          if (value instanceof File) {
+            console.log(key, "File:", value.name, value.size, "bytes");
+          } else {
+            console.log(key, value);
+          }
+        }
+
+        let response;
+        if (isEdit && articleData?._id) {
+          // Update article
+          response = await updateArticle({
+            id: articleData._id,
+            formData,
+          }).unwrap();
+        } else {
+          // Create article
+          response = await createArticle(formData).unwrap();
+        }
+
+        // Check if response is successful
+        if (response?.success) {
+          toast.success(
+            response.message ||
+              (isEdit
+                ? "Article updated successfully"
+                : "Article created successfully")
+          );
+          setOpenModal(false);
+        } else {
+          throw new Error(
+            response?.message || "An error occurred. Please try again."
+          );
+        }
+      } catch (error) {
+        // Handle error
+        const errorMessage =
+          error?.data?.message ||
+          error?.message ||
+          "An error occurred. Please try again.";
+        toast.error(errorMessage);
+        console.error("Article operation error:", error);
+      }
     },
-    [setOpenModal]
+    [
+      setOpenModal,
+      isEdit,
+      articleData,
+      form,
+      createArticle,
+      updateArticle,
+      toast,
+    ]
   );
 
   const resetForm = useCallback(() => {
     // Clean up previews
-    if (imagePreviewRef.current) {
+    if (
+      imagePreviewRef.current &&
+      imagePreviewRef.current.startsWith("blob:")
+    ) {
       URL.revokeObjectURL(imagePreviewRef.current);
       imagePreviewRef.current = "";
     }
     setImagePreview("");
-    setTagInput("");
     form.reset({
-      threadTitle: "",
-      threadDescription: "",
-      tags: [],
+      title: "",
+      description: "",
+      sourseName: "",
+      readTime: "",
       articleImage: null,
     });
     // Reset file input
@@ -156,66 +228,89 @@ const AddArticleModal = React.memo(function AddArticleModal({
     <Dialog open={openModal} onOpenChange={handleOpenChange}>
       <DialogContent className="flex flex-col max-w-[90vw] sm:max-w-lg md:max-w-2xl max-h-[90vh] sm:max-h-[85vh] p-0 overflow-hidden">
         <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4 border-b">
-          <DialogTitle>Create New Thread</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Edit Article" : "Create New Article"}
+          </DialogTitle>
           <DialogDescription>
-            Enter the details to create a new thread.
+            {isEdit
+              ? "Update the article details below."
+              : "Enter the details to create a new article."}
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="flex-1 min-h-0 overflow-y-auto">
           <div className="px-6 py-4">
             <Form {...form}>
               <form
-                id="create-new-thread-form"
+                id="create-article-form"
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
               >
                 <FormField
                   control={form.control}
-                  name="threadTitle"
+                  name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Thread Title</FormLabel>
+                      <FormLabel>Article Title</FormLabel>
                       <FormControl>
-                        <Input type="text" {...field} />
+                        <Input
+                          type="text"
+                          placeholder="Enter article title"
+                          {...field}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
                 />
                 <FormField
                   control={form.control}
-                  name="threadDescription"
+                  name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Thread Description</FormLabel>
+                      <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea {...field} />
+                        <Textarea
+                          placeholder="Enter article description"
+                          rows={4}
+                          {...field}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="tags"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Tags</FormLabel>
-                      <FormControl>
-                        <div className="space-y-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="sourseName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Source Name / Author</FormLabel>
+                        <FormControl>
                           <Input
                             type="text"
-                            placeholder="Enter tags and press Enter"
-                            value={tagInput}
-                            onChange={(e) => setTagInput(e.target.value)}
-                            onKeyDown={handleTagInputKeyDown}
+                            placeholder="e.g. Dr. Rizal Dy Ferrer"
+                            {...field}
                           />
-                          {tags.length > 0 && (
-                            <TagList tags={tags} onRemove={handleRemoveTag} />
-                          )}
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="readTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Read Time</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="e.g. 20 min"
+                            {...field}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
                   name="articleImage"
@@ -244,7 +339,10 @@ const AddArticleModal = React.memo(function AddArticleModal({
                     <button
                       type="button"
                       onClick={() => {
-                        if (imagePreviewRef.current) {
+                        if (
+                          imagePreviewRef.current &&
+                          imagePreviewRef.current.startsWith("blob:")
+                        ) {
                           URL.revokeObjectURL(imagePreviewRef.current);
                           imagePreviewRef.current = "";
                         }
@@ -266,11 +364,26 @@ const AddArticleModal = React.memo(function AddArticleModal({
           </div>
         </ScrollArea>
         <DialogFooter className="flex-shrink-0 border-t px-6 py-4 bg-background">
-          <Button type="button" variant="outline" onClick={handleClose}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleClose}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
-          <Button type="submit" form="create-new-thread-form">
-            Submit
+          <Button
+            type="submit"
+            form="create-article-form"
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? isEdit
+                ? "Updating..."
+                : "Creating..."
+              : isEdit
+              ? "Update"
+              : "Submit"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -279,31 +392,3 @@ const AddArticleModal = React.memo(function AddArticleModal({
 });
 
 export default AddArticleModal;
-
-function TagList({ tags, onRemove }) {
-  if (!tags || tags.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      {tags.map((tag) => (
-        <Badge
-          key={tag}
-          variant="secondary"
-          className="flex items-center gap-1 pr-1"
-        >
-          <span>{tag}</span>
-          <button
-            type="button"
-            onClick={() => onRemove(tag)}
-            className="rounded-full hover:bg-secondary-foreground/20 p-0.5 transition-colors"
-            aria-label={`Remove ${tag} tag`}
-          >
-            <X className="h-3 w-3" />
-          </button>
-        </Badge>
-      ))}
-    </div>
-  );
-}

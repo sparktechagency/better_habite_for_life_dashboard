@@ -53,6 +53,8 @@ export const baseApi = createApi({
         "updateCategory",
         "createCourse",
         "updateCourse",
+        "createArticle",
+        "updateArticle",
       ];
 
       const isFormDataRequest = formDataEndpoints.includes(endpoint);
@@ -74,6 +76,7 @@ export const baseApi = createApi({
     "UserManagement",
     "Course",
     "Category",
+    "Article",
   ],
   endpoints: () => ({}),
 });
