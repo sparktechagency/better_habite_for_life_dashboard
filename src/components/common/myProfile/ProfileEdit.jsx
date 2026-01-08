@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { X, Upload } from "lucide-react";
@@ -25,21 +24,42 @@ function ProfileEdit({
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    address: "",
+    street: "",
+    city: "",
+    zip: "",
+    country: "",
     profileImage: null,
   });
   const [imagePreview, setImagePreview] = useState("");
   const imageInputRef = useRef(null);
   const imagePreviewRef = useRef("");
 
+  // Parse address string into separate fields (using "?" as separator)
+  const parseAddress = (addressString) => {
+    if (!addressString) {
+      return { street: "", city: "", zip: "", country: "" };
+    }
+    const parts = addressString.split("?").map((part) => part.trim());
+    return {
+      street: parts[0] || "",
+      city: parts[1] || "",
+      zip: parts[2] || "",
+      country: parts[3] || "",
+    };
+  };
+
   // Load data when modal opens
   useEffect(() => {
     if (openModal) {
       if (initialData) {
+        const addressParts = parseAddress(initialData.address);
         setFormData({
           name: initialData.name || "",
           phone: initialData.phone || "",
-          address: initialData.address || "",
+          street: addressParts.street,
+          city: addressParts.city,
+          zip: addressParts.zip,
+          country: addressParts.country,
           profileImage: null,
         });
         if (initialData.profileImageUrl) {
@@ -50,7 +70,10 @@ function ProfileEdit({
         setFormData({
           name: "John Doe",
           phone: "",
-          address: "",
+          street: "",
+          city: "",
+          zip: "",
+          country: "",
           profileImage: null,
         });
         setImagePreview("https://github.com/shadcn.png");
@@ -115,19 +138,22 @@ function ProfileEdit({
       return;
     }
 
+    // Concatenate address fields with commas
+    const addressParts = [
+      formData.street,
+      formData.city,
+      formData.zip,
+      formData.country,
+    ].filter((part) => part.trim() !== "");
+    const concatenatedAddress = addressParts.join("? ");
+    console.log("concatenatedAddress:", concatenatedAddress);
     const payload = {
-      ...formData,
+      name: formData.name,
+      phone: formData.phone,
+      address: concatenatedAddress,
+      profileImage: formData.profileImage,
       id: initialData?.id,
     };
-
-    // Debug: Check if profileImage is in payload
-    console.log("ProfileEdit - formData:", formData);
-    console.log("ProfileEdit - payload:", payload);
-    console.log("ProfileEdit - profileImage in payload:", payload.profileImage);
-    console.log(
-      "ProfileEdit - Is profileImage a File?",
-      payload.profileImage instanceof File
-    );
 
     if (onSave) {
       await onSave(payload);
@@ -225,21 +251,80 @@ function ProfileEdit({
             />
           </div>
 
-          {/* Address */}
-          <div className="space-y-2">
-            <Label
-              htmlFor="address"
-              className="text-sm font-medium text-gray-700"
-            >
+          {/* Address Fields */}
+          <div className="space-y-4">
+            <Label className="text-sm font-medium text-gray-700">
               Address:
             </Label>
-            <Textarea
-              id="address"
-              value={formData.address}
-              onChange={(e) => updateField("address", e.target.value)}
-              placeholder="Enter your address"
-              className="min-h-[80px] bg-gray-50 border-gray-200"
-            />
+            <div className="grid grid-cols-2 gap-4">
+              {/* Street */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="street"
+                  className="text-sm font-medium text-gray-600"
+                >
+                  Street:
+                </Label>
+                <Input
+                  id="street"
+                  value={formData.street}
+                  onChange={(e) => updateField("street", e.target.value)}
+                  placeholder="Enter street address"
+                  className="bg-gray-50 border-gray-200"
+                />
+              </div>
+
+              {/* City */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="city"
+                  className="text-sm font-medium text-gray-600"
+                >
+                  City:
+                </Label>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => updateField("city", e.target.value)}
+                  placeholder="Enter city"
+                  className="bg-gray-50 border-gray-200"
+                />
+              </div>
+
+              {/* Zip */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="zip"
+                  className="text-sm font-medium text-gray-600"
+                >
+                  Zip:
+                </Label>
+                <Input
+                  id="zip"
+                  value={formData.zip}
+                  onChange={(e) => updateField("zip", e.target.value)}
+                  placeholder="Enter zip code"
+                  className="bg-gray-50 border-gray-200"
+                />
+              </div>
+
+              {/* Country */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="country"
+                  className="text-sm font-medium text-gray-600"
+                >
+                  Country:
+                </Label>
+                <Input
+                  id="country"
+                  value={formData.country}
+                  onChange={(e) => updateField("country", e.target.value)}
+                  placeholder="Enter country"
+                  className="bg-gray-50 border-gray-200"
+                />
+              </div>
+            </div>
           </div>
         </div>
 

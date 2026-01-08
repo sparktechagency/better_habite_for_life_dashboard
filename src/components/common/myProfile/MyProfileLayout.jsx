@@ -28,6 +28,16 @@ function MyProfileLayout() {
     address: myProfile?.data?.address || "",
   };
 
+  const addressInfo = myProfile?.data?.address || "";
+  const addressParts = addressInfo.split("?").map((part) => part.trim());
+  const parsedAddressInfo = {
+    street: addressParts[0] || "",
+    city: addressParts[1] || "",
+    zip: addressParts[2] || "",
+    country: addressParts[3] || "",
+  };
+
+  console.log("parsedAddressInfo:", parsedAddressInfo);
   // Prepare initial data for ProfileEdit component
   const initialData = {
     name: profileInfo.fullName,
@@ -55,41 +65,32 @@ function MyProfileLayout() {
         formData.append("address", profileData.address);
       }
 
-      // Append image file if provided
-      // console.log("Full profileData object:", profileData);
-      console.log("profileData.profileImage:", profileData.profileImage);
-      // console.log("Is File?", profileData.profileImage instanceof File);
-      // console.log("Type:", typeof profileData.profileImage);
-      // console.log("Constructor:", profileData.profileImage?.constructor?.name);
-
       if (profileData.profileImage) {
         if (profileData.profileImage instanceof File) {
           formData.append("profile", profileData.profileImage);
-          console.log("✅ Image file appended to FormData:", {
+          console.log(" Image file appended to FormData:", {
             name: profileData.profileImage.name,
             size: profileData.profileImage.size,
             type: profileData.profileImage.type,
           });
         } else {
           console.warn(
-            "❌ profileImage is not a File instance:",
+            " profileImage is not a File instance:",
             typeof profileData.profileImage,
             profileData.profileImage
           );
         }
       } else {
-        console.log("⚠️ No profileImage provided in profileData");
+        console.log(" No profileImage provided in profileData");
       }
 
-      // Debug: Log FormData contents
-      console.log("FormData entries:");
-      for (const [key, value] of formData.entries()) {
-        if (value instanceof File) {
-          console.log(key, "File:", value.name, value.size, "bytes");
-        } else {
-          console.log(key, value);
-        }
-      }
+      // for (const [key, value] of formData.entries()) {
+      //   if (value instanceof File) {
+      //     console.log(key, "File:", value.name, value.size, "bytes");
+      //   } else {
+      //     console.log(key, value);
+      //   }
+      // }
 
       const response = await updateMyProfile(formData).unwrap();
 
@@ -108,7 +109,6 @@ function MyProfileLayout() {
         error?.message ||
         "An error occurred. Please try again.";
       toast.error(errorMessage);
-      console.error("Update profile error:", error);
     }
   };
 
@@ -128,7 +128,7 @@ function MyProfileLayout() {
         </Button>
       </div>
       <ProfilePhotoSection profileInfo={profileInfo} />
-      <PersonalInformationSection />
+      <PersonalInformationSection addressInfo={parsedAddressInfo} />
       <ProfileEdit
         openModal={isEditModalOpen}
         setOpenModal={setIsEditModalOpen}
