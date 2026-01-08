@@ -7,7 +7,9 @@ import { FaUsers } from "react-icons/fa";
 import { FaUserDoctor } from "react-icons/fa6";
 import { FaUserNurse } from "react-icons/fa";
 import { RiSpeedUpFill } from "react-icons/ri";
-function UserStats() {
+function UserStats({ userStatsData }) {
+  const { totalUsers, totalAppUsers, totalBhaUsers, totalBhaaUsers } =
+    userStatsData;
   return (
     <Card className="p-4">
       <h1 className="text-xl font-semibold flex items-center gap-2">
@@ -17,7 +19,7 @@ function UserStats() {
         <Card>
           <CardHeader>
             <CardTitle>Total Users</CardTitle>
-            <CardDescription>Total number of users</CardDescription>
+            <CardDescription>{totalUsers || "N/A"}</CardDescription>
             <CardAction>
               <FaUsers size={40} />
             </CardAction>
@@ -26,7 +28,7 @@ function UserStats() {
         <Card>
           <CardHeader>
             <CardTitle>Total App Users</CardTitle>
-            <CardDescription>Number of app users</CardDescription>
+            <CardDescription>{totalAppUsers || "N/A"}</CardDescription>
             <CardAction>
               <BiSolidUserPin size={40} />
             </CardAction>
@@ -35,7 +37,7 @@ function UserStats() {
         <Card>
           <CardHeader>
             <CardTitle>BHA Users</CardTitle>
-            <CardDescription>Number of BHA users</CardDescription>
+            <CardDescription>{totalBhaUsers || "N/A"}</CardDescription>
             <CardAction>
               <FaUserDoctor size={40} />
             </CardAction>
@@ -44,7 +46,7 @@ function UserStats() {
         <Card>
           <CardHeader>
             <CardTitle>BHAA Users</CardTitle>
-            <CardDescription>Number of BHAA users</CardDescription>
+            <CardDescription>{totalBhaaUsers || "N/A"}</CardDescription>
             <CardAction>
               <FaUserNurse size={40} />
             </CardAction>
