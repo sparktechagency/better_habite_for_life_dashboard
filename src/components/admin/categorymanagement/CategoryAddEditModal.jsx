@@ -18,6 +18,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import Image from "next/image";
+import {
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+} from "@/redux/Apis/admin/categoryApi/categoryApi";
+import useToast from "@/hooks/useToast";
+import { baseUrl } from "@/redux/store/baseUrl";
 
 function CategoryAddEditModal({
   openModal,
@@ -36,6 +42,12 @@ function CategoryAddEditModal({
   const [iconFile, setIconFile] = useState(null);
   const iconInputRef = useRef(null);
   const iconPreviewRef = useRef("");
+  const toast = useToast();
+
+  const [createCategory, { isLoading: isCreating }] =
+    useCreateCategoryMutation();
+  const [updateCategory, { isLoading: isUpdating }] =
+    useUpdateCategoryMutation();
 
   // Load category data when in edit mode
   useEffect(() => {
@@ -45,9 +57,23 @@ function CategoryAddEditModal({
         icon: null,
       });
 
-      // Set preview if icon URL is provided
-      if (categoryData.iconUrl) {
-        setIconPreview(categoryData.iconUrl);
+      // Set preview if image URL is provided
+      if (categoryData.image) {
+        // Handle image URL - check if it's a full URL or relative path
+        let imageUrl = categoryData.image;
+        if (!imageUrl.startsWith("http")) {
+          // Normalize relative path
+          let normalizedPath = imageUrl.replace(/\\/g, "/");
+          if (!normalizedPath.startsWith("/")) {
+            normalizedPath = "/" + normalizedPath;
+          }
+          const apiBaseUrl =
+            baseUrl ||
+            process.env.NEXT_PUBLIC_API_BASE_URL ||
+            "http://10.10.7.79:3001";
+          imageUrl = `${apiBaseUrl}${normalizedPath}`;
+        }
+        setIconPreview(imageUrl);
       }
     }
   }, [isEdit, categoryData, openModal, form]);
@@ -102,12 +128,65 @@ function CategoryAddEditModal({
     }
   };
 
-  const onSubmit = (data) => {
-    console.log(isEdit ? "Editing category:" : "Creating category:", data);
-    if (isEdit && categoryData?.id) {
-      console.log("Category ID:", categoryData.id);
+  const onSubmit = async (data) => {
+    try {
+      // Create FormData for file upload
+      const formData = new FormData();
+
+      // Append name (required field)
+      formData.append("name", data.categoryName || "");
+
+      // Append image file if provided
+      if (iconFile && iconFile instanceof File) {
+        formData.append("image", iconFile);
+      }
+
+      // Debug: Log FormData contents
+      console.log("FormData entries:");
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(key, "File:", value.name, value.size, "bytes");
+        } else {
+          console.log(key, value);
+        }
+      }
+
+      let response;
+      if (isEdit && categoryData?._id) {
+        // Update category
+        response = await updateCategory({
+          id: categoryData._id,
+          formData,
+        }).unwrap();
+      } else {
+        // Create category
+        response = await createCategory(formData).unwrap();
+      }
+
+      // Check if response is successful
+      if (response?.success) {
+        toast.success(
+          response.message ||
+            (isEdit
+              ? "Category updated successfully"
+              : "Category created successfully")
+        );
+        setOpenModal(false);
+        resetForm();
+      } else {
+        throw new Error(
+          response?.message || "An error occurred. Please try again."
+        );
+      }
+    } catch (error) {
+      // Handle error
+      const errorMessage =
+        error?.data?.message ||
+        error?.message ||
+        "An error occurred. Please try again.";
+      toast.error(errorMessage);
+      console.error("Category operation error:", error);
     }
-    setOpenModal(false);
   };
 
   const resetForm = () => {
@@ -265,12 +344,25 @@ function CategoryAddEditModal({
               )}
             />
 
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-end pt-4 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpenModal(false)}
+                disabled={isCreating || isUpdating}
+              >
+                Cancel
+              </Button>
               <Button
                 type="submit"
                 className="bg-gray-800 text-white hover:bg-gray-700"
+                disabled={isCreating || isUpdating}
               >
-                {isEdit ? "Update" : "Add"}
+                {isCreating || isUpdating
+                  ? "Processing..."
+                  : isEdit
+                  ? "Update"
+                  : "Add"}
               </Button>
             </div>
           </form>

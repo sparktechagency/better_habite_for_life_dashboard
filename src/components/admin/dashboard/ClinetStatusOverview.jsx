@@ -18,6 +18,7 @@ import { HiOutlineRectangleStack } from "react-icons/hi2";
 import CommonuserModal from "@/components/common/commonusermodal/CommonuserModal";
 import { Progress } from "@/components/ui/progress";
 import { useRouter } from "next/navigation";
+import formatDate from "@/utils/FormatDate/formatDate";
 
 export function ClinetStatusOverview({ userInfoData }) {
   const router = useRouter();
@@ -97,7 +98,9 @@ export function ClinetStatusOverview({ userInfoData }) {
                   </TableCell>
 
                   <TableCell className="w-1/6">{data.role}</TableCell>
-                  <TableCell className="w-1/6">{data.joinedOn}</TableCell>
+                  <TableCell className="w-1/6">
+                    {formatDate(data.joinedOn)}
+                  </TableCell>
                   <TableCell className="w-1/6">
                     <p
                       className={`${
@@ -156,7 +159,7 @@ export function ClinetStatusOverview({ userInfoData }) {
 
 export default ClinetStatusOverview;
 
-const ClientDetailsModal = ({ selectedClient }) => {
+export const ClientDetailsModal = ({ selectedClient }) => {
   if (!selectedClient) return null;
 
   const getInitials = (name) => {
@@ -168,20 +171,21 @@ const ClientDetailsModal = ({ selectedClient }) => {
       .toUpperCase();
   };
 
-  // Format date if it exists
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {
-      return dateString;
-    }
-  };
+  // // Format date if it exists
+  // const formatDate = (dateString) => {
+  //   if (!dateString) return "N/A";
+  //   try {
+  //     const date = new Date(dateString);
+  //     return date.toLocaleDateString("en-US", {
+  //       year: "numeric",
+  //       month: "long",
+  //       day: "numeric",
+  //     });
+  //   } catch {
+  //     return dateString;
+  //   }
+  // };
+  const formattedDate = formatDate(selectedClient.joinedOn);
 
   const statusText = selectedClient.status === true ? "Active" : "Inactive";
   const statusClass =
@@ -227,7 +231,7 @@ const ClientDetailsModal = ({ selectedClient }) => {
         <div className="flex items-center justify-between py-2 border-b border-gray-200">
           <span className="text-sm font-medium text-gray-600">Join Date:</span>
           <span className="text-sm font-semibold text-gray-900">
-            {formatDate(selectedClient.joinedOn)}
+            {formattedDate}
           </span>
         </div>
 

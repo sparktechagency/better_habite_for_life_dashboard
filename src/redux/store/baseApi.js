@@ -6,7 +6,7 @@ export const baseApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl: baseUrl || process.env.NEXT_PUBLIC_API_BASE_URL,
-    prepareHeaders: (headers, { endpoint, type }) => {
+    prepareHeaders: (headers, { endpoint, type, originalArgs }) => {
       // Get all tokens from cookies
       const accessToken = getCookie("accessToken");
       const token = getCookie("token");
@@ -46,19 +46,26 @@ export const baseApi = createApi({
 
       // RTK Query automatically handles FormData and won't set Content-Type for it
       // Only set Content-Type for JSON requests (not for FormData)
-      // Check if this is updateMyProfile mutation - it uses FormData
-      const isUpdateMyProfile =
-        endpoint === "updateMyProfile" && type === "mutation";
+      // Check if the request body is FormData
+      const isFormDataRequest = originalArgs?.body instanceof FormData;
 
-      // Set Content-Type only if not already set (FormData will have its own)
-      // For updateMyProfile, we'll let RTK Query handle it automatically
-      if (!isUpdateMyProfile && !headers.has("Content-Type")) {
+      // IMPORTANT: Do NOT set Content-Type for FormData requests.
+      // fetchBaseQuery automatically sets 'multipart/form-data' with the correct boundary.
+      // If we explicitly set 'application/json', it overrides and breaks FormData.
+      if (!isFormDataRequest && !headers.has("Content-Type")) {
         headers.set("Content-Type", "application/json");
       }
 
       return headers;
     },
   }),
-  tagTypes: ["Auth", "Profile", "Dashboard"],
+  tagTypes: [
+    "Auth",
+    "Profile",
+    "Dashboard",
+    "UserManagement",
+    "Course",
+    "Category",
+  ],
   endpoints: () => ({}),
 });

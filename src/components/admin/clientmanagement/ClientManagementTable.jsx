@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,117 +13,275 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import formatDate from "@/utils/FormatDate/formatDate";
+import CommonuserModal from "@/components/common/commonusermodal/CommonuserModal";
+import { ClientDetailsModal } from "../dashboard/ClinetStatusOverview";
 
-const tableData = [
-  {
-    userName: "John Doe",
-    email: "john.doe@example.com",
-    joinedDate: "2025-05-12",
-    role: "BHA",
-    status: "Active",
-  },
-  {
-    userName: "John Doe",
-    email: "john.doe@example.com",
-    joinedDate: "2025-05-12",
-    role: "BHA",
-    status: "Inactive",
-  },
-  {
-    userName: "John Doe",
-    email: "john.doe@example.com",
-    joinedDate: "2025-05-12",
-    role: "User",
-    status: "Active",
-  },
-  {
-    userName: "John Doe",
-    email: "john.doe@example.com",
-    joinedDate: "2025-05-12",
-    role: "User",
-    status: "Active",
-  },
-  {
-    userName: "John Doe",
-    email: "john.doe@example.com",
-    joinedDate: "2025-05-12",
-    role: "BHAA",
-    status: "Inactive",
-  },
-  {
-    userName: "John Doe",
-    email: "john.doe@example.com",
-    joinedDate: "2025-05-12",
-    role: "BHAA",
-    status: "Inactive",
-  },
-];
-function ClientManagementTable() {
+function ClientManagementTable({
+  userInfoData = [],
+  isLoading = false,
+  paginationMeta = { page: 1, limit: 10, total: 0, totalPage: 1 },
+  currentPage = 1,
+  setCurrentPage,
+}) {
+  const getInitials = (name) => {
+    if (!name) return "CN";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const handleViewDetails = (client) => {
+    setSelectedClient(client);
+    setOpenModal(true);
+  };
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedClient(null);
+  };
+  const renderPaginationButtons = () => {
+    const { totalPage } = paginationMeta;
+    const buttons = [];
+
+    if (totalPage <= 7) {
+      // Show all pages if 7 or fewer
+      for (let i = 1; i <= totalPage; i++) {
+        buttons.push(
+          <Button
+            key={i}
+            variant="outline"
+            className={`h-8 w-8 ${
+              currentPage === i
+                ? "bg-orange-500 text-white border-orange-500"
+                : "bg-gray-100 text-gray-600 border-gray-300"
+            }`}
+            onClick={() => setCurrentPage(i)}
+          >
+            {i}
+          </Button>
+        );
+      }
+    } else {
+      // Show first page
+      buttons.push(
+        <Button
+          key={1}
+          variant="outline"
+          className={`h-8 w-8 ${
+            currentPage === 1
+              ? "bg-orange-500 text-white border-orange-500"
+              : "bg-gray-100 text-gray-600 border-gray-300"
+          }`}
+          onClick={() => setCurrentPage(1)}
+        >
+          1
+        </Button>
+      );
+
+      // Show ellipsis and pages around current page
+      if (currentPage > 3) {
+        buttons.push(
+          <span key="ellipsis1" className="px-2 text-gray-600">
+            ...
+          </span>
+        );
+      }
+
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPage - 1, currentPage + 1);
+
+      for (let i = start; i <= end; i++) {
+        if (i !== 1 && i !== totalPage) {
+          buttons.push(
+            <Button
+              key={i}
+              variant="outline"
+              className={`h-8 w-8 ${
+                currentPage === i
+                  ? "bg-orange-500 text-white border-orange-500"
+                  : "bg-gray-100 text-gray-600 border-gray-300"
+              }`}
+              onClick={() => setCurrentPage(i)}
+            >
+              {i}
+            </Button>
+          );
+        }
+      }
+
+      if (currentPage < totalPage - 2) {
+        buttons.push(
+          <span key="ellipsis2" className="px-2 text-gray-600">
+            ...
+          </span>
+        );
+      }
+
+      // Show last page
+      if (totalPage > 1) {
+        buttons.push(
+          <Button
+            key={totalPage}
+            variant="outline"
+            className={`h-8 w-8 ${
+              currentPage === totalPage
+                ? "bg-orange-500 text-white border-orange-500"
+                : "bg-gray-100 text-gray-600 border-gray-300"
+            }`}
+            onClick={() => setCurrentPage(totalPage)}
+          >
+            {totalPage}
+          </Button>
+        );
+      }
+    }
+
+    return buttons;
+  };
+
   return (
-    <ScrollArea className="w-full rounded-md border whitespace-nowrap">
-      <Table className="bg-white">
-        <TableHeader>
-          <TableRow className="bg-gray-200">
-            <TableHead className="w-1/6">User Name</TableHead>
-            <TableHead className="w-1/6">Role</TableHead>
-            <TableHead className="w-1/6">Joined Date</TableHead>
-            <TableHead className="w-1/6">Status</TableHead>
-            <TableHead className="w-1/6 text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tableData.map((data, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-medium w-1/6">
-                <div className="flex items-center gap-2">
-                  <Avatar className="size-9">
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">{data.userName}</span>
-                    <span className="text-xs text-gray-500">{data.email}</span>
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell className="w-1/6">{data.role}</TableCell>
-              <TableCell className="w-1/6">{data.joinedDate}</TableCell>
-              <TableCell className="w-1/6">
-                <p
-                  className={`${
-                    data.status === "Active"
-                      ? "bg-lime-500/50 text-black"
-                      : data.status === "Inactive"
-                      ? "bg-red-500/50 text-white"
-                      : "bg-yellow-500/55 text-gray-500"
-                  } px-2 py-1 rounded-full text-center font-medium text-xs inline-block w-20`}
-                >
-                  {data.status}
-                </p>
-              </TableCell>
-              <TableCell className="w-1/6 text-right">
-                <div className="flex items-center gap-2 justify-end">
-                  <Button
-                    variant="outline"
-                    className="border border-gray-400 h-8"
-                  >
-                    View Details
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border border-red-400 h-8 text-red-500"
-                  >
-                    Block
-                  </Button>
-                </div>
-              </TableCell>
+    <div className="space-y-4">
+      <ScrollArea className="w-full rounded-md border whitespace-nowrap">
+        <Table className="bg-white">
+          <TableHeader>
+            <TableRow className="bg-gray-200">
+              <TableHead className="w-1/6">User Name</TableHead>
+              <TableHead className="w-1/6">Role</TableHead>
+              <TableHead className="w-1/6">Joined Date</TableHead>
+              <TableHead className="w-1/6">Status</TableHead>
+              <TableHead className="w-1/6 text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-        <TableFooter></TableFooter>
-      </Table>
-      <Scrollbar orientation="horizontal" className="h-2 w-full" />
-    </ScrollArea>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="text-center py-8 text-gray-500"
+                >
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : userInfoData && userInfoData.length > 0 ? (
+              userInfoData.map((data, index) => (
+                <TableRow key={data.id || index}>
+                  <TableCell className="font-medium w-1/6">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="size-9">
+                        <AvatarImage
+                          src={
+                            data.profilePicture ||
+                            "https://github.com/shadcn.png"
+                          }
+                        />
+                        <AvatarFallback>
+                          {getInitials(data.fullName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">
+                          {data.fullName}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {data.email}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="w-1/6">
+                    {data.role?.charAt(0).toUpperCase() + data.role?.slice(1) ||
+                      "N/A"}
+                  </TableCell>
+                  <TableCell className="w-1/6">
+                    {formatDate(data.joinedOn)}
+                  </TableCell>
+                  <TableCell className="w-1/6">
+                    <p
+                      className={`${
+                        data.status === true
+                          ? "bg-lime-500/50 text-black"
+                          : "bg-red-500/50 text-white"
+                      } px-2 py-1 rounded-full text-center font-medium text-xs inline-block w-20`}
+                    >
+                      {data.status === true ? "Active" : "Inactive"}
+                    </p>
+                  </TableCell>
+                  <TableCell className="w-1/6 text-right">
+                    <div className="flex items-center gap-2 justify-end">
+                      <Button
+                        variant="outline"
+                        className="border border-gray-400 h-8"
+                        onClick={() => handleViewDetails(data)}
+                      >
+                        View Details
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="border border-red-400 h-8 text-red-500"
+                      >
+                        Block
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="text-center py-8 text-gray-500"
+                >
+                  No user data available
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+          <TableFooter></TableFooter>
+        </Table>
+        <Scrollbar orientation="horizontal" className="h-2 w-full" />
+      </ScrollArea>
+
+      {/* Pagination */}
+      {paginationMeta.totalPage > 1 && (
+        <div className="flex items-center justify-center gap-2 py-4 border-t">
+          <Button
+            variant="outline"
+            className="bg-gray-100 text-gray-600 border-gray-300 h-8"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+          >
+            Previous
+          </Button>
+          <div className="flex items-center gap-1">
+            {renderPaginationButtons()}
+          </div>
+          <Button
+            variant="outline"
+            className="bg-orange-500 text-white border-orange-500 hover:bg-orange-600 h-8"
+            disabled={currentPage === paginationMeta.totalPage}
+            onClick={() =>
+              setCurrentPage((prev) =>
+                Math.min(paginationMeta.totalPage, prev + 1)
+              )
+            }
+          >
+            Next
+          </Button>
+        </div>
+      )}
+
+      <CommonuserModal
+        openModal={openModal}
+        setOpenModal={handleCloseModal}
+        title="View Details"
+        onSave={null}
+      >
+        <ClientDetailsModal selectedClient={selectedClient} />
+      </CommonuserModal>
+    </div>
   );
 }
 

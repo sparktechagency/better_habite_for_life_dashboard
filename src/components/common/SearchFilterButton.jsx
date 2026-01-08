@@ -18,15 +18,21 @@ function SearchFilterButton({
   selectOptions = ["All Status"],
   placeholder = "Search Client",
   searchByDate = false,
+  searchText = "",
+  setSearchText = () => {},
+  status = "All Status",
+  setStatus = () => {},
 }) {
   return (
     <div className="flex items-center gap-2 ">
       <Input
         className="flex-1 bg-white border-gray-300"
         placeholder={placeholder}
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
       />
       {showFilterButton && (
-        <Select>
+        <Select value={status} onValueChange={setStatus}>
           <SelectTrigger className="bg-white border-gray-300">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
