@@ -46,8 +46,14 @@ export const baseApi = createApi({
 
       // RTK Query automatically handles FormData and won't set Content-Type for it
       // Only set Content-Type for JSON requests (not for FormData)
-      // Check if the request body is FormData
-      const isFormDataRequest = originalArgs?.body instanceof FormData;
+      // List of endpoints that use FormData
+      const formDataEndpoints = [
+        "updateMyProfile",
+        "createCategory",
+        "updateCategory",
+      ];
+
+      const isFormDataRequest = formDataEndpoints.includes(endpoint);
 
       // IMPORTANT: Do NOT set Content-Type for FormData requests.
       // fetchBaseQuery automatically sets 'multipart/form-data' with the correct boundary.

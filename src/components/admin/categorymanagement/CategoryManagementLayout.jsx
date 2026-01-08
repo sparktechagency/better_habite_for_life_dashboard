@@ -22,12 +22,13 @@ function CategoryManagementLayout() {
   const [editCategoryData, setEditCategoryData] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteCategoryData, setDeleteCategoryData] = useState(null);
+  const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(12);
   const toast = useToast();
 
   const { data: categoryData, isLoading: isCategoryLoading } =
-    useGetCategoryDataQuery({ page: currentPage, limit });
+    useGetCategoryDataQuery({ page: currentPage, limit, searchText });
   const [deleteCategory, { isLoading: isDeleting }] =
     useDeleteCategoryMutation();
 
@@ -46,6 +47,11 @@ function CategoryManagementLayout() {
   const handleDeleteClick = (categoryData) => {
     setDeleteCategoryData(categoryData);
     setIsDeleteModalOpen(true);
+  };
+
+  const handleSearchChange = (value) => {
+    setSearchText(value);
+    setCurrentPage(1);
   };
 
   const handleConfirmDelete = async () => {
@@ -94,6 +100,8 @@ function CategoryManagementLayout() {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         onDeleteClick={handleDeleteClick}
+        searchText={searchText}
+        onSearchChange={handleSearchChange}
       />
       <CategoryAddEditModal
         openModal={isModalOpen}
@@ -127,6 +135,8 @@ const CategorySection = ({
   paginationMeta,
   currentPage,
   setCurrentPage,
+  searchText,
+  onSearchChange,
 }) => {
   const categories = categoryData?.data || [];
 
@@ -233,7 +243,13 @@ const CategorySection = ({
   return (
     <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
       <p className="text-lg font-bold">Uploaded Category</p>
-      <SearchFilterButton showAddButton={false} showFilterButton={false} />
+      <SearchFilterButton
+        showAddButton={false}
+        showFilterButton={false}
+        searchText={searchText}
+        setSearchText={onSearchChange}
+        placeholder="Search Category"
+      />
       {isLoading ? (
         <div className="text-center py-12 text-gray-500">
           Loading categories...
