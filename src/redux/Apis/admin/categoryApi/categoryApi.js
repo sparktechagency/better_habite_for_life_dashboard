@@ -22,6 +22,14 @@ export const categoryApi = baseApi.injectEndpoints({
       },
       providesTags: ["Category"],
     }),
+    // Get all categories without pagination limit (for dropdowns)
+    getAllCategories: builder.query({
+      query: () => ({
+        url: `/category?limit=1000`,
+        method: "GET",
+      }),
+      providesTags: ["Category"],
+    }),
     createCategory: builder.mutation({
       query: (formData) => ({
         url: "/category/create-category",
@@ -66,6 +74,7 @@ export const categoryApi = baseApi.injectEndpoints({
 
 export const {
   useGetCategoryDataQuery,
+  useGetAllCategoriesQuery,
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,

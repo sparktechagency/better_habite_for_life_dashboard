@@ -5,6 +5,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import Image from "next/image";
 import { Rating, RatingButton } from "@/components/ui/shadcn-io/rating";
 import { VscEye } from "react-icons/vsc";
+import { getImageUrl } from "@/utils/getImageUrl";
+import { Badge } from "@/components/ui/badge";
 
 function RecentCourses({ course }) {
   const router = useRouter();
@@ -27,7 +29,7 @@ function RecentCourses({ course }) {
     >
       <CardContent className="p-0 relative h-[10rem] md:h-[12rem]">
         <Image
-          src="/course_thumbnail.png"
+          src={getImageUrl(course?.thumbnail)}
           alt={title}
           width={300}
           height={300}
@@ -43,7 +45,12 @@ function RecentCourses({ course }) {
       <CardFooter className="py-2 px-4">
         <div className="w-full space-y-1">
           <h3 className="text-lg font-semibold text-gray-900 ">{title}</h3>
-          <p className="text-sm text-gray-600 ">{category}</p>
+          <Badge
+            variant="outline"
+            className="text-sm border border-white bg-pink-200 text-gray-600 w-fit"
+          >
+            {category}
+          </Badge>
           <div className="flex items-center gap-2">
             <Rating defaultValue={ratingValue} readOnly>
               {Array.from({ length: 5 }).map((_, index) => (

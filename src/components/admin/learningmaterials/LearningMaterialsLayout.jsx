@@ -29,6 +29,10 @@ function LearningMaterialsLayout() {
     totalPage: 1,
   };
 
+  const handleCreateNewMaterial = useCallback(() => {
+    setOpenAddNewMaterialModal(true);
+  }, []);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">

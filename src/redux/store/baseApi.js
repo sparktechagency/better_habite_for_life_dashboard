@@ -51,6 +51,8 @@ export const baseApi = createApi({
         "updateMyProfile",
         "createCategory",
         "updateCategory",
+        "createCourse",
+        "updateCourse",
       ];
 
       const isFormDataRequest = formDataEndpoints.includes(endpoint);
