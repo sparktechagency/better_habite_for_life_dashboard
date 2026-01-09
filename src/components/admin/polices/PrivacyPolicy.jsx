@@ -1,30 +1,73 @@
 "use client";
-import GetPolicy from "@/components/common/policies/GetPolicy";
 import SmallPageInfo from "@/components/common/SmallPageInfo";
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiEdit3 } from "react-icons/fi";
 import PolicyModal from "./PolicyModal";
+import {
+  useGetPrivacyPolicyQuery,
+  useUpdatePolicyMutation,
+} from "@/redux/Apis/policyApi/policyApi";
+import useToast from "@/hooks/useToast";
 
 function PrivacyPolicy() {
+  const toast = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // Mock policy content - in real app, this would come from API
-  const [policyContent, setPolicyContent] = useState(
-    "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>"
-  );
+  const [policyContent, setPolicyContent] = useState("");
+
+  const { data: policyResponse, isLoading, error } = useGetPrivacyPolicyQuery();
+  const [updatePolicy, { isLoading: isUpdating }] = useUpdatePolicyMutation();
+
+  // Sync policy content with API data
+  useEffect(() => {
+    if (policyResponse?.data?.privacyPolicy) {
+      setPolicyContent(policyResponse.data.privacyPolicy);
+    }
+  }, [policyResponse]);
 
   const handleEditClick = () => {
     setIsModalOpen(true);
   };
 
   const handleSave = async (htmlContent) => {
-    // Save the policy content
-    console.log("Saving Privacy Policy:", htmlContent);
-    // In real app, make API call here
-    // await updatePolicy("Privacy Policy", htmlContent);
-    setPolicyContent(htmlContent);
-    setIsModalOpen(false);
+    try {
+      const response = await updatePolicy({
+        privacyPolicy: htmlContent,
+      }).unwrap();
+
+      if (response?.success) {
+        toast.success(
+          response.message || "Privacy Policy updated successfully"
+        );
+        setPolicyContent(htmlContent);
+        setIsModalOpen(false);
+      } else {
+        toast.error(response?.message || "Failed to update Privacy Policy");
+      }
+    } catch (error) {
+      const errorMessage =
+        error?.data?.message ||
+        error?.message ||
+        "Failed to update Privacy Policy";
+      toast.error(errorMessage);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-gray-500">Loading Privacy Policy...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-red-500">Failed to load Privacy Policy</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -33,17 +76,33 @@ function PrivacyPolicy() {
           title="Privacy Policy"
           description="Here is an overview of your privacy policy"
         />
-        <Button className="" onClick={handleEditClick}>
+        <Button onClick={handleEditClick}>
           <FiEdit3 size={15} /> Edit Privacy Policy
         </Button>
       </div>
-      <GetPolicy getPolicy="Privacy Policy" />
+
+      {/* Policy Content Display */}
+      <div className="space-y-4 border bg-white p-4 rounded-lg min-h-[700px]">
+        <h1 className="text-2xl font-bold">Privacy Policy</h1>
+        {policyContent ? (
+          <div
+            className="text-base text-gray-700 prose max-w-none"
+            dangerouslySetInnerHTML={{ __html: policyContent }}
+          />
+        ) : (
+          <p className="text-base text-gray-500">
+            No privacy policy content available.
+          </p>
+        )}
+      </div>
+
       <PolicyModal
         openModal={isModalOpen}
         setOpenModal={setIsModalOpen}
         title="Edit Privacy Policy"
         content={policyContent}
         onSave={handleSave}
+        isLoading={isUpdating}
       />
     </div>
   );

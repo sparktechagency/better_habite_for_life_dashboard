@@ -16,9 +16,9 @@ function PolicyModal({
   title = "Edit Policy",
   content = "",
   onSave,
+  isLoading = false,
 }) {
   const [editorContent, setEditorContent] = useState(content);
-  const [isSaving, setIsSaving] = useState(false);
 
   // Update editor content when content prop changes
   useEffect(() => {
@@ -31,7 +31,6 @@ function PolicyModal({
   useEffect(() => {
     if (!openModal) {
       setEditorContent("");
-      setIsSaving(false);
     }
   }, [openModal]);
 
@@ -44,17 +43,10 @@ function PolicyModal({
       return;
     }
 
-    setIsSaving(true);
-    try {
-      if (onSave) {
-        await onSave(editorContent);
-      }
-      setOpenModal(false);
-    } catch (error) {
-    } finally {
-      setIsSaving(false);
+    if (onSave) {
+      await onSave(editorContent);
     }
-  }, [editorContent, onSave, setOpenModal]);
+  }, [editorContent, onSave]);
 
   const handleOpenChange = useCallback(
     (open) => {
@@ -89,17 +81,17 @@ function PolicyModal({
             type="button"
             variant="outline"
             onClick={() => setOpenModal(false)}
-            disabled={isSaving}
+            disabled={isLoading}
           >
             Cancel
           </Button>
           <Button
             type="button"
             onClick={handleSave}
-            disabled={isSaving || !editorContent.trim()}
+            disabled={isLoading || !editorContent.trim()}
             className="bg-gray-800 hover:bg-gray-700 text-white"
           >
-            {isSaving ? "Saving..." : "Save"}
+            {isLoading ? "Saving..." : "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>

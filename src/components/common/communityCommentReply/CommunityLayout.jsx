@@ -19,7 +19,7 @@ import { useGetPostDataQuery } from "@/redux/Apis/admin/postApi/postApi";
 export default function CommunityLayout() {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit] = useState(12);
-  const [filter, setFilter] = useState("popular");
+  const [filter, setFilter] = useState("recent");
 
   const {
     data: postsResponse,
