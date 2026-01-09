@@ -16,7 +16,7 @@ import { Scrollbar } from "@radix-ui/react-scroll-area";
 
 import { HiOutlineRectangleStack } from "react-icons/hi2";
 import CommonuserModal from "@/components/common/commonusermodal/CommonuserModal";
-
+import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import formatDate from "@/utils/FormatDate/formatDate";
 import { useBlockUserMutation } from "@/redux/Apis/admin/usermanagementApi/usermanagementApi";
@@ -174,13 +174,17 @@ export function ClinetStatusOverview({ userInfoData }) {
                           onClick={() => handleBlockUser(data)}
                           disabled={isCurrentlyBlocking}
                         >
-                          {isCurrentlyBlocking
-                            ? isActive
-                              ? "Blocking..."
-                              : "Unblocking..."
-                            : isActive
-                            ? "Block"
-                            : "Unblock"}
+                          {isCurrentlyBlocking ? (
+                            isActive ? (
+                              <Loader className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Loader className="w-4 h-4 animate-spin" />
+                            )
+                          ) : isActive ? (
+                            "Block"
+                          ) : (
+                            "Unblock"
+                          )}
                         </Button>
                       );
                     })()}
@@ -228,20 +232,6 @@ export const ClientDetailsModal = ({ selectedClient }) => {
       .toUpperCase();
   };
 
-  // // Format date if it exists
-  // const formatDate = (dateString) => {
-  //   if (!dateString) return "N/A";
-  //   try {
-  //     const date = new Date(dateString);
-  //     return date.toLocaleDateString("en-US", {
-  //       year: "numeric",
-  //       month: "long",
-  //       day: "numeric",
-  //     });
-  //   } catch {
-  //     return dateString;
-  //   }
-  // };
   const formattedDate = formatDate(selectedClient.joinedOn);
 
   const statusText = selectedClient.status === true ? "Active" : "Inactive";
