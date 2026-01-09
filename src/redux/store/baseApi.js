@@ -80,6 +80,7 @@ export const baseApi = createApi({
     "Post",
     "Faq",
     "Policy",
+    "Report",
   ],
   endpoints: () => ({}),
 });

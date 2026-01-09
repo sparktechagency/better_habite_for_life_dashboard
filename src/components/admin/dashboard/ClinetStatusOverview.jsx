@@ -16,14 +16,19 @@ import { Scrollbar } from "@radix-ui/react-scroll-area";
 
 import { HiOutlineRectangleStack } from "react-icons/hi2";
 import CommonuserModal from "@/components/common/commonusermodal/CommonuserModal";
-import { Progress } from "@/components/ui/progress";
+
 import { useRouter } from "next/navigation";
 import formatDate from "@/utils/FormatDate/formatDate";
-
+import { useBlockUserMutation } from "@/redux/Apis/admin/usermanagementApi/usermanagementApi";
+import useToast from "@/hooks/useToast";
 export function ClinetStatusOverview({ userInfoData }) {
   const router = useRouter();
+  const toast = useToast();
   const [openModal, setOpenModal] = useState(false);
+  const [blockUser, { isLoading: isBlocking }] = useBlockUserMutation();
   const [selectedClient, setSelectedClient] = useState(null);
+  const [blockingUserId, setBlockingUserId] = useState(null);
+
   const handleViewDetails = (client) => {
     setSelectedClient(client);
     setOpenModal(true);
@@ -35,6 +40,34 @@ export function ClinetStatusOverview({ userInfoData }) {
   };
   const handleViewAll = () => {
     router.push("/admin/client-management");
+  };
+  const handleBlockUser = async (client) => {
+    const userId = client._id || client.id;
+    setBlockingUserId(userId);
+    try {
+      const response = await blockUser({ id: userId }).unwrap();
+      if (response?.success) {
+        // isActive: true = user is active, we're blocking them
+        // isActive: false = user is blocked, we're unblocking them
+        const isCurrentlyActive =
+          client.isActive !== undefined
+            ? client.isActive === true
+            : client.status === true;
+        toast.success(
+          isCurrentlyActive
+            ? "User blocked successfully"
+            : "User unblocked successfully"
+        );
+      } else {
+        toast.error(response?.message || "Failed to update user status");
+      }
+    } catch (error) {
+      toast.error(
+        error?.data?.message || error?.message || "Failed to update user status"
+      );
+    } finally {
+      setBlockingUserId(null);
+    }
   };
   return (
     <>
@@ -121,12 +154,36 @@ export function ClinetStatusOverview({ userInfoData }) {
                     >
                       View Details
                     </Button>
-                    <Button
-                      variant="outline"
-                      className="border border-red-400 h-8 text-red-500"
-                    >
-                      Block
-                    </Button>
+                    {(() => {
+                      // isActive: true = user is active, show Block button
+                      // isActive: false = user is blocked, show Unblock button
+                      const isActive =
+                        data.isActive !== undefined
+                          ? data.isActive === true
+                          : data.status === true;
+                      const userId = data._id || data.id;
+                      const isCurrentlyBlocking = blockingUserId === userId;
+                      return (
+                        <Button
+                          variant="outline"
+                          className={
+                            isActive
+                              ? "border border-red-400 h-8 text-red-500"
+                              : "border border-lime-500 h-8 text-lime-600"
+                          }
+                          onClick={() => handleBlockUser(data)}
+                          disabled={isCurrentlyBlocking}
+                        >
+                          {isCurrentlyBlocking
+                            ? isActive
+                              ? "Blocking..."
+                              : "Unblocking..."
+                            : isActive
+                            ? "Block"
+                            : "Unblock"}
+                        </Button>
+                      );
+                    })()}
                   </TableCell>
                 </TableRow>
               ))

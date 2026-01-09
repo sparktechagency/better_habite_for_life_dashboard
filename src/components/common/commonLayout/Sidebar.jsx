@@ -75,11 +75,11 @@ const sidebars = {
       path: "/admin/category-management",
       icon: BiCategory,
     },
-    {
-      name: "Subscriptions",
-      path: "/admin/subscriptions",
-      icon: TiGift,
-    },
+    // {
+    //   name: "Subscriptions",
+    //   path: "/admin/subscriptions",
+    //   icon: TiGift,
+    // },
     {
       name: "Terms and Conditions",
       path: "/admin/terms-and-conditions",
@@ -96,7 +96,7 @@ const sidebars = {
       icon: FaQuoteRight,
     },
 
-    { name: "Settings", path: "/admin/settings", icon: Settings },
+    // { name: "Settings", path: "/admin/settings", icon: Settings },
   ],
   bha: [
     { name: "Dashboard", path: "/bha/dashboard", icon: RxDashboard },

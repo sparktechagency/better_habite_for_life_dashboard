@@ -16,6 +16,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import formatDate from "@/utils/FormatDate/formatDate";
 import CommonuserModal from "@/components/common/commonusermodal/CommonuserModal";
 import { ClientDetailsModal } from "../dashboard/ClinetStatusOverview";
+import { useBlockUserMutation } from "@/redux/Apis/admin/usermanagementApi/usermanagementApi";
+import useToast from "@/hooks/useToast";
+import { Loader } from "lucide-react";
+// import Loader from "@/components/common/loader/Loader";
 
 function ClientManagementTable({
   userInfoData = [],
@@ -24,6 +28,10 @@ function ClientManagementTable({
   currentPage = 1,
   setCurrentPage,
 }) {
+  const toast = useToast();
+  const [blockUser] = useBlockUserMutation();
+  const [blockingUserId, setBlockingUserId] = useState(null);
+
   const getInitials = (name) => {
     if (!name) return "CN";
     return name
@@ -34,14 +42,46 @@ function ClientManagementTable({
   };
   const [openModal, setOpenModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
+
   const handleViewDetails = (client) => {
     setSelectedClient(client);
     setOpenModal(true);
   };
+
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedClient(null);
   };
+
+  const handleBlockUser = async (client) => {
+    const userId = client._id || client.id;
+    setBlockingUserId(userId);
+    try {
+      const response = await blockUser({ id: userId }).unwrap();
+      if (response?.success) {
+        // isActive: true = user is active, we're blocking them
+        // isActive: false = user is blocked, we're unblocking them
+        const isCurrentlyActive =
+          client.isActive !== undefined
+            ? client.isActive === true
+            : client.status === true;
+        toast.success(
+          isCurrentlyActive
+            ? "User blocked successfully"
+            : "User unblocked successfully"
+        );
+      } else {
+        toast.error(response?.message || "Failed to update user status");
+      }
+    } catch (error) {
+      toast.error(
+        error?.data?.message || error?.message || "Failed to update user status"
+      );
+    } finally {
+      setBlockingUserId(null);
+    }
+  };
+
   const renderPaginationButtons = () => {
     const { totalPage } = paginationMeta;
     const buttons = [];
@@ -166,68 +206,95 @@ function ClientManagementTable({
                 </TableCell>
               </TableRow>
             ) : userInfoData && userInfoData.length > 0 ? (
-              userInfoData.map((data, index) => (
-                <TableRow key={data.id || index}>
-                  <TableCell className="font-medium w-1/6">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="size-9">
-                        <AvatarImage
-                          src={
-                            data.profilePicture ||
-                            "https://github.com/shadcn.png"
-                          }
-                        />
-                        <AvatarFallback>
-                          {getInitials(data.fullName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">
-                          {data.fullName}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {data.email}
-                        </span>
+              userInfoData.map((data, index) => {
+                // isActive: true = user is active, show Block button
+                // isActive: false = user is blocked, show Unblock button
+                const isActive =
+                  data.isActive !== undefined
+                    ? data.isActive === true
+                    : data.status === true;
+                const userId = data._id || data.id;
+                const isCurrentlyBlocking = blockingUserId === userId;
+
+                return (
+                  <TableRow key={userId || index}>
+                    <TableCell className="font-medium w-1/6">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="size-9">
+                          <AvatarImage
+                            src={
+                              data.profilePicture ||
+                              "https://github.com/shadcn.png"
+                            }
+                          />
+                          <AvatarFallback>
+                            {getInitials(data.fullName)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">
+                            {data.fullName}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {data.email}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="w-1/6">
-                    {data.role?.charAt(0).toUpperCase() + data.role?.slice(1) ||
-                      "N/A"}
-                  </TableCell>
-                  <TableCell className="w-1/6">
-                    {formatDate(data.joinedOn)}
-                  </TableCell>
-                  <TableCell className="w-1/6">
-                    <p
-                      className={`${
-                        data.status === true
-                          ? "bg-lime-500/50 text-black"
-                          : "bg-red-500/50 text-white"
-                      } px-2 py-1 rounded-full text-center font-medium text-xs inline-block w-20`}
-                    >
-                      {data.status === true ? "Active" : "Inactive"}
-                    </p>
-                  </TableCell>
-                  <TableCell className="w-1/6 text-right">
-                    <div className="flex items-center gap-2 justify-end">
-                      <Button
-                        variant="outline"
-                        className="border border-gray-400 h-8"
-                        onClick={() => handleViewDetails(data)}
+                    </TableCell>
+                    <TableCell className="w-1/6">
+                      {data.role?.charAt(0).toUpperCase() +
+                        data.role?.slice(1) || "N/A"}
+                    </TableCell>
+                    <TableCell className="w-1/6">
+                      {formatDate(data.joinedOn)}
+                    </TableCell>
+                    <TableCell className="w-1/6">
+                      <p
+                        className={`${
+                          isActive
+                            ? "bg-lime-500/50 text-black"
+                            : "bg-red-500/50 text-white"
+                        } px-2 py-1 rounded-full text-center font-medium text-xs inline-block w-20`}
                       >
-                        View Details
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="border border-red-400 h-8 text-red-500"
-                      >
-                        Block
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                        {isActive ? "Active" : "Inactive"}
+                      </p>
+                    </TableCell>
+                    <TableCell className="w-1/6 text-right">
+                      <div className="flex items-center gap-2 justify-end">
+                        <Button
+                          variant="outline"
+                          className="border border-gray-400 h-8"
+                          onClick={() => handleViewDetails(data)}
+                        >
+                          View Details
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className={
+                            isActive
+                              ? "border border-red-400 h-8 text-red-500"
+                              : "border border-lime-500 h-8 text-lime-600"
+                          }
+                          onClick={() => handleBlockUser(data)}
+                          disabled={isCurrentlyBlocking}
+                        >
+                          {isCurrentlyBlocking ? (
+                            isActive ? (
+                              <Loader className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Loader className="w-4 h-4 animate-spin" />
+                            )
+                          ) : isActive ? (
+                            "Block"
+                          ) : (
+                            "Unblock"
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell

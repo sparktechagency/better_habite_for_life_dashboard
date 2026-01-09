@@ -34,7 +34,15 @@ export const usermanagementApi = baseApi.injectEndpoints({
       },
       providesTags: ["UserManagement"],
     }),
+    blockUser: builder.mutation({
+      query: ({ id }) => ({
+        url: `/users/blocked/${id}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["UserManagement", "Dashboard"],
+    }),
   }),
 });
 
-export const { useGetUserManagementDataQuery } = usermanagementApi;
+export const { useGetUserManagementDataQuery, useBlockUserMutation } =
+  usermanagementApi;
