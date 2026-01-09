@@ -83,6 +83,7 @@ export const baseApi = createApi({
     "Report",
     "BhaManagement",
     "BhaaManagement",
+    "BHaDashboard",
   ],
   endpoints: () => ({}),
 });

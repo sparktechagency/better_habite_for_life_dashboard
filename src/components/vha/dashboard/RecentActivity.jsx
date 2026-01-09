@@ -9,34 +9,45 @@ import {
 import { LuActivity } from "react-icons/lu";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
-function RecentActivity() {
+import { TiUser } from "react-icons/ti";
+import formatTimeAgo from "@/utils/FormatDate/xtimesAgo";
+
+function RecentActivity({ recentActivityData }) {
+  const recentActivity =
+    recentActivityData?.map((activity) => ({
+      title: activity.title,
+      user: activity.userId?.fullName,
+      timeAgo: formatTimeAgo(activity.createdAt),
+      viewLink: `/vha/task/${activity.taskId}`,
+      status: activity.status,
+    })) || [];
   const router = useRouter();
-  const recentActivity = [
-    {
-      title: "Session completed with Sarah Johnson",
-      hoursAgo: "10 hours ago",
-      viewLink: "/vha/session/123",
-      status: "Completed",
-    },
-    {
-      title: "Session completed with Sarah Johnson",
-      hoursAgo: "10 hours ago",
-      viewLink: "/vha/session/123",
-      status: "Pending",
-    },
-    {
-      title: "Session completed with Sarah Johnson",
-      hoursAgo: "10 hours ago",
-      viewLink: "/vha/session/123",
-      status: "Completed",
-    },
-    {
-      title: "Session completed with Sarah Johnson",
-      hoursAgo: "10 hours ago",
-      viewLink: "/vha/session/123",
-      status: "Pending",
-    },
-  ];
+  // const recentActivitys = [
+  //   {
+  //     title: "Session completed with Sarah Johnson",
+  //     hoursAgo: "10 hours ago",
+  //     viewLink: "/vha/session/123",
+  //     status: "Completed",
+  //   },
+  //   {
+  //     title: "Session completed with Sarah Johnson",
+  //     hoursAgo: "10 hours ago",
+  //     viewLink: "/vha/session/123",
+  //     status: "Pending",
+  //   },
+  //   {
+  //     title: "Session completed with Sarah Johnson",
+  //     hoursAgo: "10 hours ago",
+  //     viewLink: "/vha/session/123",
+  //     status: "Completed",
+  //   },
+  //   {
+  //     title: "Session completed with Sarah Johnson",
+  //     hoursAgo: "10 hours ago",
+  //     viewLink: "/vha/session/123",
+  //     status: "Pending",
+  //   },
+  // ];
   return (
     <Card>
       <CardHeader>
@@ -60,15 +71,27 @@ function RecentActivity() {
             <div className="flex items-center gap-4">
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
               <div className="flex flex-col items-start gap-1  ">
-                <h3>{activity.title}</h3>
-                <p className="text-sm text-gray-500">{activity.hoursAgo}</p>
+                <div>
+                  <h3 className="flex items-center  gap-2">
+                    <TiUser size={15} className="text-gray-500 mt-0.5" />
+                    {activity.user}
+                  </h3>
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <p className="text-sm ">{activity.title}</p>•
+                    <p className="text-sm ">{activity.timeAgo}</p>
+                  </div>
+                </div>
               </div>
             </div>
             <Badge
               className={`${
-                activity.status === "Completed"
+                activity.status.toLowerCase() === "completed"
                   ? "bg-green-500 text-white"
-                  : "bg-yellow-500 text-white"
+                  : activity.status.toLowerCase() === "pending"
+                  ? "bg-yellow-500 text-white"
+                  : activity.status.toLowerCase() === "overdue"
+                  ? "bg-red-500 text-white"
+                  : "bg-gray-500 text-white"
               }`}
             >
               {activity.status}
