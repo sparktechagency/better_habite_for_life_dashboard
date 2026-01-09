@@ -132,7 +132,6 @@ function ArticleDetails() {
           </div>
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span>{articleData.readTime || "N/A"} read</span>
-            <span>{formatDate(articleData.publicationDate)}</span>
           </div>
         </div>
 

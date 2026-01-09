@@ -30,6 +30,8 @@ import { RiArticleLine } from "react-icons/ri";
 import { BiCategory } from "react-icons/bi";
 import { FaQuoteRight } from "react-icons/fa6";
 import { LuBotMessageSquare } from "react-icons/lu";
+import { usePathname } from "next/navigation";
+
 const sidebars = {
   admin: [
     { name: "Dashboard", path: "/admin/dashboard", icon: RxDashboard },
@@ -157,11 +159,36 @@ const sidebars = {
     },
   ],
 };
-import { useSelector } from "react-redux";
-
 export function AppSidebar() {
-  // Get role from Redux store
-  const currentRole = useSelector((state) => state.userRole.role);
+  const pathname = usePathname();
+
+  // Determine which sidebar to show based on pathname
+  const getSidebarRole = () => {
+    if (pathname.includes("/admin")) return "admin";
+    if (pathname.includes("/bhaa")) return "bhaa";
+    if (pathname.includes("/bha")) return "bha";
+    return "admin"; // default fallback
+  };
+
+  const currentRole = getSidebarRole();
+  const currentSidebar = sidebars[currentRole] || [];
+
+  // Check if a path is active (exact match or starts with path)
+  const isActive = (path) => {
+    if (!path) return false;
+    // Exact match
+    if (pathname === path) return true;
+    // For nested routes, check if pathname starts with the menu path
+    // But exclude exact parent matches (e.g., /admin/learning-management should not match /admin/learning-management/materials)
+    if (pathname.startsWith(path + "/")) return true;
+    return false;
+  };
+
+  // Check if any subItem is active
+  const isSubMenuActive = (subItems) => {
+    if (!subItems) return false;
+    return subItems.some((subItem) => isActive(subItem.path));
+  };
 
   return (
     <Sidebar>
@@ -179,37 +206,67 @@ export function AppSidebar() {
 
           <SidebarGroupContent className="mt-10">
             <SidebarMenu>
-              {sidebars[currentRole].map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  {item.subItems ? (
-                    <>
-                      <SidebarMenuButton>
-                        <item.icon />
-                        <span>{item.name}</span>
+              {currentSidebar.map((item) => {
+                const hasSubItems = item.subItems && item.subItems.length > 0;
+                const itemIsActive = hasSubItems
+                  ? isSubMenuActive(item.subItems)
+                  : isActive(item.path);
+
+                return (
+                  <SidebarMenuItem key={item.name}>
+                    {hasSubItems ? (
+                      <>
+                        <SidebarMenuButton
+                          className={
+                            itemIsActive
+                              ? "bg-primary/10 text-primary font-medium"
+                              : ""
+                          }
+                        >
+                          <item.icon />
+                          <span>{item.name}</span>
+                        </SidebarMenuButton>
+                        <SidebarMenuSub>
+                          {item.subItems.map((subItem) => {
+                            const subItemIsActive = isActive(subItem.path);
+                            return (
+                              <SidebarMenuSubItem key={subItem.name}>
+                                <SidebarMenuButton
+                                  asChild
+                                  className={
+                                    subItemIsActive
+                                      ? "bg-primary/10 text-primary font-medium"
+                                      : ""
+                                  }
+                                >
+                                  <Link href={subItem.path}>
+                                    <subItem.icon />
+                                    <span>{subItem.name}</span>
+                                  </Link>
+                                </SidebarMenuButton>
+                              </SidebarMenuSubItem>
+                            );
+                          })}
+                        </SidebarMenuSub>
+                      </>
+                    ) : (
+                      <SidebarMenuButton
+                        asChild
+                        className={
+                          itemIsActive
+                            ? "bg-primary/10 text-primary font-medium"
+                            : ""
+                        }
+                      >
+                        <Link href={item.path}>
+                          <item.icon />
+                          <span>{item.name}</span>
+                        </Link>
                       </SidebarMenuButton>
-                      <SidebarMenuSub>
-                        {item.subItems.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.name}>
-                            <SidebarMenuButton asChild>
-                              <Link href={subItem.path}>
-                                <subItem.icon />
-                                <span>{subItem.name}</span>
-                              </Link>
-                            </SidebarMenuButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </>
-                  ) : (
-                    <SidebarMenuButton asChild>
-                      <Link href={item.path}>
-                        <item.icon />
-                        <span>{item.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  )}
-                </SidebarMenuItem>
-              ))}
+                    )}
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
