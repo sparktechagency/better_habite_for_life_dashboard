@@ -39,7 +39,17 @@ export const sessionmanagementApi = baseApi.injectEndpoints({
       },
       providesTags: ["SessionManagement"],
     }),
+    getSessionManagementDataById: builder.query({
+      query: ({ id }) => ({
+        url: `/doctor-booking/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["SessionManagement"],
+    }),
   }),
 });
 
-export const { useGetSessionManagementDataQuery } = sessionmanagementApi;
+export const {
+  useGetSessionManagementDataQuery,
+  useGetSessionManagementDataByIdQuery,
+} = sessionmanagementApi;
