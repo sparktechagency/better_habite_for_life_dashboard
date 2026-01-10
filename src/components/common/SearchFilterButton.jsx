@@ -22,6 +22,8 @@ function SearchFilterButton({
   setSearchText = () => {},
   status = "All Status",
   setStatus = () => {},
+  selectedDate = "",
+  setSelectedDate = () => {},
 }) {
   return (
     <div className="flex items-center gap-2 ">
@@ -56,7 +58,12 @@ function SearchFilterButton({
 
       {searchByDate && (
         <div className="flex items-center gap-2">
-          <Input type="date" className="bg-white border-gray-300" />
+          <Input
+            type="date"
+            className="bg-white border-gray-300"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
         </div>
       )}
     </div>
