@@ -119,9 +119,16 @@ export function AssignedTaskList({ tableData }) {
                   {data.taskName}
                 </TableCell>
                 <TableCell className="font-medium w-1/6">
-                  {data.taskDescription}
+                  {data.taskDescription.slice(0, 50)}...
                 </TableCell>
-                <TableCell className="w-1/6">{data.targetDomain}</TableCell>
+                <TableCell className="w-1/6">
+                  <Badge
+                    variant="outline"
+                    className="bg-red-500/50 text-black h-7"
+                  >
+                    {data.targetDomain}
+                  </Badge>
+                </TableCell>
                 <TableCell className="w-1/6">{data.startDate}</TableCell>
                 <TableCell className="w-1/6">{data.endDate}</TableCell>
                 <TableCell className="w-1/6">

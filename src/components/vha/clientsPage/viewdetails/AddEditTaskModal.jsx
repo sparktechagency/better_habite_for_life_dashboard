@@ -25,22 +25,30 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { useGetAllCategoriesQuery } from "@/redux/Apis/admin/categoryApi/categoryApi";
 
 const AddEditTaskModal = ({
   openModal,
   setOpenModal,
   onSave,
   initialData = null,
+  isLoading = false,
 }) => {
+  // Fetch all categories
+  const { data: categoriesData, isLoading: isCategoriesLoading } =
+    useGetAllCategoriesQuery();
   const [formData, setFormData] = useState({
     taskTitle: "",
     taskDescription: "",
-    category: "",
-    date: null, // store Date object
-    startTime: "",
-    endTime: "",
+    categoryId: "",
+    startDate: null,
+    endDate: null,
   });
-  const [isDateOpen, setIsDateOpen] = useState(false);
+  const [isStartDateOpen, setIsStartDateOpen] = useState(false);
+  const [isEndDateOpen, setIsEndDateOpen] = useState(false);
+
+  // Map categories from API
+  const categories = categoriesData?.data || [];
 
   const updateField = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -52,10 +60,11 @@ const AddEditTaskModal = ({
       setFormData({
         taskTitle: initialData?.taskName || "",
         taskDescription: initialData?.taskDescription || "",
-        category: initialData?.targetDomain || "",
-        date: initialData?.date ? new Date(initialData.date) : null,
-        startTime: initialData?.startTime || "",
-        endTime: initialData?.endTime || "",
+        categoryId: initialData?.categoryId || "",
+        startDate: initialData?.startDate
+          ? new Date(initialData.startDate)
+          : null,
+        endDate: initialData?.endDate ? new Date(initialData.endDate) : null,
       });
     }
   }, [openModal, initialData]);
@@ -64,16 +73,17 @@ const AddEditTaskModal = ({
     if (!formData.taskTitle.trim()) return;
     const payload = {
       id: initialData?.id,
-      taskName: formData.taskTitle,
-      taskDescription: formData.taskDescription,
-      targetDomain: formData.category,
-      date: formData.date ? format(formData.date, "yyyy-MM-dd") : "",
-      startTime: formData.startTime,
-      endTime: formData.endTime,
-      status: initialData?.status || "Pending",
+      title: formData.taskTitle,
+      description: formData.taskDescription,
+      categoryId: formData.categoryId,
+      startDate: formData.startDate
+        ? format(formData.startDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        : "",
+      endDate: formData.endDate
+        ? format(formData.endDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        : "",
     };
     if (onSave) onSave(payload);
-    setOpenModal(false);
   };
 
   const handleClose = () => {
@@ -122,81 +132,96 @@ const AddEditTaskModal = ({
               Target Domain
             </label>
             <Select
-              value={formData.category}
-              onValueChange={(val) => updateField("category", val)}
+              value={formData.categoryId}
+              onValueChange={(val) => updateField("categoryId", val)}
             >
-              <SelectTrigger className="bg-gray-100">
+              <SelectTrigger className="bg-gray-100 w-full">
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Self-Management Domain">
-                  Self-Management Domain
-                </SelectItem>
-                <SelectItem value="Communication Domain">
-                  Communication Domain
-                </SelectItem>
-                <SelectItem value="Physical Health Domain">
-                  Physical Health Domain
-                </SelectItem>
+                {isCategoriesLoading ? (
+                  <SelectItem value="" disabled>
+                    Loading categories...
+                  </SelectItem>
+                ) : categories.length === 0 ? (
+                  <SelectItem value="" disabled>
+                    No categories available
+                  </SelectItem>
+                ) : (
+                  categories.map((category) => (
+                    <SelectItem key={category._id} value={category._id}>
+                      {category.name}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
 
-          {/* Date */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-900">Date</label>
-            <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-between bg-gray-100 border-gray-200 text-left font-normal"
-                >
-                  {formData.date ? (
-                    format(formData.date, "PPP")
-                  ) : (
-                    <span className="text-gray-500">Select a date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={formData.date}
-                  onSelect={(day) => {
-                    updateField("date", day);
-                    setIsDateOpen(false);
-                  }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Time Row */}
+          {/* Date Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Start Date */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-900">
-                Start Time
+                Start Date
               </label>
-              <Input
-                type="time"
-                value={formData.startTime}
-                onChange={(e) => updateField("startTime", e.target.value)}
-                className="bg-gray-100"
-                placeholder="Enter start time here"
-              />
+              <Popover open={isStartDateOpen} onOpenChange={setIsStartDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between bg-gray-100 border-gray-200 text-left font-normal"
+                  >
+                    {formData.startDate ? (
+                      format(formData.startDate, "PPP")
+                    ) : (
+                      <span className="text-gray-500">Select start date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={formData.startDate}
+                    onSelect={(day) => {
+                      updateField("startDate", day);
+                      setIsStartDateOpen(false);
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
+
+            {/* End Date */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-900">
-                End Time
+                End Date
               </label>
-              <Input
-                type="time"
-                value={formData.endTime}
-                onChange={(e) => updateField("endTime", e.target.value)}
-                className="bg-gray-100"
-                placeholder="Enter end time here"
-              />
+              <Popover open={isEndDateOpen} onOpenChange={setIsEndDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between bg-gray-100 border-gray-200 text-left font-normal"
+                  >
+                    {formData.endDate ? (
+                      format(formData.endDate, "PPP")
+                    ) : (
+                      <span className="text-gray-500">Select end date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={formData.endDate}
+                    onSelect={(day) => {
+                      updateField("endDate", day);
+                      setIsEndDateOpen(false);
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
@@ -205,8 +230,9 @@ const AddEditTaskModal = ({
           <Button
             onClick={handleSave}
             className="bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={isLoading}
           >
-            {initialData ? "Update" : "Add"}
+            {isLoading ? "Saving..." : initialData ? "Update" : "Add"}
           </Button>
         </DialogFooter>
       </DialogContent>

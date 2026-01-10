@@ -19,84 +19,50 @@ import { Badge } from "@/components/ui/badge";
 import { FiEdit3 } from "react-icons/fi";
 import { FiTrash2 } from "react-icons/fi";
 import AddEditTaskModal from "./viewdetails/AddEditTaskModal";
-
-const initialTasks = [
-  {
-    id: 1,
-    taskName: "Complete weekly exercise tracking",
-    taskDescription: "Log daily physical activities for 7 consecutive days",
-    targetDomain: "Self-Management Domain",
-    date: "2025-05-12",
-    startTime: "10:00 AM",
-    endTime: "11:00 AM",
-    status: "Completed",
-  },
-  {
-    id: 2,
-    taskName: "Complete weekly exercise tracking",
-    taskDescription: "Log daily physical activities for 7 consecutive days",
-    targetDomain: "Self-Management Domain",
-    date: "2025-05-12",
-    startTime: "10:00 AM",
-    endTime: "11:00 AM",
-    status: "Completed",
-  },
-  {
-    id: 3,
-    taskName: "Complete weekly exercise tracking",
-    taskDescription: "Log daily physical activities for 7 consecutive days",
-    targetDomain: "Self-Management Domain",
-    date: "2025-05-12",
-    startTime: "10:00 AM",
-    endTime: "11:00 AM",
-    status: "Completed",
-  },
-  {
-    id: 4,
-    taskName: "Complete weekly exercise tracking",
-    taskDescription: "Log daily physical activities for 7 consecutive days",
-    targetDomain: "Self-Management Domain",
-    date: "2025-05-12",
-    startTime: "10:00 AM",
-    endTime: "11:00 AM",
-    status: "Completed",
-  },
-  {
-    id: 5,
-    taskName: "Complete weekly exercise tracking",
-    taskDescription: "Log daily physical activities for 7 consecutive days",
-    targetDomain: "Self-Management Domain",
-    date: "2025-05-12",
-    startTime: "10:00 AM",
-    endTime: "11:00 AM",
-    status: "Pending",
-  },
-  {
-    id: 6,
-    taskName: "Complete weekly exercise tracking",
-    taskDescription: "Log daily physical activities for 7 consecutive days",
-    targetDomain: "Self-Management Domain",
-    date: "2025-05-12",
-    startTime: "10:00 AM",
-    endTime: "11:00 AM",
-    status: "Pending",
-  },
-  {
-    id: 7,
-    taskName: "Complete weekly exercise tracking",
-    taskDescription: "Log daily physical activities for 7 consecutive days",
-    targetDomain: "Self-Management Domain",
-    date: "2025-05-12",
-    startTime: "10:00 AM",
-    endTime: "11:00 AM",
-    status: "Completed",
-  },
-];
+import { useParams } from "next/navigation";
+import {
+  useGetAssignTaskDataQuery,
+  useCreateTaskMutation,
+  useDeleteTaskMutation,
+} from "@/redux/Apis/bha/assigntaskApi/assignTaskApi";
+import formatDate from "@/utils/FormatDate/formatDate";
+import useToast from "@/hooks/useToast";
+import { Loader2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 function AssignTaskLayout() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const { id } = useParams();
+  const toast = useToast();
+  const {
+    data: assignTaskData,
+    isLoading: isAssignTaskDataLoading,
+    refetch,
+  } = useGetAssignTaskDataQuery({ id });
+  const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
+  const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+
+  // Map API data to table format
+  const tasks =
+    assignTaskData?.data?.map((task) => ({
+      id: task._id,
+      taskName: task.title,
+      taskDescription: task.description,
+      targetDomain: task.category,
+      categoryId: task.categoryId,
+      startDate: formatDate(task.startDate),
+      endDate: formatDate(task.endDate),
+      status: task.status,
+      userId: task.userId?._id,
+      userName: task.userId?.fullName,
+      doctorBookingId: task.doctorBookingId,
+    })) || [];
+
+  // Get user name from the first task if available
+  const userName = assignTaskData?.data?.[0]?.userId?.fullName || "Client";
 
   const handleAddClick = () => {
     setEditingTask(null);
@@ -108,18 +74,36 @@ function AssignTaskLayout() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    setTasks((prev) => prev.filter((task) => task.id !== id));
+  const handleDelete = async (taskId) => {
+    try {
+      setDeletingId(taskId);
+      await deleteTask({ id: taskId }).unwrap();
+      toast.success("Task deleted successfully");
+      refetch();
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to delete task");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
-  const handleSave = (taskData) => {
-    if (taskData.id) {
-      setTasks((prev) =>
-        prev.map((t) => (t.id === taskData.id ? { ...t, ...taskData } : t))
-      );
-    } else {
-      const newId = tasks.length ? Math.max(...tasks.map((t) => t.id)) + 1 : 1;
-      setTasks((prev) => [...prev, { ...taskData, id: newId }]);
+  const handleSave = async (taskData) => {
+    try {
+      // Create new task
+      const payload = {
+        doctorBookingId: id,
+        title: taskData.title,
+        description: taskData.description,
+        categoryId: taskData.categoryId,
+        startDate: taskData.startDate,
+        endDate: taskData.endDate,
+      };
+
+      await createTask(payload).unwrap();
+      toast.success("Task created successfully");
+      setIsModalOpen(false);
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to create task");
     }
   };
 
@@ -133,8 +117,11 @@ function AssignTaskLayout() {
           Add New Task
         </Button>
       </div>
-      <p className="text-lg font-bold">Sarah Peterson</p>
+      <p className="text-lg font-bold">{userName}</p>
       <p className="text-lg font-bold">Task Details</p>
+      {isAssignTaskDataLoading && (
+        <p className="text-gray-500">Loading tasks...</p>
+      )}
       <SearchFilterButton
         showAddButton={false}
         placeholder="Search Task"
@@ -145,12 +132,15 @@ function AssignTaskLayout() {
         tasks={tasks}
         onEdit={handleEditClick}
         onDelete={handleDelete}
+        deletingId={deletingId}
       />
       <AddEditTaskModal
         openModal={isModalOpen}
         setOpenModal={setIsModalOpen}
         onSave={handleSave}
         initialData={editingTask}
+        isLoading={isCreating}
+        doctorBookingId={id}
       />
     </div>
   );
@@ -158,7 +148,7 @@ function AssignTaskLayout() {
 
 export default AssignTaskLayout;
 
-export function TaskDetailsTable({ tasks, onEdit, onDelete }) {
+export function TaskDetailsTable({ tasks, onEdit, onDelete, deletingId }) {
   return (
     <ScrollArea className="w-full rounded-md border whitespace-nowrap">
       <Table>
@@ -170,59 +160,78 @@ export function TaskDetailsTable({ tasks, onEdit, onDelete }) {
             <TableHead className="w-1/6">Task Name</TableHead>
             <TableHead className="w-1/6">Task Description</TableHead>
             <TableHead className="w-1/6">Target Domain</TableHead>
-            <TableHead className="w-1/6">Date</TableHead>
-            <TableHead className="w-1/6">Start Time</TableHead>
-            <TableHead className="w-1/6">End Time</TableHead>
+            <TableHead className="w-1/6">Start Date</TableHead>
+            <TableHead className="w-1/6">End Date</TableHead>
             <TableHead className="w-1/6">Status</TableHead>
             <TableHead className="w-1/6">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tasks.map((data) => (
-            <TableRow key={data.id}>
-              <TableCell className="font-medium w-1/6">
-                {data.taskName}
-              </TableCell>
-              <TableCell className="font-medium w-1/6">
-                {data.taskDescription}
-              </TableCell>
-
-              <TableCell className="w-1/6">{data.targetDomain}</TableCell>
-              <TableCell className="w-1/6">{data.date}</TableCell>
-              <TableCell className="w-1/6">{data.startTime}</TableCell>
-              <TableCell className="w-1/6">{data.endTime}</TableCell>
-              <TableCell className="w-1/6">
-                <Badge
-                  variant="outline"
-                  className={`${
-                    data.status === "Pending"
-                      ? "bg-yellow-500 text-white"
-                      : data.status === "Completed"
-                      ? "bg-lime-500 text-white border-lime-500"
-                      : "bg-red-500 text-white border-red-500"
-                  } px-2 py-1  text-center font-medium text-xs inline-block w-20`}
-                >
-                  {data.status}
-                </Badge>
-              </TableCell>
-              <TableCell className="w-auto flex justify-end gap-2 text-right ">
-                <Button
-                  variant="outline"
-                  className="   "
-                  onClick={() => onEdit && onEdit(data)}
-                >
-                  <FiEdit3 size={20} />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="   "
-                  onClick={() => onDelete && onDelete(data.id)}
-                >
-                  <FiTrash2 size={20} color="red" />
-                </Button>
+          {tasks.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                No tasks assigned yet
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            tasks.map((data) => (
+              <TableRow key={data.id}>
+                <TableCell className="font-medium w-1/6">
+                  {data.taskName}
+                </TableCell>
+                <TableCell className="font-medium w-1/6">
+                  {data.taskDescription.slice(0, 50)}...
+                </TableCell>
+                <TableCell className="w-1/6">
+                  <Badge
+                    variant="outline"
+                    className="bg-red-500/50 text-black h-7"
+                  >
+                    {data.targetDomain}
+                  </Badge>
+                </TableCell>
+                <TableCell className="w-1/6">{data.startDate}</TableCell>
+                <TableCell className="w-1/6">{data.endDate}</TableCell>
+                <TableCell className="w-1/6">
+                  <Badge
+                    variant="outline"
+                    className={`${
+                      data.status === "pending"
+                        ? "bg-yellow-500 text-white border-yellow-500"
+                        : data.status === "completed"
+                        ? "bg-lime-500 text-white border-lime-500"
+                        : data.status === "overdue"
+                        ? "bg-red-500 text-white border-red-500"
+                        : data.status === "in-progress"
+                        ? "bg-blue-500 text-white border-blue-500"
+                        : "bg-gray-500 text-white border-gray-500"
+                    } px-2 py-1 text-center font-medium text-xs inline-block w-20 capitalize`}
+                  >
+                    {data.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="w-auto flex justify-end gap-2 text-right">
+                  {/* <Button
+                    variant="outline"
+                    onClick={() => onEdit && onEdit(data)}
+                  >
+                    <FiEdit3 size={20} />
+                  </Button> */}
+                  <Button
+                    variant="outline"
+                    onClick={() => onDelete && onDelete(data.id)}
+                    disabled={deletingId === data.id}
+                  >
+                    {deletingId === data.id ? (
+                      <Loader2 className="animate-spin" size={20} color="red" />
+                    ) : (
+                      <Trash2 size={20} color="red" />
+                    )}{" "}
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
         <TableFooter></TableFooter>
       </Table>
