@@ -1,36 +1,68 @@
 "use client";
 import { Search } from "lucide-react";
-import React, { useState, useEffect } from "react";
-import { useChat, useAppDispatch } from "@/redux/hooks";
-import {
-  selectChat,
-  setSearchQuery,
-  fetchChatList,
-} from "@/redux/features/chat/chatSlice";
-import Image from "next/image";
+import React, { useState, useMemo } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import getImageUrl from "@/utils/getImageUrl";
+import formatTimeAgo from "@/utils/FormatDate/xtimesAgo";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useRouter, useSearchParams } from "next/navigation";
 
-function ChatListSidebar() {
-  const dispatch = useAppDispatch();
+function ChatListSidebar({ chatList = [], isLoading = false, currentUserId }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedChatId = searchParams.get("chatId");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const { chatList, selectedChat, isLoading, searchQuery, filteredChatList } =
-    useChat();
+  // Transform API chat data to display format
+  const transformedChats = useMemo(() => {
+    return chatList.map((item) => {
+      const { chat, message, unreadMessageCount } = item;
+      // Find the other participant (not the current user)
+      const otherParticipant =
+        chat.participants.find((p) => p._id !== currentUserId) ||
+        chat.participants[0];
 
-  useEffect(() => {
-    // Fetch chat list on component mount
-    dispatch(fetchChatList());
-  }, [dispatch]);
+      return {
+        id: chat._id,
+        name: otherParticipant?.fullName || "Unknown",
+        avatar: getImageUrl(otherParticipant?.profile) || "/default-avatar.png",
+        lastMessage: message?.message || "No messages yet",
+        timestamp: message?.createdAt ? formatTimeAgo(message.createdAt) : "",
+        unreadCount: unreadMessageCount || 0,
+        hasNewMessage: unreadMessageCount > 0,
+        isOnline: false, // You can add online status logic here
+        status: chat.status,
+        participants: chat.participants,
+        otherParticipant,
+      };
+    });
+  }, [chatList, currentUserId]);
+
+  // Get selected chat from transformed chats
+  const selectedChat = useMemo(() => {
+    return transformedChats.find((chat) => chat.id === selectedChatId) || null;
+  }, [transformedChats, selectedChatId]);
+
+  // Filter chats based on search query
+  const filteredChats = useMemo(() => {
+    if (!searchQuery.trim()) return transformedChats;
+    return transformedChats.filter(
+      (chat) =>
+        chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [transformedChats, searchQuery]);
+
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
+  };
 
   const handleChatSelect = (chatId) => {
-    dispatch(selectChat(chatId));
+    // Update URL with chatId param
+    const params = new URLSearchParams(searchParams);
+    params.set("chatId", chatId);
+    router.push(`?${params.toString()}`);
   };
-
-  const handleSearchChange = (query) => {
-    dispatch(setSearchQuery(query));
-  };
-
-  // Use filtered list if search query exists, otherwise use full list
-  const displayChatList = searchQuery.trim() ? filteredChatList : chatList;
 
   return (
     <div className="lg:w-[30rem] bg-white flex flex-col h-auto lg:h-full border-b lg:border-b-0 lg:border-r border-gray-200">
@@ -46,7 +78,7 @@ function ChatListSidebar() {
       <div className="lg:hidden h-fit">
         <ScrollArea className="w-full h-full">
           <HorizontalChatList
-            chats={displayChatList}
+            chats={filteredChats}
             selectedChat={selectedChat}
             onChatSelect={handleChatSelect}
             isLoading={isLoading}
@@ -59,7 +91,7 @@ function ChatListSidebar() {
       <div className="flex-1 overflow-y-auto hidden lg:block">
         <ScrollArea className="h-full">
           <ChatList
-            chats={displayChatList}
+            chats={filteredChats}
             selectedChat={selectedChat}
             onChatSelect={handleChatSelect}
             isLoading={isLoading}
@@ -124,6 +156,12 @@ function HorizontalChatList({ chats, selectedChat, onChatSelect, isLoading }) {
     );
   }
 
+  if (!chats || chats.length === 0) {
+    return (
+      <div className="p-4 text-center text-gray-500">No conversations yet</div>
+    );
+  }
+
   return (
     <div className="p-4">
       <div
@@ -138,11 +176,9 @@ function HorizontalChatList({ chats, selectedChat, onChatSelect, isLoading }) {
           >
             {/* Avatar with online status */}
             <div className="relative">
-              <Image
-                src={chat.avatar}
+              <Avatar
+                image={chat.avatar}
                 alt={chat.name}
-                width={64}
-                height={64}
                 className={`w-12 h-12 md:w-16 md:h-16 rounded-full object-cover ${
                   selectedChat?.id === chat.id
                     ? "ring-3 ring-offset-2 ring-blue-500"
@@ -151,6 +187,11 @@ function HorizontalChatList({ chats, selectedChat, onChatSelect, isLoading }) {
               />
               {chat.isOnline && (
                 <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+              )}
+              {chat.unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-medium w-5 h-5 rounded-full flex items-center justify-center">
+                  {chat.unreadCount}
+                </div>
               )}
             </div>
 
@@ -192,6 +233,14 @@ function ChatList({ chats, selectedChat, onChatSelect, isLoading }) {
     );
   }
 
+  if (!chats || chats.length === 0) {
+    return (
+      <div className="p-8 text-center text-gray-500">
+        <p>No conversations yet</p>
+      </div>
+    );
+  }
+
   return (
     <div className="p-2">
       {chats.map((chat) => (
@@ -206,11 +255,13 @@ function ChatList({ chats, selectedChat, onChatSelect, isLoading }) {
         >
           {/* Avatar with online status */}
           <div className="relative mr-3">
-            <img
-              src={chat.avatar}
-              alt={chat.name}
+            <Avatar
+              image={chat.avatar}
               className="w-12 h-12 rounded-full object-cover"
-            />
+            >
+              <AvatarImage src={chat.avatar} />
+              <AvatarFallback>{chat.name.split(" ")[0][0]}</AvatarFallback>
+            </Avatar>
             {chat.isOnline && (
               <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
             )}
@@ -227,7 +278,7 @@ function ChatList({ chats, selectedChat, onChatSelect, isLoading }) {
                 {chat.name}
               </h3>
               <span
-                className={`text-xs ml-2 ${
+                className={`text-xs ml-2 whitespace-nowrap ${
                   selectedChat?.id === chat.id
                     ? "text-blue-100"
                     : "text-gray-500"
@@ -245,11 +296,6 @@ function ChatList({ chats, selectedChat, onChatSelect, isLoading }) {
               {chat.lastMessage || "No recent message"}
             </p>
           </div>
-
-          {/* New message indicator */}
-          {chat.hasNewMessage && selectedChat?.id !== chat.id && (
-            <div className="w-2 h-2 bg-blue-500 rounded-full ml-2"></div>
-          )}
 
           {/* Unread count */}
           {chat.unreadCount > 0 && selectedChat?.id !== chat.id && (
