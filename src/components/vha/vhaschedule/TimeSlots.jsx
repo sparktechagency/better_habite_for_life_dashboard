@@ -7,6 +7,7 @@ const TimeSlots = ({
   slots = [],
   selectedTimes = [],
   onTimeToggle,
+  readOnly = false,
   defaultSlots = [
     "09:00 AM - 09:45 AM",
     "10:00 AM - 10:45 AM",
@@ -15,10 +16,13 @@ const TimeSlots = ({
     "01:00 PM - 01:45 PM",
   ],
 }) => {
-  // Use slots array if provided, otherwise use defaultSlots
+  // If slots is an array of strings (formatted), use as-is
+  // If slots is an array of objects, format them
   const timeSlots =
     slots.length > 0
-      ? slots.map((slot) => `${slot.startTime} - ${slot.endTime}`)
+      ? typeof slots[0] === "string"
+        ? slots
+        : slots.map((slot) => `${slot.startTime} - ${slot.endTime}`)
       : defaultSlots;
 
   return (
@@ -28,10 +32,12 @@ const TimeSlots = ({
         return (
           <Button
             key={timeSlot}
-            onClick={() => onTimeToggle(timeSlot)}
+            onClick={() => !readOnly && onTimeToggle && onTimeToggle(timeSlot)}
             variant="outline"
             className={`${
-              isSelected
+              readOnly
+                ? "bg-blue-100 border-blue-300 text-blue-700 cursor-default"
+                : isSelected
                 ? "bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200"
                 : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
             }`}

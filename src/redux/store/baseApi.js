@@ -89,6 +89,7 @@ export const baseApi = createApi({
     "AssignTask",
     "BhaReport",
     "TodaysSession",
+    "BhaScheduleSlot",
   ],
   endpoints: () => ({}),
 });
