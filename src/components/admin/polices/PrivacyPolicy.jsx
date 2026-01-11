@@ -9,8 +9,9 @@ import {
   useUpdatePolicyMutation,
 } from "@/redux/Apis/policyApi/policyApi";
 import useToast from "@/hooks/useToast";
-
+import useRoleCheckfromPathname from "@/hooks/useRoleCheckfromPathname";
 function PrivacyPolicy() {
+  const { isAdmin } = useRoleCheckfromPathname();
   const toast = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [policyContent, setPolicyContent] = useState("");
@@ -76,9 +77,11 @@ function PrivacyPolicy() {
           title="Privacy Policy"
           description="Here is an overview of your privacy policy"
         />
-        <Button onClick={handleEditClick}>
-          <FiEdit3 size={15} /> Edit Privacy Policy
-        </Button>
+        {isAdmin && (
+          <Button onClick={handleEditClick}>
+            <FiEdit3 size={15} /> Edit Privacy Policy
+          </Button>
+        )}
       </div>
 
       {/* Policy Content Display */}
