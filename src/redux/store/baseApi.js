@@ -85,7 +85,8 @@ export const baseApi = createApi({
     "BhaaManagement",
     "BHaDashboard",
     "BHaaOverview",
-    "BhaaClient"
+    "BhaaClient",
+    "task"
   ],
   endpoints: () => ({}),
 });
