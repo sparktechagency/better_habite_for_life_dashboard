@@ -1,13 +1,12 @@
 "use client";
 
-import React from "react";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 
 function BhaaClinetTaskDetails({ openModal, setOpenModal, taskData }) {
   if (!taskData) return null;
@@ -20,6 +19,16 @@ function BhaaClinetTaskDetails({ openModal, setOpenModal, taskData }) {
     } else {
       return "bg-yellow-500 text-white border-yellow-500";
     }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "No due date";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
   };
 
   return (
@@ -39,7 +48,7 @@ function BhaaClinetTaskDetails({ openModal, setOpenModal, taskData }) {
                 <label className="text-sm font-bold text-gray-900 block">
                   Task Title:
                 </label>
-                <p className="text-sm text-gray-600">{taskData.taskName}</p>
+                <p className="text-sm text-gray-600">{taskData.title}</p>
               </div>
               <Badge
                 variant="outline"
@@ -52,21 +61,13 @@ function BhaaClinetTaskDetails({ openModal, setOpenModal, taskData }) {
             </div>
           </div>
 
-          {/* Target Domain */}
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-gray-900 block">
-              Target Domain:
-            </label>
-            <p className="text-sm text-gray-600">{taskData.targetDomain}</p>
-          </div>
-
           {/* Task Description */}
           <div className="space-y-2">
             <label className="text-sm font-bold text-gray-900 block">
               Task Description:
             </label>
             <p className="text-sm text-gray-600 leading-relaxed">
-              {taskData.taskDescription}
+              {taskData.description}
             </p>
           </div>
 
@@ -75,7 +76,7 @@ function BhaaClinetTaskDetails({ openModal, setOpenModal, taskData }) {
             <label className="text-sm font-bold text-gray-900 block">
               Date:
             </label>
-            <p className="text-sm text-gray-600">{taskData.date}</p>
+            <p className="text-sm text-gray-600">{formatDate(taskData.createdAt)}</p>
           </div>
         </div>
       </DialogContent>

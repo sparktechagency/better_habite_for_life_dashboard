@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import { HiPlus } from "react-icons/hi";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -9,19 +9,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { HiPlus } from "react-icons/hi";
 function SearchFilterButton({
   showAddButton = true,
-  onClickAddButton = () => {},
+  onClickAddButton = () => { },
   addButtonText = "Add New Client",
   showFilterButton = true,
   selectOptions = ["All Status"],
   placeholder = "Search Client",
   searchByDate = false,
   searchText = "",
-  setSearchText = () => {},
+  setSearchText = () => { },
   status = "All Status",
-  setStatus = () => {},
+  setStatus = () => { },
 }) {
   return (
     <div className="flex items-center gap-2 ">
