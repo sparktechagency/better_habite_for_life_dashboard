@@ -46,10 +46,19 @@ export const sessionmanagementApi = baseApi.injectEndpoints({
       }),
       providesTags: ["SessionManagement"],
     }),
+
+    getTimeSlotsForReschedule: builder.query({
+      query: ({ date }) => ({
+        url: `/doctor-booking/my-doctor-available-slots?date=${date}`,
+        method: "GET",
+      }),
+      providesTags: ["SessionManagement"],
+    }),
   }),
 });
 
 export const {
   useGetSessionManagementDataQuery,
   useGetSessionManagementDataByIdQuery,
+  useGetTimeSlotsForRescheduleQuery,
 } = sessionmanagementApi;

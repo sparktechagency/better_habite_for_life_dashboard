@@ -1,17 +1,19 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Clock, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import getImageUrl from "@/utils/getImageUrl";
 import { Badge } from "@/components/ui/badge";
+import RescheduleModal from "./RescheduleModal";
+import useToast from "@/hooks/useToast";
 
-const ClientDetailsLayout = ({ clientInfo }) => {
+const ClientDetailsLayout = ({ clientInfo, bookingId }) => {
   return (
     <div className="flex flex-col md:flex-row items-center  md:items-start lg:justify-between gap-4 md:gap-6 bg-white border border-gray-300 rounded-lg p-4 md:p-6">
       <ClientProfile clientInfo={clientInfo} />
       <div className="w-full lg:w-1/2">
-        <Session clientInfo={clientInfo} />
+        <Session clientInfo={clientInfo} bookingId={bookingId} />
       </div>
     </div>
   );
@@ -33,7 +35,10 @@ const ClientProfile = ({ clientInfo }) => {
     </div>
   );
 };
-const Session = ({ clientInfo }) => {
+const Session = ({ clientInfo, bookingId }) => {
+  const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
+  const toast = useToast();
+
   const sessionData = {
     startTime: clientInfo.startTime,
     endTime: clientInfo.endTime,
@@ -41,8 +46,20 @@ const Session = ({ clientInfo }) => {
   };
 
   const handleReschedule = () => {
-    console.log("Reschedule session");
-    // Handle reschedule logic
+    setIsRescheduleModalOpen(true);
+  };
+
+  const handleRescheduleSubmit = async (rescheduleData) => {
+    try {
+      // TODO: Call reschedule API here
+      // Example:
+      // await rescheduleBookingApi(rescheduleData).unwrap();
+      
+      toast.success("Session rescheduled successfully!");
+      setIsRescheduleModalOpen(false);
+    } catch (error) {
+      toast.error("Failed to reschedule session. Please try again.");
+    }
   };
 
   const handleJoinNow = () => {
@@ -93,6 +110,14 @@ const Session = ({ clientInfo }) => {
           Join Now
         </Button>
       </div>
+
+      {/* Reschedule Modal */}
+      <RescheduleModal
+        open={isRescheduleModalOpen}
+        onOpenChange={setIsRescheduleModalOpen}
+        bookingId={bookingId}
+        onReschedule={handleRescheduleSubmit}
+      />
     </div>
   );
 };

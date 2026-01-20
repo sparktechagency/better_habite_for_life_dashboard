@@ -42,11 +42,13 @@ function ViewDetailsLayout() {
     status: sessionManagementDataById?.data?.status,
   };
 
+  const bookingId = sessionManagementDataById?.data?._id;
+
   // console.log("sessionManagementInfo:", clientInfo);
   return (
     <div className="space-y-4">
       <BackButton showText={true} text="View Client Details" />
-      <ClientDetailsLayout clientInfo={clientInfo} />
+      <ClientDetailsLayout clientInfo={clientInfo} bookingId={bookingId} />
       <AssignedTaskList tableData={sessionManagementInfo?.taskData} />
     </div>
   );
