@@ -144,7 +144,7 @@ const sidebars = {
       path: "/bhaa/settings",
       icon: Settings,
       subItems: [
-        { name: "Faqs", path: "/bha/faqs", icon: FaQuoteRight },
+        { name: "Faqs", path: "/bhaa/faqs", icon: FaQuoteRight },
         {
           name: "Terms and Conditions",
           path: "/bhaa/terms-and-conditions",
