@@ -10,6 +10,8 @@ import getImageUrl from "@/utils/getImageUrl";
 import formatTimeAgo from "@/utils/FormatDate/xtimesAgo";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getCookie } from "@/utils/cookies";
+import { FaMagic } from "react-icons/fa";
+import PredefinedMessageModal from "./PredefinedMessage/PredefinedMessageModal";
 const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
   const { data: messagesResponse, isLoading: isMessagesLoading } =
     useGetMessagesQuery({ chatId }, { skip: !chatId });
@@ -26,6 +28,7 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
   const [newMessage, setNewMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [isPredefinedModalOpen, setIsPredefinedModalOpen] = useState(false);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -125,6 +128,21 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  const handlePredefinedMessageSelect = async (messageText) => {
+    if (!chatId) return;
+
+    try {
+      // Send the predefined message with messageType
+      await sendMessageApi({
+        chatId: chatId,
+        message: messageText,
+        messageType: "assistant_question",
+      }).unwrap();
+    } catch (error) {
+      console.error("Failed to send predefined message:", error);
     }
   };
 
@@ -313,7 +331,7 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
             </button>
           </div>
         )}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-4">
           <input
             type="file"
             ref={fileInputRef}
@@ -328,7 +346,14 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
           >
             <ImageIcon size={20} />
           </button>
-
+          <button
+            onClick={() => setIsPredefinedModalOpen(true)}
+            className="text-gray-500 hover:text-gray-700 transition-colors"
+            disabled={!chatId}
+            title="Predefined Messages"
+          >
+            <FaMagic size={15} />
+          </button>
           <div className="flex-1 relative">
             <input
               type="text"
@@ -354,6 +379,13 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
           </button>
         </div>
       </div>
+
+      {/* Predefined Message Modal */}
+      <PredefinedMessageModal
+        open={isPredefinedModalOpen}
+        onOpenChange={setIsPredefinedModalOpen}
+        onSelectMessage={handlePredefinedMessageSelect}
+      />
     </div>
   );
 };

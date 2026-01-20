@@ -1,0 +1,64 @@
+{
+    "scale": {
+      "min": 1,
+      "max": 3,
+      "labels": {
+        "1": "Not at all easy",
+        "2": "Somewhat easy",
+        "3": "Very easy"
+      }
+    },
+    "questions": [
+      {
+        "id": "ease_1",
+        "text": "How doable was your {{taskName}}?",
+        "type": "rating"
+      },
+      {
+        "id": "ease_2",
+        "text": "On a scale from 1 to 3, how easy did your {{taskName}} feel?",
+        "type": "rating"
+      },
+      {
+        "id": "ease_3",
+        "text": "Quick check-in: How manageable was {{taskName}} for you?",
+        "type": "rating"
+      },
+      {
+        "id": "ease_4",
+        "text": "How was {{taskName}} for you today? Rate it:",
+        "type": "rating"
+      },
+      {
+        "id": "ease_5",
+        "text": "Let’s rate the ease of your {{taskName}}.",
+        "type": "rating"
+      },
+      {
+        "id": "ease_6",
+        "text": "After doing {{taskName}}, how would you rate it in terms of ease?",
+        "type": "rating"
+      },
+      {
+        "id": "ease_7",
+        "text": "How did {{taskName}} feel?",
+        "type": "rating"
+      },
+      {
+        "id": "ease_8",
+        "text": "Rate how doable your {{taskName}} felt today:",
+        "type": "rating"
+      },
+      {
+        "id": "ease_9",
+        "text": "Thinking back on {{taskName}}, how easy was it to complete?",
+        "type": "rating"
+      },
+      {
+        "id": "ease_10",
+        "text": "Give your {{taskName}} a quick ease rating:",
+        "type": "rating"
+      }
+    ]
+  }
+  

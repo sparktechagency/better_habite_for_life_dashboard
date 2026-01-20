@@ -65,7 +65,7 @@ function ChatListSidebar({ chatList = [], isLoading = false, currentUserId }) {
   };
 
   return (
-    <div className="lg:w-[30rem] bg-white flex flex-col h-auto lg:h-full border-b lg:border-b-0 lg:border-r border-gray-200">
+    <div className="lg:w-[25rem] bg-white flex flex-col h-auto lg:h-full border-b lg:border-b-0 lg:border-r border-gray-200">
       {/* Mobile Header with Search */}
       <div className="p-5 border-b border-gray-200">
         <SearchBar
