@@ -41,9 +41,10 @@ export const getImageUrl = (imagePath, fallback = "") => {
     normalizedPath = "/" + normalizedPath;
   }
 
+  console.log("normalizedPath", normalizedPath);
+
   // Construct full URL with base URL
-  const apiBaseUrl =
-    baseUrl || process.env.NEXT_PUBLIC_API_BASE_URL || "http://10.10.7.79:3001";
+  const apiBaseUrl = process.env.NEXT_PUBLIC_IMAGE_URL;
 
   return `${apiBaseUrl}${normalizedPath}`;
 };

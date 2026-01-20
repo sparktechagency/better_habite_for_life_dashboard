@@ -5,20 +5,13 @@ import { Button } from "@/components/ui/button";
 import { HiPlus } from "react-icons/hi";
 import ScheduleCard from "./ScheduleCard";
 import ScheduleAddEditModal from "./ScheduleAddEditModal";
+import { useGetBhaScheduleSlotDataQuery } from "@/redux/Apis/bha/scheuleApi/scheduleApi";
 
 function BhaScheduleLayout() {
-  const [schedules, setSchedules] = useState([
-    {
-      id: 1,
-      availableDays: ["Monday", "Tuesday", "Friday"],
-      selectedDay: "Monday",
-      selectedTimes: [
-        "09:00 AM - 09:45 AM",
-        "10:00 AM - 10:45 AM",
-        "11:00 AM - 11:45 AM",
-      ],
-    },
-  ]);
+  const { data: scheduleSlotData, isLoading: isScheduleSlotLoading } =
+    useGetBhaScheduleSlotDataQuery();
+
+  const availability = scheduleSlotData?.data?.availability || [];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState(null);
@@ -28,31 +21,9 @@ function BhaScheduleLayout() {
     setIsModalOpen(true);
   };
 
-  const handleEdit = (schedule) => {
-    setEditingSchedule(schedule);
+  const handleEdit = () => {
+    setEditingSchedule({ availability });
     setIsModalOpen(true);
-  };
-
-  const handleSave = (scheduleData) => {
-    if (scheduleData.id) {
-      // Update existing schedule
-      setSchedules(
-        schedules.map((s) => (s.id === scheduleData.id ? scheduleData : s))
-      );
-    } else {
-      // Add new schedule
-      const newSchedule = {
-        ...scheduleData,
-        id: schedules.length + 1,
-      };
-      setSchedules([...schedules, newSchedule]);
-    }
-    setIsModalOpen(false);
-    setEditingSchedule(null);
-  };
-
-  const handleDelete = (scheduleId) => {
-    setSchedules(schedules.filter((s) => s.id !== scheduleId));
   };
 
   return (
@@ -76,16 +47,17 @@ function BhaScheduleLayout() {
         </Button>
       </div>
 
-      {/* Schedule Cards */}
+      {/* Schedule Card */}
       <div className="space-y-4">
-        {schedules.map((schedule) => (
-          <ScheduleCard
-            key={schedule.id}
-            schedule={schedule}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ))}
+        {isScheduleSlotLoading ? (
+          <div className="text-center py-8 text-gray-500">Loading...</div>
+        ) : availability.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No schedule available. Click "Add Schedule" to create one.
+          </div>
+        ) : (
+          <ScheduleCard availability={availability} onEdit={handleEdit} />
+        )}
       </div>
 
       {/* Add/Edit Modal */}
@@ -93,7 +65,6 @@ function BhaScheduleLayout() {
         openModal={isModalOpen}
         setOpenModal={setIsModalOpen}
         scheduleData={editingSchedule}
-        onSave={handleSave}
       />
     </div>
   );

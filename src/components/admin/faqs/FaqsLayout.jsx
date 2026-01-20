@@ -15,8 +15,9 @@ import {
   useDeleteFaqMutation,
 } from "@/redux/Apis/faqApi/faqApi";
 import useToast from "@/hooks/useToast";
-
+import useRoleCheckfromPathname from "@/hooks/useRoleCheckfromPathname";
 function FaqsLayout() {
+  const { isAdmin } = useRoleCheckfromPathname();
   const toast = useToast();
   const { data: faqResponse, isLoading, error } = useGetFaqDataQuery({});
   const [createFaq, { isLoading: isCreating }] = useCreateFaqMutation();
@@ -212,44 +213,46 @@ function FaqsLayout() {
           icon={<FcFaq />}
           description="Here is an overview of your faqs"
         />
-        <div className="flex items-center gap-2">
-          {isEditMode && (
-            <Button
-              onClick={handleAddNewSection}
-              className="bg-black hover:bg-black/80 text-white"
-              disabled={isSaving}
-            >
-              <Plus size={16} />
-              Add FAQ
-            </Button>
-          )}
-          {isEditMode ? (
-            <>
+        {isAdmin && (
+          <div className="flex items-center gap-2">
+            {isEditMode && (
               <Button
-                variant="outline"
-                onClick={handleCancel}
-                disabled={isSaving}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSave}
+                onClick={handleAddNewSection}
                 className="bg-black hover:bg-black/80 text-white"
                 disabled={isSaving}
               >
-                {isSaving ? "Saving..." : "Save"}
+                <Plus size={16} />
+                Add FAQ
               </Button>
-            </>
-          ) : (
-            <Button
-              variant="outline"
-              onClick={handleEditClick}
-              className="hover:bg-white hover:text-red-400"
-            >
-              <FiEdit3 size={15} />
-            </Button>
-          )}
-        </div>
+            )}
+            {isEditMode ? (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={handleCancel}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  className="bg-black hover:bg-black/80 text-white"
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Save"}
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={handleEditClick}
+                className="hover:bg-white hover:text-red-400"
+              >
+                <FiEdit3 size={15} />
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Empty State */}
@@ -257,10 +260,12 @@ function FaqsLayout() {
         <div className="flex flex-col items-center justify-center py-12 border rounded-lg bg-white">
           <FcFaq className="text-6xl mb-4" />
           <p className="text-gray-500 mb-4">No FAQs found</p>
-          <Button onClick={handleEditClick}>
-            <Plus size={16} className="mr-2" />
-            Add Your First FAQ
-          </Button>
+          {isAdmin && (
+            <Button onClick={handleEditClick}>
+              <Plus size={16} className="mr-2" />
+              Add Your First FAQ
+            </Button>
+          )}
         </div>
       )}
 
@@ -299,7 +304,7 @@ function FaqsLayout() {
                     </button>
                   )}
                   <div className="flex items-center gap-2">
-                    {isEditMode && (
+                    {isEditMode && isAdmin && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

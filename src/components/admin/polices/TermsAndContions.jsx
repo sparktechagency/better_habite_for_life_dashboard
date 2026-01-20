@@ -9,8 +9,10 @@ import {
   useUpdatePolicyMutation,
 } from "@/redux/Apis/policyApi/policyApi";
 import useToast from "@/hooks/useToast";
+import useRoleCheckfromPathname from "@/hooks/useRoleCheckfromPathname";
 
 function TermsAndContions() {
+  const { isAdmin } = useRoleCheckfromPathname();
   const toast = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [policyContent, setPolicyContent] = useState("");
@@ -82,9 +84,11 @@ function TermsAndContions() {
           title="Terms and Conditions"
           description="Here is an overview of your terms and conditions"
         />
-        <Button onClick={handleEditClick}>
-          <FiEdit3 size={15} /> Edit T&C
-        </Button>
+        {isAdmin && (
+          <Button onClick={handleEditClick}>
+            <FiEdit3 size={15} /> Edit T&C
+          </Button>
+        )}
       </div>
 
       {/* Policy Content Display */}

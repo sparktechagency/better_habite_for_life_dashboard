@@ -55,9 +55,17 @@ export const baseApi = createApi({
         "updateCourse",
         "createArticle",
         "updateArticle",
+        "sendMessage",
       ];
 
-      const isFormDataRequest = formDataEndpoints.includes(endpoint);
+      // Check if request body is FormData (dynamic detection)
+      const isFormDataBody =
+        originalArgs instanceof FormData ||
+        originalArgs?.body instanceof FormData ||
+        originalArgs?.formData instanceof FormData;
+
+      const isFormDataRequest =
+        formDataEndpoints.includes(endpoint) || isFormDataBody;
 
       // IMPORTANT: Do NOT set Content-Type for FormData requests.
       // fetchBaseQuery automatically sets 'multipart/form-data' with the correct boundary.
@@ -85,8 +93,13 @@ export const baseApi = createApi({
     "BhaaManagement",
     "BHaDashboard",
     "BHaaOverview",
-    "BhaaClient",
-    "task"
+    "SessionManagement",
+    "AssignTask",
+    "BhaReport",
+    "TodaysSession",
+    "BhaScheduleSlot",
+    "Chat",
+    "Message",
   ],
   endpoints: () => ({}),
 });

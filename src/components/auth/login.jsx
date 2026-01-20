@@ -42,6 +42,9 @@ export default function Login() {
         if (refreshToken) {
           setCookie("refreshToken", refreshToken, 30); // 30 days expiry
         }
+        if (user) {
+          setCookie("user_id", user._id, 30); // 30 days expiry
+        }
 
         // Save user role to localStorage
         if (user?.role) {

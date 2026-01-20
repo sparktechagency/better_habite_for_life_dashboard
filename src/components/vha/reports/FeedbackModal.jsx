@@ -11,8 +11,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getImageUrl } from "@/utils/getImageUrl";
 
-const FeedbackModal = ({ openModal, setOpenModal, clientData, onSave }) => {
+const FeedbackModal = ({
+  openModal,
+  setOpenModal,
+  clientData,
+  onSave,
+  isLoading = false,
+}) => {
   const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
@@ -26,14 +33,10 @@ const FeedbackModal = ({ openModal, setOpenModal, clientData, onSave }) => {
 
     if (onSave) {
       onSave({
-        clientId: clientData?.id,
-        clientName: clientData?.name,
-        feedback: feedback.trim(),
+        userId: clientData?.userId,
+        message: feedback.trim(),
       });
     }
-
-    setOpenModal(false);
-    setFeedback("");
   };
 
   const handleClose = () => {
@@ -56,17 +59,20 @@ const FeedbackModal = ({ openModal, setOpenModal, clientData, onSave }) => {
           {/* Client Info */}
           <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
             <Avatar className="size-12">
-              <AvatarImage src={clientData.avatar} alt={clientData.name} />
+              <AvatarImage
+                src={getImageUrl(clientData.profile)}
+                alt={clientData.fullName}
+              />
               <AvatarFallback>
-                {clientData.name
-                  .split(" ")
+                {clientData.fullName
+                  ?.split(" ")
                   .map((n) => n[0])
-                  .join("")}
+                  .join("") || "U"}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
               <p className="text-base font-semibold text-gray-800">
-                {clientData.name}
+                {clientData.fullName}
               </p>
               <p className="text-sm text-gray-500">{clientData.email}</p>
             </div>
@@ -87,15 +93,15 @@ const FeedbackModal = ({ openModal, setOpenModal, clientData, onSave }) => {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={handleClose} disabled={isLoading}>
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!feedback.trim()}
+            disabled={!feedback.trim() || isLoading}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            Submit Feedback
+            {isLoading ? "Submitting..." : "Submit Feedback"}
           </Button>
         </DialogFooter>
       </DialogContent>
