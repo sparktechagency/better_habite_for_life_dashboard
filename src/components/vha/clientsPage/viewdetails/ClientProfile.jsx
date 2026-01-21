@@ -1,19 +1,37 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Clock, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import getImageUrl from "@/utils/getImageUrl";
 import { Badge } from "@/components/ui/badge";
+import RescheduleModal from "./Reschedule/RescheduleModal";
 
 const ClientDetailsLayout = ({ clientInfo }) => {
+  const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
+  const initialSessionDate = clientInfo?.sessionDateRaw
+    ? new Date(clientInfo.sessionDateRaw)
+    : new Date();
+
   return (
-    <div className="flex flex-col md:flex-row items-center  md:items-start lg:justify-between gap-4 md:gap-6 bg-white border border-gray-300 rounded-lg p-4 md:p-6">
-      <ClientProfile clientInfo={clientInfo} />
-      <div className="w-full lg:w-1/2">
-        <Session clientInfo={clientInfo} />
+    <>
+      <div className="flex flex-col md:flex-row items-center  md:items-start lg:justify-between gap-4 md:gap-6 bg-white border border-gray-300 rounded-lg p-4 md:p-6">
+        <ClientProfile clientInfo={clientInfo} />
+        <div className="w-full lg:w-1/2">
+          <Session
+            clientInfo={clientInfo}
+            onOpenReschedule={() => setIsRescheduleOpen(true)}
+          />
+        </div>
       </div>
-    </div>
+
+      <RescheduleModal
+        isOpen={isRescheduleOpen}
+        onClose={() => setIsRescheduleOpen(false)}
+        initialDate={initialSessionDate}
+        bookingId={clientInfo?.bookingId}
+      />
+    </>
   );
 };
 
@@ -33,16 +51,11 @@ const ClientProfile = ({ clientInfo }) => {
     </div>
   );
 };
-const Session = ({ clientInfo }) => {
+const Session = ({ clientInfo, onOpenReschedule }) => {
   const sessionData = {
     startTime: clientInfo.startTime,
     endTime: clientInfo.endTime,
     date: clientInfo.sessionDate,
-  };
-
-  const handleReschedule = () => {
-    console.log("Reschedule session");
-    // Handle reschedule logic
   };
 
   const handleJoinNow = () => {
@@ -81,7 +94,7 @@ const Session = ({ clientInfo }) => {
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
         <Button
           variant="outline"
-          onClick={handleReschedule}
+          onClick={onOpenReschedule}
           className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto"
         >
           Reschedule

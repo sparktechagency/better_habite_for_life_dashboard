@@ -36,10 +36,12 @@ function ViewDetailsLayout() {
     ),
     agoraId: sessionManagementDataById?.data?.channelName,
     sessionDate: formatDate(sessionManagementDataById?.data?.bookingDate),
+    sessionDateRaw: sessionManagementDataById?.data?.bookingDate,
     startTime: sessionManagementDataById?.data?.startTime,
     endTime: sessionManagementDataById?.data?.endTime,
     duration: sessionManagementDataById?.data?.scheduledDuration,
     status: sessionManagementDataById?.data?.status,
+    bookingId: sessionManagementDataById?.data?._id,
   };
 
   // console.log("sessionManagementInfo:", clientInfo);
