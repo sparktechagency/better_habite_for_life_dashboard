@@ -20,10 +20,23 @@ export const bhaScheduleSlotApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["BhaScheduleSlot"],
     }),
+
+    // Join the session
+    joinSessionNow: builder.mutation({
+      query: ({ bookingId }) => ({
+        url: `/video-session/create-video-session`,
+        method: "POST",
+        body: {
+          bookingSheduleId: bookingId,
+        },
+      }),
+      invalidatesTags: ["SessionManagement"],
+    }),
   }),
 });
 
 export const {
   useGetBhaScheduleSlotDataQuery,
   useUpdateBhaAvailabilityMutation,
+  useJoinSessionNowMutation,
 } = bhaScheduleSlotApi;

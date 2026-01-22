@@ -34,7 +34,7 @@ function ViewDetailsLayout() {
     clientProfilePicture: getImageUrl(
       sessionManagementDataById?.data?.userId?.profile
     ),
-    agoraId: sessionManagementDataById?.data?.channelName,
+    agoraChannelName: sessionManagementDataById?.data?.channelName,
     sessionDate: formatDate(sessionManagementDataById?.data?.bookingDate),
     sessionDateRaw: sessionManagementDataById?.data?.bookingDate,
     startTime: sessionManagementDataById?.data?.startTime,

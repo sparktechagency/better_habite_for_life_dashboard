@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import getImageUrl from "@/utils/getImageUrl";
 import { Badge } from "@/components/ui/badge";
 import RescheduleModal from "./Reschedule/RescheduleModal";
+import { useJoinSessionNowMutation } from "@/redux/Apis/bha/scheuleApi/scheduleApi";
+import VideoContainer from "./JoinSession/VideoContainer";
+import useToast from "@/hooks/useToast";
 
 const ClientDetailsLayout = ({ clientInfo }) => {
   const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
@@ -51,61 +54,95 @@ const ClientProfile = ({ clientInfo }) => {
     </div>
   );
 };
+
 const Session = ({ clientInfo, onOpenReschedule }) => {
   const sessionData = {
     startTime: clientInfo.startTime,
     endTime: clientInfo.endTime,
     date: clientInfo.sessionDate,
   };
+  const [joinSessionNow, { isLoading: isJoining }] = useJoinSessionNowMutation();
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [sessionResponseData, setSessionResponseData] = useState(null);
+  const toast = useToast();
 
-  const handleJoinNow = () => {
-    console.log("Join session");
-    // Handle join logic
+  const handleJoinNow = async () => {
+    try {
+      const response = await joinSessionNow({ bookingId: clientInfo.bookingId });
+      if (response.data?.success) {
+        toast.success(response.data.message);
+        setSessionResponseData(response.data.data);
+        setIsVideoOpen(true);
+      } else {
+        toast.error(response.data?.message || "Failed to join session");
+      }
+    } catch (error) {
+      console.log("error----->", error);
+      toast.error("Failed to join session");
+    }
+  };
+
+  const currentUser = {
+    name: clientInfo.clientName,
+    profilePicture: clientInfo.clientProfilePicture,
   };
 
   return (
-    <div className="bg-gray-200 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div className="flex flex-col gap-2 flex-1">
-        <h3 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center gap-2">
-          Coaching Session{" "}
-          <Badge
-            variant="outline"
-            className="text-xs bg-blue-500/50 text-white"
-          >
-            {clientInfo.status}
-          </Badge>
-        </h3>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-          <div className="flex items-center gap-1.5">
-            <Clock size={16} className="text-gray-700 flex-shrink-0" />
-            <p className="text-sm text-gray-700">{sessionData.startTime}</p>
-          </div>
-          -
-          <div className="flex items-center gap-1.5">
-            <Clock size={16} className="text-gray-700 flex-shrink-0" />
-            <p className="text-sm text-gray-700">{sessionData.endTime}</p>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Calendar size={16} className="text-gray-700 flex-shrink-0" />
-            <p className="text-sm text-gray-700">{sessionData.date}</p>
+    <>
+      <div className="bg-gray-200 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col gap-2 flex-1">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center gap-2">
+            Coaching Session{" "}
+            <Badge
+              variant="outline"
+              className="text-xs bg-blue-500/50 text-white"
+            >
+              {clientInfo.status}
+            </Badge>
+          </h3>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-1.5">
+              <Clock size={16} className="text-gray-700 flex-shrink-0" />
+              <p className="text-sm text-gray-700">{sessionData.startTime}</p>
+            </div>
+            -
+            <div className="flex items-center gap-1.5">
+              <Clock size={16} className="text-gray-700 flex-shrink-0" />
+              <p className="text-sm text-gray-700">{sessionData.endTime}</p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Calendar size={16} className="text-gray-700 flex-shrink-0" />
+              <p className="text-sm text-gray-700">{sessionData.date}</p>
+            </div>
           </div>
         </div>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          <Button
+            variant="outline"
+            onClick={onOpenReschedule}
+            className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto"
+          >
+            Reschedule
+          </Button>
+          <Button
+            onClick={handleJoinNow}
+            disabled={isJoining}
+            className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+          >
+            {isJoining ? "Joining..." : "Join Now"}
+          </Button>
+        </div>
       </div>
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-        <Button
-          variant="outline"
-          onClick={onOpenReschedule}
-          className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto"
-        >
-          Reschedule
-        </Button>
-        <Button
-          onClick={handleJoinNow}
-          className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
-        >
-          Join Now
-        </Button>
-      </div>
-    </div>
+
+      <VideoContainer
+        isOpen={isVideoOpen}
+        onClose={() => {
+          setIsVideoOpen(false);
+          setSessionResponseData(null);
+        }}
+        sessionData={sessionResponseData}
+        currentUser={currentUser}
+      />
+    </>
   );
 };
