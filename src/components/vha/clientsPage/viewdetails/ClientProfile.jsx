@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Clock, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,8 @@ const ClientDetailsLayout = ({ clientInfo }) => {
   const initialSessionDate = clientInfo?.sessionDateRaw
     ? new Date(clientInfo.sessionDateRaw)
     : new Date();
+
+  console.log("clientInfo-----><---", clientInfo);
 
   return (
     <>
@@ -64,7 +66,69 @@ const Session = ({ clientInfo, onOpenReschedule }) => {
   const [joinSessionNow, { isLoading: isJoining }] = useJoinSessionNowMutation();
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [sessionResponseData, setSessionResponseData] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
   const toast = useToast();
+
+  // Update current time every minute to check if we're in the time window
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Convert time string (e.g., "10:00 AM") to minutes since midnight
+  const timeToMinutes = (timeStr) => {
+    if (!timeStr) return null;
+    const [time, period] = timeStr.split(" ");
+    const [hours, minutes] = time.split(":").map(Number);
+    let totalMinutes = hours * 60 + minutes;
+    if (period?.toUpperCase() === "PM" && hours !== 12) {
+      totalMinutes += 12 * 60;
+    }
+    if (period?.toUpperCase() === "AM" && hours === 12) {
+      totalMinutes -= 12 * 60;
+    }
+    return totalMinutes;
+  };
+
+  // Check if current date matches session date
+  const isTodaySession = useMemo(() => {
+    if (!clientInfo.sessionDateRaw) return false;
+    const sessionDate = new Date(clientInfo.sessionDateRaw);
+    const today = new Date();
+    
+    return (
+      sessionDate.getFullYear() === today.getFullYear() &&
+      sessionDate.getMonth() === today.getMonth() &&
+      sessionDate.getDate() === today.getDate()
+    );
+  }, [clientInfo.sessionDateRaw, currentTime]);
+
+  // Check if current time is within session time window
+  const isWithinTimeWindow = useMemo(() => {
+    if (!isTodaySession || !clientInfo.startTime || !clientInfo.endTime) {
+      return false;
+    }
+
+    const startMinutes = timeToMinutes(clientInfo.startTime);
+    const endMinutes = timeToMinutes(clientInfo.endTime);
+    const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+
+    if (startMinutes === null || endMinutes === null) return false;
+
+    return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+  }, [isTodaySession, clientInfo.startTime, clientInfo.endTime, currentTime]);
+
+  // Join button should be enabled only if it's today and within time window
+  const canJoin = isTodaySession && isWithinTimeWindow;
+
+  // Reschedule button should be enabled only if status is "confirmed" or "pending"
+  const canReschedule = useMemo(() => {
+    const status = clientInfo.status?.toLowerCase();
+    return status === "confirmed" || status === "pending";
+  }, [clientInfo.status]);
 
   const handleJoinNow = async () => {
     try {
@@ -95,7 +159,7 @@ const Session = ({ clientInfo, onOpenReschedule }) => {
             Coaching Session{" "}
             <Badge
               variant="outline"
-              className="text-xs bg-blue-500/50 text-white"
+              className={`text-xs bg-blue-500/50 ${clientInfo.status === "completed" ? "bg-green-500" : "bg-blue-500/50"} text-white`}
             >
               {clientInfo.status}
             </Badge>
@@ -120,14 +184,15 @@ const Session = ({ clientInfo, onOpenReschedule }) => {
           <Button
             variant="outline"
             onClick={onOpenReschedule}
-            className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto"
+            disabled={isJoining || !canReschedule}
+            className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Reschedule
           </Button>
           <Button
             onClick={handleJoinNow}
-            disabled={isJoining}
-            className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+            // disabled={isJoining || !canJoin}
+            className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isJoining ? "Joining..." : "Join Now"}
           </Button>
@@ -141,6 +206,7 @@ const Session = ({ clientInfo, onOpenReschedule }) => {
           setSessionResponseData(null);
         }}
         sessionData={sessionResponseData}
+        bookingId={clientInfo.bookingId}
         currentUser={currentUser}
       />
     </>

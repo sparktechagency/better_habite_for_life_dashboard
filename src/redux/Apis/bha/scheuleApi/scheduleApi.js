@@ -18,7 +18,7 @@ export const bhaScheduleSlotApi = baseApi.injectEndpoints({
         method: "POST",
         body: availability,
       }),
-      invalidatesTags: ["BhaScheduleSlot"],
+      invalidatesTags: ["BhaScheduleSlot", "SessionManagement"],
     }),
 
     // Join the session
@@ -30,7 +30,15 @@ export const bhaScheduleSlotApi = baseApi.injectEndpoints({
           bookingSheduleId: bookingId,
         },
       }),
-      invalidatesTags: ["SessionManagement"],
+      invalidatesTags: ["SessionManagement", "BhaScheduleSlot"],
+    }),
+
+    leaveSessionNow: builder.mutation({
+      query: ({ bookingId }) => ({
+        url: `/doctor-booking/booking-session-close/${bookingId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["SessionManagement", "BhaScheduleSlot"],
     }),
   }),
 });
@@ -39,4 +47,5 @@ export const {
   useGetBhaScheduleSlotDataQuery,
   useUpdateBhaAvailabilityMutation,
   useJoinSessionNowMutation,
+  useLeaveSessionNowMutation,
 } = bhaScheduleSlotApi;

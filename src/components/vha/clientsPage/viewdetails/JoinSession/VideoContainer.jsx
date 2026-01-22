@@ -4,14 +4,16 @@ import { useAgora } from "./hooks/useAgora";
 import VideoControls from "./VideoControls";
 import VideoTimer from "./VideoTimer";
 import VideoParticipant from "./VideoParticipant";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLeaveSessionNowMutation } from "@/redux/Apis/bha/scheuleApi/scheduleApi";
 
 function VideoContainer({ 
   isOpen, 
   onClose, 
   sessionData,
-  currentUser 
+  currentUser,
+  bookingId
 }) {
   const [position, setPosition] = useState({ x: 100, y: 100 });
   const [isDragging, setIsDragging] = useState(false);
@@ -19,7 +21,7 @@ function VideoContainer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [callStartTime] = useState(Date.now());
   const containerRef = useRef(null);
-
+  const [leaveSessionNow, { isLoading: isLeaving }] = useLeaveSessionNowMutation();
   const {
     isJoined,
     isVideoEnabled,
@@ -36,6 +38,9 @@ function VideoContainer({
     channelName: sessionData?.channelName,
     uid: sessionData?.uid,
   });
+
+  console.log("sessionData-----><---", sessionData);
+  console.log("bookingId-----><---", bookingId);
 
   // Handle dragging
   const handleMouseDown = (e) => {
@@ -82,6 +87,14 @@ function VideoContainer({
 
   const handleEndCall = async () => {
     await leaveChannel();
+    console.log("bookingId-----><---", bookingId);
+    const response = await leaveSessionNow({ bookingId: bookingId });
+    if (response.data?.success) {
+    //   toast.success(response.data.message);
+      onClose?.();
+    } else {
+    //   toast.error(response.data.message);
+    }
     onClose?.();
   };
 
@@ -132,10 +145,11 @@ function VideoContainer({
         <Button
           variant="ghost"
           size="icon"
-          onClick={onClose}
-          className="w-6 h-6 text-white hover:bg-gray-600"
+          onClick={handleEndCall}
+          disabled={isLeaving}
+          className="w-6 h-6 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <X className="w-4 h-4" />
+          {isLeaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
         </Button>
       </div>
 
