@@ -191,7 +191,7 @@ const Session = ({ clientInfo, onOpenReschedule }) => {
           </Button>
           <Button
             onClick={handleJoinNow}
-            // disabled={isJoining || !canJoin}
+            disabled={isJoining || !canJoin}
             className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isJoining ? "Joining..." : "Join Now"}
