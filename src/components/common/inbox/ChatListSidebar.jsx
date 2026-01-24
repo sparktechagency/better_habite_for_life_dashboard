@@ -242,12 +242,12 @@ function ChatList({ chats, selectedChat, onChatSelect, isLoading }) {
   }
 
   return (
-    <div className="p-2">
+    <div className="p-2 max-w-sm">
       {chats.map((chat) => (
         <div
           key={chat.id}
           onClick={() => onChatSelect(chat.id)}
-          className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 mb-1 ${
+          className={`flex items-center p-3 max-w-sm rounded-lg cursor-pointer transition-all duration-200 mb-1 ${
             selectedChat?.id === chat.id
               ? "bg-blue-500 text-white"
               : "hover:bg-gray-50"
