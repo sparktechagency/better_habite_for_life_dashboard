@@ -15,7 +15,8 @@ import { Checkbox } from "../ui/checkbox";
 import { useRouter } from "next/navigation";
 import { useLoginMutation } from "@/redux/Apis/authApi/authApi";
 import useToast from "@/hooks/useToast";
-import { setCookie } from "@/utils/cookies";
+import { setCookie, getCookie } from "@/utils/cookies";
+import { setUserRole } from "@/utils/authUtils";
 
 export default function Login() {
   const router = useRouter();
@@ -46,24 +47,39 @@ export default function Login() {
           setCookie("user_id", user._id, 30); // 30 days expiry
         }
 
-        // Save user role to localStorage
+        // Save user role to both localStorage and cookies (for middleware access)
         if (user?.role) {
-          localStorage.setItem("userRole", user.role);
-        }
+          console.log("Setting user role:", user.role);
+          setUserRole(user.role, 7); // Sets in both localStorage and cookies
+          
+          // Wait a bit and verify role was set in both places
+          setTimeout(() => {
+            const verifyRoleStorage = typeof window !== "undefined" ? localStorage.getItem("userRole") : null;
+            const verifyRoleCookie = typeof document !== "undefined" ? getCookie("userRole") : null;
+            console.log("Role verification - localStorage:", verifyRoleStorage, "cookie:", verifyRoleCookie);
+            
+            // Show success toast
+            toast.success(response.message || "Logged in successfully");
 
-        // Show success toast
-        toast.success(response.message || "Logged in successfully");
+            // Determine redirect path based on role
+            let redirectPath = "/dashboard"; // Default
+            if (user?.role === "admin") {
+              redirectPath = "/admin/dashboard";
+            } else if (user?.role === "doctor") {
+              redirectPath = "/bha/dashboard";
+            } else if (user?.role === "assistant") {
+              redirectPath = "/bhaa/dashboard";
+            }
 
-        // Navigate based on role
-        if (user?.role === "admin") {
-          router.push("/admin/dashboard");
-        } else if (user?.role === "doctor") {
-          router.push("/bha/dashboard");
-        } else if (user?.role === "assistant") {
-          router.push("/bhaa/dashboard");
+            console.log("Redirecting to:", redirectPath, "with role:", user?.role);
+            console.log("All cookies before redirect:", document.cookie);
+
+            // Use window.location.href for full page reload to ensure cookies are available to middleware
+            window.location.href = redirectPath;
+          }, 500); // Increased delay to ensure cookies are fully set
         } else {
-          // Default redirect or handle other roles
-          router.push("/dashboard");
+          // No role - show error
+          toast.error("User role not found in response");
         }
       } else {
         throw new Error(response?.message || "Login failed");
