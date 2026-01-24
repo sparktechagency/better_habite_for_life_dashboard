@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronDown } from "lucide-react";
+import { deleteCookie } from "@/utils/cookies";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import { LogOutIcon } from "lucide-react";
+
 
 export default function Header() {
   const router = useRouter();
@@ -30,6 +33,16 @@ export default function Header() {
     } else {
       router.push("/auth/login");
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    deleteCookie("accessToken");
+    deleteCookie("refreshToken");
+    deleteCookie("userRole");
+    deleteCookie("user_id");
+    deleteCookie("userData");
+    router.push("/auth/login");
   };
   return (
     <div className="w-full mx-auto px-4 bg-sidebar border-b">
@@ -85,7 +98,10 @@ export default function Header() {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-500 focus:text-red-500">
-                Log Out
+                <Button  className="w-full justify-start bg-red-500 text-white hover:bg-red-600 cursor-pointer" onClick={handleLogout}>
+                  <LogOutIcon className="w-4 h-4 mr-2" />
+                  Log Out
+                </Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
