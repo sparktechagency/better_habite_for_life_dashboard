@@ -17,17 +17,32 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GoHeart } from "react-icons/go";
 import formatDate from "@/utils/FormatDate/formatDate";
 import { getImageUrl } from "@/utils/getImageUrl";
+import useToast from "@/hooks/useToast";
 import Link from "next/link";
 import { LuArrowRight } from "react-icons/lu";
+import { useHighlightPostMutation } from "@/redux/Apis/admin/postApi/postApi";
 
 function PostCard({ post }) {
   const router = useRouter();
-
+  const [highlightPost, { isLoading }] = useHighlightPostMutation();
+  const { success, error } = useToast();
   const handleCardClick = () => {
     router.push(`/admin/community/post/${post._id}`);
   };
 
   console.log(post);
+
+  const handleHighlightPost =async (e) => {
+    e.stopPropagation();
+    try {
+      const response = await highlightPost({ postId: post._id }).unwrap();
+      if (response.success) {
+          success(response.message);
+      }
+    } catch (error) {
+      error(error.data.message);
+    }
+  };
 
   return (
     <>
@@ -55,7 +70,7 @@ function PostCard({ post }) {
 
           <CardAction
             className="border border-gray-200 rounded-full p-1 hover:bg-gray-100 hover:scale-110 transition-all duration-300 cursor-pointer"
-            onClick={(e) => e.stopPropagation()}
+            onClick={handleHighlightPost}
           >
             <PiHighlighterFill
               size={20}
