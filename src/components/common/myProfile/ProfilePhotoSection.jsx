@@ -5,7 +5,7 @@ function ProfilePhotoSection({ profileInfo }) {
   const { fullName, email, profile, phone } = profileInfo;
   return (
     <div className="w-full flex flex-col  items-center justify-center gap-4">
-      <Avatar className="size-40">
+      <Avatar className="size-40 bg-white">
         <AvatarImage src={profile} />
         <AvatarFallback>
           {fullName

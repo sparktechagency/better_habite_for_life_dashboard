@@ -27,6 +27,8 @@ function PostCard({ post }) {
     router.push(`/admin/community/post/${post._id}`);
   };
 
+  console.log(post);
+
   return (
     <>
       <Card
@@ -37,7 +39,7 @@ function PostCard({ post }) {
           <CardTitle className="flex items-center gap-2">
             <Avatar className="size-10">
               <AvatarImage
-                src={getImageUrl(post.userId.avatar, "/admin/article/adhd.png")}
+                src={getImageUrl(post.userId.profile, "/admin/article/adhd.png")}
               />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
