@@ -198,6 +198,7 @@ export function TaskMonitorTable({
                   <Button
                     variant="outline"
                     className="border-blue-500 text-blue-500 hover:bg-blue-50 h-8 text-xs"
+                    onClick={() => router.push(`/bhaa/messages?chatId=${task.chatId}`)}
                   >
                     Chat
                   </Button>

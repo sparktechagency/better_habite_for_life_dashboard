@@ -123,7 +123,7 @@ export function ClinetStatusOverview({ clients = [] }) {
               </TableCell>
 
               <TableCell className="w-auto flex justify-end gap-2 text-right ">
-                <Button variant="outline" className="border border-sky-400 h-8">
+                <Button variant="outline" className="border border-sky-400 h-8" onClick={() => router.push(`/bhaa/messages?chatId=${client.chatId}`)}>
                   Chat
                 </Button>
                 <Button

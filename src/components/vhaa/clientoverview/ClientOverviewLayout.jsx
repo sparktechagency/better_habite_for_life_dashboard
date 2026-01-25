@@ -14,6 +14,7 @@ function ClientOverviewLayout() {
 
     return apiData.data.map(item => {
       const user = item.user;
+      const tasks = item.tasks ;
       return {
         id: user._id,
         clientName: user.fullName,
@@ -22,10 +23,12 @@ function ClientOverviewLayout() {
         address: user.address,
         status: user.isActive ? "Active" : "Inactive",
         joinedOn: formatDate(user.createdAt),
-        profile: user.profile
+        profile: user.profile,
+        chatId: tasks.map(task => task.chatId).toString(),
       };
     });
   };
+  
 
   // Format date function
   const formatDate = (dateString) => {
