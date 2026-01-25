@@ -24,7 +24,7 @@ export const bhaScheduleSlotApi = baseApi.injectEndpoints({
     // Join the session
     joinSessionNow: builder.mutation({
       query: ({ bookingId }) => ({
-        url: `/video-session/create-video-session`,
+        url: `/doctor-booking/agora-token`,
         method: "POST",
         body: {
           bookingSheduleId: bookingId,
