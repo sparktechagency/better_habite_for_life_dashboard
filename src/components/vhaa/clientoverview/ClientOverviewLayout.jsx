@@ -11,7 +11,7 @@ function ClientOverviewLayout() {
   const limit = 10;
   const { data, isLoading } = useGetClientQuery({
     searchTerm: searchText,
-    status: status !== "All Status" ? status.toLowerCase() : undefined,
+    isActive: status !== "All Status" ? status.toLowerCase() === "active" ? true : false : undefined,
     page: currentPage,
     limit: limit,
   });
@@ -25,21 +25,19 @@ function ClientOverviewLayout() {
 
   // Transform API data to match table structure
   const transformApiData = (apiData) => {
-    if (!apiData?.data) return [];
+    if (!apiData?.data || !Array.isArray(apiData.data)) return [];
 
     return apiData.data.map(item => {
-      const user = item.user;
-      const tasks = item.tasks ;
       return {
-        id: user._id,
-        clientName: user.fullName,
-        clientEmail: user.email,
-        contactInfo: user.phone,
-        address: user.address,
-        status: user.isActive ? "Active" : "Inactive",
-        joinedOn: formatDate(user.createdAt),
-        profile: user.profile,
-        chatId: tasks.map(task => task.chatId).toString(),
+        id: item._id,
+        clientName: item.fullName,
+        clientEmail: item.email,
+        contactInfo: item.phone,
+        address: item.address,
+        status: item.isActive ? "Active" : "Inactive",
+        joinedOn: formatDate(item.createdAt),
+        profile: item.profile,
+        chatId: item.chatId || "",
       };
     });
   };
@@ -74,6 +72,17 @@ function ClientOverviewLayout() {
     contactInfo: formatContactInfo(data.contactInfo, data.address),
   }));
 
+  // Handlers to reset page on filter changes
+  const handleSearchChange = (value) => {
+    setSearchText(value);
+    setCurrentPage(1); // Reset to first page on search change
+  };
+
+  const handleStatusChange = (value) => {
+    setStatus(value);
+    setCurrentPage(1); // Reset to first page on status change
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -98,14 +107,20 @@ function ClientOverviewLayout() {
       <SearchFilterButton
         showAddButton={false}
         searchText={searchText}
-        setSearchText={(value) => setSearchText(value)}
+        setSearchText={handleSearchChange}
         selectOptions={["All Status", "Active", "Inactive"]}
         status={status}
-        setStatus={(value) => setStatus(value)}
+        setStatus={handleStatusChange}
         placeholder="Search Client"
       />
 
-      <ClientTable tableData={formattedTableData} />
+      <ClientTable 
+        tableData={formattedTableData} 
+        paginationMeta={paginationMeta}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        isLoading={isLoading}
+      />
     </div>
   );
 }
