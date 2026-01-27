@@ -17,11 +17,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { LogOutIcon } from "lucide-react";
-
+import { socket } from "@/socket/socket";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const router = useRouter();
   const userRole = localStorage.getItem("userRole");
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    socket.on("notification", (notification) => {
+      setNotifications(notification);
+      console.log("notification", notifications);
+    });
+  }, []);
+
+  console.log("notifications", notifications);
+
 
   const handleProfileRedirect = () => {
     if (userRole === "admin") {
@@ -53,10 +65,15 @@ export default function Header() {
           <Input type="text" placeholder="Search" className="w-full max-w-sm" />
           <Button
             variant="ghost"
-            className="p-0 border bg-transparent"
-            onClick={() => router.push("/bha/notifications")}
+            className="p-0 border bg-transparent relative"
+            onClick={() => router.push(userRole === "admin" || userRole === "super_admin" ? "/admin/notifications" : userRole === "doctor" ? "/bha/notifications" : userRole === "assistant" ? "/bhaa/notifications" : "/auth/login")}
           >
             <IoIosNotificationsOutline size={28} className="text-black" />
+            {notifications.length > 0 && (
+              <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">
+                {notifications.length}
+              </span>
+            )}
           </Button>
 
           {/* Shadcn Dropdown Menu */}

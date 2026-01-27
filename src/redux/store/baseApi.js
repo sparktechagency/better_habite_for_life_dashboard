@@ -102,6 +102,7 @@ export const baseApi = createApi({
     "Chat",
     "task",
     "Message",
+    "Notification",
   ],
   endpoints: () => ({}),
 });

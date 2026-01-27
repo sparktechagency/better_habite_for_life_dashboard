@@ -23,7 +23,6 @@ import { LuBookOpen, LuCalendarDays } from "react-icons/lu";
 import { LuSquareUserRound } from "react-icons/lu";
 import { RxDashboard } from "react-icons/rx";
 import { FaUsers } from "react-icons/fa";
-import { TiGift } from "react-icons/ti";
 import { LuFileCheck } from "react-icons/lu";
 import { LuFileLock2 } from "react-icons/lu";
 import { RiArticleLine } from "react-icons/ri";
@@ -31,6 +30,7 @@ import { BiCategory } from "react-icons/bi";
 import { FaQuoteRight } from "react-icons/fa6";
 import { LuBotMessageSquare } from "react-icons/lu";
 import { usePathname } from "next/navigation";
+import { IoIosNotificationsOutline } from "react-icons/io";
 
 const sidebars = {
   admin: [
@@ -75,11 +75,11 @@ const sidebars = {
       path: "/admin/category-management",
       icon: BiCategory,
     },
-    // {
-    //   name: "Subscriptions",
-    //   path: "/admin/subscriptions",
-    //   icon: TiGift,
-    // },
+    {
+      name: "Notifications",
+      path: "/admin/notifications",
+      icon: IoIosNotificationsOutline,
+    },
     {
       name: "Terms and Conditions",
       path: "/admin/terms-and-conditions",

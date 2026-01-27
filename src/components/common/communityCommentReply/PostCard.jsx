@@ -54,16 +54,16 @@ function PostCard({ post }) {
           <CardTitle className="flex items-center gap-2">
             <Avatar className="size-10">
               <AvatarImage
-                src={getImageUrl(post.userId.profile, "/admin/article/adhd.png")}
+                src={getImageUrl(post?.userId?.profile, "/admin/article/adhd.png")}
               />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
               <span className="text-sm font-medium">
-                {post.userId.fullName}
+                {post?.userId?.fullName}
               </span>
               <span className="text-xs text-gray-500">
-                {formatDate(post.createdAt)}
+                {formatDate(post?.createdAt)}
               </span>
             </div>
           </CardTitle>
@@ -75,16 +75,16 @@ function PostCard({ post }) {
             <PiHighlighterFill
               size={20}
               className={` ${
-                post.highlights === true ? "text-yellow-500" : "text-gray-300"
+                post?.highlights === true ? "text-yellow-500" : "text-gray-300"
               }`}
             />
           </CardAction>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-gray-500">
-            {post.description.length > 350
+            {post?.description?.length > 350
               ? post.description.slice(0, 350) + "..."
-              : post.description}
+              : post?.description}
           </p>
 
           {post.description.length > 350 && (
