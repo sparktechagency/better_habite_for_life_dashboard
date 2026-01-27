@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, Loader } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import { useRouter } from "next/navigation";
 import { useLoginMutation } from "@/redux/Apis/authApi/authApi";
@@ -185,7 +185,7 @@ export default function Login() {
             disabled={isLoading}
             className="w-full bg-black/70 hover:bg-black text-white hover:text-white  font-medium py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Signing In..." : "Sign In"}
+            {isLoading ? <>Signing In...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></> : "Sign In"}
           </Button>
         </form>
       </CardContent>

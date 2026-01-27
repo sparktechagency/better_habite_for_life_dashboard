@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Lock } from "lucide-react";
+import { Eye, EyeOff, Lock, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import useToast from "@/hooks/useToast";
 import { useResetPasswordMutation } from "@/redux/Apis/authApi/authApi";
@@ -158,7 +158,7 @@ export default function ResetPassword() {
             }
             className="w-full bg-black/70 hover:bg-black text-white hover:text-white  font-medium py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Resetting..." : "Reset Password"}
+            {isLoading ? <>Resetting...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></> : "Reset Password"}
           </Button>
         </form>
       </CardContent>

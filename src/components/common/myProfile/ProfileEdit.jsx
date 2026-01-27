@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { X, Upload } from "lucide-react";
+import { X, Upload, Loader } from "lucide-react";
 
 function ProfileEdit({
   openModal,
@@ -341,7 +341,7 @@ function ProfileEdit({
             disabled={isLoading}
             className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Saving..." : "Save Changes"}
+            {isLoading ? <>Saving...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></> : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>

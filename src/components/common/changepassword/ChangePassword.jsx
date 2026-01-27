@@ -8,12 +8,14 @@ import { useChangePasswordMutation } from "@/redux/Apis/authApi/authApi";
 import useToast from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 import { HiOutlineEmojiSad } from "react-icons/hi";
-import { Eye, EyeOff } from "lucide-react";
-
+import { Eye, EyeOff, Loader } from "lucide-react";
+import { HiOutlineEmojiHappy } from "react-icons/hi";
+import { deleteCookie } from "@/utils/cookies";
 const ChangePassword = () => {
   const { success, error } = useToast();
   const router = useRouter();
   const [apiError, setApiError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -32,17 +34,23 @@ const ChangePassword = () => {
 
     try {
       const response = await changePassword({
-        currentPassword: data.oldPassword,
-        newPassword: data.newPassword,
-        confirmPassword: data.confirmPassword,
+        oldPassword: data.oldPassword,
+        // newPassword: data.newPassword,
+        newPassword: data.confirmPassword,
       }).unwrap();
 
-      if (response.success && response.statusCode === 200) {
-        success(response.message || "Password changed successfully");
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("userData");
-        router.push("/auth/login");
+      if (response.success) {
+        const message = response.message || "Password changed successfully";
+        setSuccessMessage(message);
+        success(message);
+        deleteCookie("accessToken");
+        deleteCookie("refreshToken");
+        deleteCookie("user_id");
+        deleteCookie("userRole");
+        // Redirect after a short delay to show success message
+        setTimeout(() => {
+          router.push("/auth/login");
+        }, 1500);
       } else {
         const errorMessage = response.message || "Password change failed";
         setApiError(errorMessage);
@@ -77,6 +85,12 @@ const ChangePassword = () => {
         <CardTitle>Change Password</CardTitle>
       </CardHeader>
       <CardContent>
+        {successMessage && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md flex items-center justify-between">
+            <p className="text-sm text-green-600">{successMessage}</p>
+            <span className="text-2xl"><HiOutlineEmojiHappy className="text-green-600" /></span>
+          </div>
+        )}
         {apiError && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center justify-between">
             <p className="text-sm text-red-600">{apiError}</p>
@@ -97,6 +111,7 @@ const ChangePassword = () => {
                   },
                   onChange: () => {
                     if (apiError) setApiError(""); // Clear error when user starts typing
+                    if (successMessage) setSuccessMessage(""); // Clear success when user starts typing
                   },
                 })}
                 className={`pr-10 ${
@@ -137,6 +152,7 @@ const ChangePassword = () => {
                   },
                   onChange: () => {
                     if (apiError) setApiError(""); // Clear error when user starts typing
+                    if (successMessage) setSuccessMessage(""); // Clear success when user starts typing
                   },
                 })}
                 className={`pr-10 ${
@@ -177,6 +193,7 @@ const ChangePassword = () => {
                   },
                   onChange: () => {
                     if (apiError) setApiError(""); // Clear error when user starts typing
+                    if (successMessage) setSuccessMessage(""); // Clear success when user starts typing
                   },
                 })}
                 className={`pr-10 ${
@@ -209,7 +226,7 @@ const ChangePassword = () => {
             className="w-full bg-black/70 hover:bg-black text-white hover:text-white font-medium py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/25 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
-            {isLoading ? "Changing..." : "Change Password"}
+            {isLoading ? <>Changing...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></> : "Change Password"}
           </Button>
         </form>
       </CardContent>

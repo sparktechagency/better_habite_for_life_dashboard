@@ -18,13 +18,15 @@ import {
 import { useRouter } from "next/navigation";
 import { LogOutIcon } from "lucide-react";
 import { socket } from "@/socket/socket";
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
+import { useGetMyProfileQuery } from "@/redux/Apis/profileApi/profileApi";
 import useToast from "@/hooks/useToast";
 export default function Header() {
   const router = useRouter();
   const userRole = localStorage.getItem("userRole");
   const [notifications, setNotifications] = useState({});
   const {success} = useToast();
+  const { data: myProfile } = useGetMyProfileQuery();
   useEffect(() => {
     socket.connect();
     socket.on("notification", (notification) => {
@@ -42,7 +44,7 @@ export default function Header() {
 
 
   const handleProfileRedirect = () => {
-    if (userRole === "admin") {
+    if (userRole === "admin" || userRole === "super_admin") {
       router.push("/admin/my-profile");
     } else if (userRole === "doctor") {
       router.push("/bha/my-profile");
@@ -92,8 +94,8 @@ export default function Header() {
               >
                 <div className="flex items-center gap-2">
                   <Avatar className="h-6 w-6">
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>CN</AvatarFallback>
+                    <AvatarImage src={myProfile?.data?.profile || "https://github.com/shadcn.png"}  alt={myProfile?.data?.fullName || "User"} />
+                    <AvatarFallback>{myProfile?.data?.fullName?.charAt(0) || "CN"}</AvatarFallback>
                   </Avatar>
                   <span className="text-sm">Profile</span>
                 </div>
@@ -107,7 +109,7 @@ export default function Header() {
               <DropdownMenuItem asChild>
                 <Link
                   href={
-                    userRole === "admin"
+                    userRole === "admin" || userRole === "super_admin"
                       ? "/admin/change-password"
                       : userRole === "doctor"
                       ? "/bha/change-password"

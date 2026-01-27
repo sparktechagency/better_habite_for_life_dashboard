@@ -48,9 +48,9 @@ function LearningMaterialsLayout() {
       </div>
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-bold">Recently Uploaded Courses</h1>
-        <p className="font-semibold underline text-sky-500 cursor-pointer text-sm sm:text-base">
+        {/* <p className="font-semibold underline text-sky-500 cursor-pointer text-sm sm:text-base">
           View All
-        </p>
+        </p> */}
       </div>
 
       {isCourseLoading ? (
