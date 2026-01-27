@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React from "react";
+import React, { useState } from "react";
 import { TbBellRinging2 } from "react-icons/tb";
 import { HiOutlineBell } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
@@ -15,8 +15,9 @@ import formatTimeAgo from "@/utils/FormatDate/xtimesAgo";
 import { Loader } from "lucide-react";
 
 function AllNotifications({ notifications = [], isLoading = false, meta = {}, page = 1, setPage, userRole }) {
-  const [markAsRead, { isLoading: isMarkingAsRead }] = useMarkAsReadMutation();
+  const [markAsRead] = useMarkAsReadMutation();
   const [markAllAsRead, { isLoading: isMarkingAllAsRead }] = useMarkAllAsReadMutation();
+  const [markingNotificationId, setMarkingNotificationId] = useState(null);
   const toast = useToast();
 
   console.log("notifications ------->bha", notifications?.result);
@@ -26,6 +27,7 @@ function AllNotifications({ notifications = [], isLoading = false, meta = {}, pa
 
   const handleMarkAsRead = async (notificationId) => {
     try {
+      setMarkingNotificationId(notificationId);
       const response = await markAsRead(notificationId).unwrap();
       if (response?.success) {
         toast.success(response.message || "Notification marked as read");
@@ -36,6 +38,8 @@ function AllNotifications({ notifications = [], isLoading = false, meta = {}, pa
         error?.message ||
         "Failed to mark notification as read";
       toast.error(errorMessage);
+    } finally {
+      setMarkingNotificationId(null);
     }
   };
 
@@ -164,9 +168,13 @@ function AllNotifications({ notifications = [], isLoading = false, meta = {}, pa
                     variant="outline" 
                     className="bg-white"
                     onClick={() => handleMarkAsRead(notification?._id)}
-                    disabled={isMarkingAsRead}
+                    disabled={markingNotificationId === notification?._id}
                   >
-                    {isMarkingAsRead ? <>Marking...{" "}<Loader className="w-4 h-4 animate-spin text-primary" /></> : "Mark as read"}
+                    {markingNotificationId === notification?._id ? (
+                      <>Marking...{" "}<Loader className="w-4 h-4 animate-spin text-primary" /></>
+                    ) : (
+                      "Mark as read"
+                    )}
                   </Button>
                 )}
               </div>
