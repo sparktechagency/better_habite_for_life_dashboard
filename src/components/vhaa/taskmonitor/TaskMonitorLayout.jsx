@@ -106,10 +106,10 @@ function TaskMonitorLayout() {
     setPage(1); // Reset to first page on filter change
   };
 
-  const handleTimeChange = (value) => {
-    setTimeFilter(value);
-    setPage(1); // Reset to first page on filter change
-  };
+  // const handleTimeChange = (value) => {
+  //   setTimeFilter(value);
+  //   setPage(1); // Reset to first page on filter change
+  // };
 
   return (
     <div className="space-y-4">
@@ -129,7 +129,7 @@ function TaskMonitorLayout() {
             value={search}
             onChange={handleSearchChange}
           />
-          <Select value={timeFilter} onValueChange={handleTimeChange}>
+          {/* <Select value={timeFilter} onValueChange={handleTimeChange}>
             <SelectTrigger className="bg-gray-50 border-gray-300 w-[120px]">
               <SelectValue />
             </SelectTrigger>
@@ -138,7 +138,7 @@ function TaskMonitorLayout() {
               <SelectItem value="week">This Week</SelectItem>
               <SelectItem value="month">This Month</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
           <Select value={statusFilter} onValueChange={handleStatusChange}>
             <SelectTrigger className="bg-gray-50 border-gray-300 w-[120px]">
               <SelectValue />

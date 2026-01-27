@@ -19,6 +19,7 @@ import { useState } from "react";
 import useToast from '../../../hooks/useToast';
 import { useGetSingleTaskQuery, useTaskReminderMutation } from '../../../redux/Apis/bhaa/TaskMonitor/taskMonitorApi';
 import BhaaTaskDetails from "./BhaaTaskDetails";
+import { Loader } from "lucide-react";
 
 export function TaskMonitorTable({
   data = [],
@@ -209,7 +210,7 @@ export function TaskMonitorTable({
                       onClick={() => handleSendReminder(task)}
                       disabled={isSendingReminder}
                     >
-                      {isSendingReminder ? "Sending..." : "Send Reminder"}
+                      {isSendingReminder ? <>Sending...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></> : "Send Reminder"}
                     </Button>
                   )}
                   <Button
@@ -318,6 +319,7 @@ export function TaskMonitorTable({
         openModal={isReminderModalOpen}
         setOpenModal={setIsReminderModalOpen}
         onSend={handleSend}
+        isLoading={isSendingReminder}
       />
 
       {/* View Task Details Modal */}

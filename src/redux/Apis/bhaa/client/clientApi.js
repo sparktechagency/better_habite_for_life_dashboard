@@ -4,10 +4,11 @@ export const clientApi = baseApi.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
     getClient: builder.query({
-      query: () => {
+      query: (queryParams) => {
         return {
           url: `/task/client`,
           method: "GET",
+          params: queryParams
         };
       },
       providesTags: ["BhaaClient"],

@@ -3,9 +3,24 @@ import SearchFilterButton from "@/components/common/SearchFilterButton";
 import SmallPageInfo from "@/components/common/SmallPageInfo";
 import ClientTable from "@/components/common/clientTable/ClientTable";
 import { useGetClientQuery } from '../../../redux/Apis/bhaa/client/clientApi';
-
+import { useState } from "react";
 function ClientOverviewLayout() {
-  const { data, isLoading } = useGetClientQuery();
+  const [searchText, setSearchText] = useState("");
+  const [status, setStatus] = useState("All Status");
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
+  const { data, isLoading } = useGetClientQuery({
+    searchTerm: searchText,
+    status: status !== "All Status" ? status.toLowerCase() : undefined,
+    page: currentPage,
+    limit: limit,
+  });
+  const paginationMeta = data?.meta || {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPage: 1,
+  };
   console.log("client data", data);
 
   // Transform API data to match table structure
@@ -82,7 +97,11 @@ function ClientOverviewLayout() {
 
       <SearchFilterButton
         showAddButton={false}
+        searchText={searchText}
+        setSearchText={(value) => setSearchText(value)}
         selectOptions={["All Status", "Active", "Inactive"]}
+        status={status}
+        setStatus={(value) => setStatus(value)}
         placeholder="Search Client"
       />
 

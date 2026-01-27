@@ -11,6 +11,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
+import { Loader } from "lucide-react";
 
 function SendReminderModal({ openModal, setOpenModal, onSend, isLoading = false }) {
   const [prompt, setPrompt] = useState("");
@@ -74,7 +75,7 @@ function SendReminderModal({ openModal, setOpenModal, onSend, isLoading = false 
             disabled={!prompt.trim() || isLoading}
             className="bg-orange-500 hover:bg-orange-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? "Sending..." : "Send"}
+            {isLoading ? <>Sending...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></> : "Send"}
           </Button>
         </DialogFooter>
       </DialogContent>

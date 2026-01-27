@@ -133,11 +133,11 @@ const sidebars = {
     { name: "Clients", path: "/bhaa/client-overview", icon: LuSquareUserRound },
     // { name: "Reports", path: "/bhaa/reports", icon: CgFileDocument }, // this page removed from bhaa app because it is not used
     { name: "Task Monitor", path: "/bhaa/task-monitor", icon: GrTask },
-    {
-      name: "Reminder Prompts",
-      path: "/bhaa/task-promts",
-      icon: LuBotMessageSquare,
-    },
+    // {
+    //   name: "Reminder Prompts",
+    //   path: "/bhaa/task-promts",
+    //   icon: LuBotMessageSquare,
+    // },
     { name: "Messages", path: "/bhaa/messages", icon: AiOutlineMessage },
     {
       name: "Settings",
