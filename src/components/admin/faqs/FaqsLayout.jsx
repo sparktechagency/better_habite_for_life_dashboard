@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Loader, Plus, Trash2 } from "lucide-react";
 import { FiEdit3 } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import SmallPageInfo from "@/components/common/SmallPageInfo";
@@ -239,7 +239,7 @@ function FaqsLayout() {
                   className="bg-black hover:bg-black/80 text-white"
                   disabled={isSaving}
                 >
-                  {isSaving ? "Saving..." : "Save"}
+                  {isSaving ? <> Saving...{" "}<Loader className="w-4 h-4 animate-spin ml-2 text-white" /></> : "Save"}
                 </Button>
               </>
             ) : (

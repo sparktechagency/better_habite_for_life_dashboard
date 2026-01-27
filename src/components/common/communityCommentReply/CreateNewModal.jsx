@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreatePostMutation } from "@/redux/Apis/admin/postApi/postApi";
 import useToast from "@/hooks/useToast";
+import { Loader } from "lucide-react";
 
 const CreateNewPostModal = React.memo(function CreateNewPostModal({
   openModal,
@@ -107,7 +108,7 @@ const CreateNewPostModal = React.memo(function CreateNewPostModal({
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Submit"}
+                {isLoading ? <> Creating...{" "}<Loader className="w-4 h-4 animate-spin ml-2 text-white" /></> : "Submit"}
               </Button>
             </DialogFooter>
           </form>

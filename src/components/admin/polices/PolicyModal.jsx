@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import TipTapEditor from "@/TipTap/TipTapEditor";
+import { Loader } from "lucide-react";
 
 function PolicyModal({
   openModal,
@@ -91,7 +92,7 @@ function PolicyModal({
             disabled={isLoading || !editorContent.trim()}
             className="bg-gray-800 hover:bg-gray-700 text-white"
           >
-            {isLoading ? "Saving..." : "Save"}
+            {isLoading ? <> Saving...{" "}<Loader className="w-4 h-4 animate-spin ml-2 text-white" /></> : "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { X } from "lucide-react";
+import { Loader, X } from "lucide-react";
 
 import {
   Dialog,
@@ -379,8 +379,8 @@ const AddArticleModal = React.memo(function AddArticleModal({
           >
             {isSubmitting
               ? isEdit
-                ? "Updating..."
-                : "Creating..."
+                ? <> Updating...{" "}<Loader className="w-4 h-4 animate-spin ml-2 text-white" /></>
+                : <> Creating...{" "}<Loader className="w-4 h-4 animate-spin ml-2 text-white" /></>
               : isEdit
               ? "Update"
               : "Submit"}
