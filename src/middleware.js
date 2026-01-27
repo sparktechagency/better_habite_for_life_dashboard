@@ -53,9 +53,9 @@ export function middleware(request) {
   }
 
   // Role-based route protection
-  // Admin routes
+  // Admin routes (admin and super_admin are treated the same)
   if (pathname.startsWith("/admin")) {
-    if (userRole !== "admin") {
+    if (userRole !== "admin" && userRole !== "super_admin") {
       console.log("Admin route blocked - userRole:", userRole);
       const redirectUrl = new URL("/auth/login", request.url);
       redirectUrl.searchParams.set("error", "unauthorized");

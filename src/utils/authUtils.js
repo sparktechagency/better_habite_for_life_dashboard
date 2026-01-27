@@ -71,9 +71,23 @@ export const hasRole = (allowedRoles = []) => {
   }
 
   const userRole = getUserRole();
+  
+  // Treat super_admin the same as admin
+  const normalizedUserRole = userRole === "super_admin" ? "admin" : userRole;
+  const normalizedAllowedRoles = allowedRoles.map(role => 
+    role === "super_admin" ? "admin" : role
+  );
+  
   // Debug logging
-  console.log("hasRole check:", { userRole, allowedRoles, match: userRole && allowedRoles.includes(userRole) });
-  return userRole && allowedRoles.includes(userRole);
+  console.log("hasRole check:", { 
+    userRole, 
+    normalizedUserRole,
+    allowedRoles, 
+    normalizedAllowedRoles,
+    match: normalizedUserRole && normalizedAllowedRoles.includes(normalizedUserRole) 
+  });
+  
+  return normalizedUserRole && normalizedAllowedRoles.includes(normalizedUserRole);
 };
 
 /**

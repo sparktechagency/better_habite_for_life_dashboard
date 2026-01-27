@@ -63,7 +63,7 @@ export default function Login() {
 
             // Determine redirect path based on role
             let redirectPath = "/dashboard"; // Default
-            if (user?.role === "admin") {
+            if (user?.role === "admin" || user?.role === "super_admin") {
               redirectPath = "/admin/dashboard";
             } else if (user?.role === "doctor") {
               redirectPath = "/bha/dashboard";

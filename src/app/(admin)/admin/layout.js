@@ -8,7 +8,7 @@ export default function Layout({ children }) {
 
   return (
     <AuthLayoutWrapper
-      allowedRoles={["admin"]}
+      allowedRoles={["admin","super_admin"]}
       requireAuth={true}
       redirectOnMount={true}
     >
