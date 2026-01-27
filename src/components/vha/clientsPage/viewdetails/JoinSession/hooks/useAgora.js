@@ -2,6 +2,17 @@
 import { useEffect, useRef, useState } from "react";
 import AgoraRTC from "agora-rtc-sdk-ng";
 
+// Suppress Agora SDK console logs - we handle errors gracefully ourselves
+if (typeof window !== "undefined") {
+  try {
+    // Set log level to NONE (4) to suppress all SDK logs
+    // Camera errors are handled gracefully in our try-catch blocks
+    AgoraRTC.setLogLevel(4); // 0: DEBUG, 1: INFO, 2: WARNING, 3: ERROR, 4: NONE
+  } catch (e) {
+    // Ignore if setLogLevel is not available in this SDK version
+  }
+}
+
 export function useAgora({ appId, token, channelName, uid }) {
   const [isJoined, setIsJoined] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
@@ -28,20 +39,60 @@ export function useAgora({ appId, token, channelName, uid }) {
         // Join the channel
         await client.join(appId, channelName, token, uid);
 
-        // Create and publish local tracks
-        videoTrack = await AgoraRTC.createCameraVideoTrack();
-        audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+        // Try to create video track, but allow audio-only if camera is unavailable
+        try {
+          videoTrack = await AgoraRTC.createCameraVideoTrack();
+          setLocalVideoTrack(videoTrack);
+          setIsVideoEnabled(true);
 
-        setLocalVideoTrack(videoTrack);
-        setLocalAudioTrack(audioTrack);
-
-        // Play local video
-        if (localVideoElementRef.current) {
-          videoTrack.play(localVideoElementRef.current);
+          // Play local video
+          if (localVideoElementRef.current) {
+            videoTrack.play(localVideoElementRef.current);
+          }
+        } catch (videoError) {
+          // Handle camera errors gracefully - allow audio-only calls
+          // Check if it's a camera-related error
+          const isCameraError = 
+            videoError?.code === "NOT_READABLE" ||
+            videoError?.name === "NotReadableError" ||
+            videoError?.message?.includes("video source") ||
+            videoError?.message?.includes("camera") ||
+            videoError?.message?.includes("Could not start video");
+          
+          if (isCameraError) {
+            // Silently continue with audio-only - this is expected behavior
+            videoTrack = null;
+            setLocalVideoTrack(null);
+            setIsVideoEnabled(false);
+          } else {
+            // Log other unexpected errors
+            console.error("Unexpected video track error:", videoError);
+            videoTrack = null;
+            setLocalVideoTrack(null);
+            setIsVideoEnabled(false);
+          }
         }
 
-        // Publish tracks
-        await client.publish([videoTrack, audioTrack]);
+        // Create audio track
+        try {
+          audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+          setLocalAudioTrack(audioTrack);
+          setIsAudioEnabled(true);
+        } catch (audioError) {
+          console.error("Microphone not available:", audioError);
+          audioTrack = null;
+          setLocalAudioTrack(null);
+          setIsAudioEnabled(false);
+        }
+
+        // Publish only the tracks that were successfully created
+        const tracksToPublish = [];
+        if (videoTrack) tracksToPublish.push(videoTrack);
+        if (audioTrack) tracksToPublish.push(audioTrack);
+
+        if (tracksToPublish.length > 0) {
+          await client.publish(tracksToPublish);
+        }
 
         setIsJoined(true);
 
