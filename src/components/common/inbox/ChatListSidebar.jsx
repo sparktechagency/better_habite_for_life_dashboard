@@ -1,6 +1,6 @@
 "use client";
 import { Search } from "lucide-react";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import getImageUrl from "@/utils/getImageUrl";
 import formatTimeAgo from "@/utils/FormatDate/xtimesAgo";
@@ -63,25 +63,28 @@ function ChatListSidebar({ chatList = [], isLoading = false, currentUserId, newM
     setSearchQuery(value);
   };
 
-  const handleChatSelect = async (chatId) => {
-    // Call seenMessage API when user selects a chat
-    if (chatId) {
-      try {
-        await seenMessage({ chatId }).unwrap();
-        // Refetch chat list to update unread counts
-        if (refetchChatList) {
-          refetchChatList();
-        }
-      } catch (error) {
-        console.error("Failed to mark messages as seen:", error);
-      }
+  const handleChatSelect = useCallback(async (chatId) => {
+    // Prevent unnecessary API calls if the same chat is already selected
+    if (!chatId || chatId === selectedChatId) {
+      return;
     }
     
-    // Update URL with chatId param
+    // Update URL with chatId param first
     const params = new URLSearchParams(searchParams);
     params.set("chatId", chatId);
     router.push(`?${params.toString()}`);
-  };
+    
+    // Call seenMessage API when user selects a chat
+    try {
+      await seenMessage({ chatId }).unwrap();
+      // Refetch chat list to update unread counts
+      if (refetchChatList) {
+        refetchChatList();
+      }
+    } catch (error) {
+      console.log("Failed to mark messages as seen:", error);
+    }
+  }, [searchParams, router, refetchChatList, seenMessage, selectedChatId]);
 
   return (
     <div className="lg:w-[25rem] bg-white flex flex-col h-auto lg:h-full border-b lg:border-b-0 lg:border-r border-gray-200">
@@ -236,6 +239,7 @@ function HorizontalChatList({ chats, selectedChat, onChatSelect, isLoading }) {
 }
 
 function ChatList({ chats, selectedChat, onChatSelect, isLoading, newMessage, newMessageChatId }) {
+  //Loading Skeleton
   if (isLoading) {
     return (
       <div className="p-4">
@@ -254,6 +258,7 @@ function ChatList({ chats, selectedChat, onChatSelect, isLoading, newMessage, ne
     );
   }
 
+  //No chats found
   if (!chats || chats.length === 0) {
     return (
       <div className="p-8 text-center text-gray-500">
