@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { useGetAllCategoriesQuery } from "@/redux/Apis/admin/categoryApi/categoryApi";
+import { Loader } from "lucide-react";
 
 const AddEditTaskModal = ({
   openModal,
@@ -232,7 +233,7 @@ const AddEditTaskModal = ({
             className="bg-blue-600 hover:bg-blue-700 text-white"
             disabled={isLoading}
           >
-            {isLoading ? "Saving..." : initialData ? "Update" : "Add"}
+            {isLoading ? <>Saving...{" "}<Loader className="w-4 h-4 animate-spin ml-2 text-white" /></> : initialData ? "Update" : "Add"}
           </Button>
         </DialogFooter>
       </DialogContent>
