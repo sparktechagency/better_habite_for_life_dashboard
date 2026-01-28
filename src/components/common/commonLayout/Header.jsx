@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronDown } from "lucide-react";
-import { deleteCookie } from "@/utils/cookies";
+import { deleteCookie, getCookie } from "@/utils/cookies";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,22 +23,35 @@ import { useGetMyProfileQuery } from "@/redux/Apis/profileApi/profileApi";
 import useToast from "@/hooks/useToast";
 export default function Header() {
   const router = useRouter();
-  const userRole = localStorage.getItem("userRole");
+  const userRole = getCookie("userRole");
   const [notifications, setNotifications] = useState({});
   const {success} = useToast();
   const { data: myProfile } = useGetMyProfileQuery();
+  const currentUserId = getCookie("user_id");
   useEffect(() => {
     socket.connect();
-    socket.on("notification", (notification) => {
-      setNotifications(notification);
+  
+    const eventName =
+      userRole === "admin" || userRole === "super_admin"
+        ? "notification"
+        : `notification::${currentUserId}`;
+  
+    socket.on(eventName, (notification) => {
+      // store number only
+      setNotifications(notification?.count || 0);
+  
+      // show message
       success(notification?.message);
-      console.log("notification", notifications);
+  
+      // log correct data
+      console.log("notification object:", notification);
     });
-    
+  
     return () => {
+      socket.off(eventName);
       socket.disconnect();
     };
-  }, []);
+  }, [currentUserId, userRole]);
 
   console.log("notifications 📡", notifications);
 
@@ -78,8 +91,8 @@ export default function Header() {
           >
             <IoIosNotificationsOutline size={28} className="text-black" />
             {notifications?.userId  && (
-              <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">
-                {notifications.length}
+              <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-2 h-2 text-xs flex items-center justify-center">
+                {notifications}
               </span>
             )}
           </Button>

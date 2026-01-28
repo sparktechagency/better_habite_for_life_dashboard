@@ -4,11 +4,24 @@ import SmallPageInfo from "../SmallPageInfo";
 import AllNotifications from "./AllNotifications";
 import { useGetNotificationsQuery } from "@/redux/Apis/noticationApi/notificationApi";
 import { socket } from "@/socket/socket";
+import { getCookie } from "@/utils/cookies";
 
 function NotificationsLayout() {
   const [page, setPage] = useState(1);
   const limit = 10;
-  const userRole = typeof window !== "undefined" ? localStorage.getItem("userRole") : "";
+  
+  // Use useState to ensure stable values and prevent dependency array size changes
+  const [userRole, setUserRole] = useState("");
+  const [currentUserId, setCurrentUserId] = useState("");
+  
+  // Read cookies once on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setUserRole(getCookie("userRole") || "");
+      setCurrentUserId(getCookie("user_id") || "");
+    }
+  }, []);
+  
   const roleWiseEndpoint = userRole === "admin" || userRole === "super_admin" ? "/admin-all" : "";
   
   const { data: notificationsData, isLoading: isNotificationsLoading, refetch } = useGetNotificationsQuery({
@@ -20,6 +33,7 @@ function NotificationsLayout() {
   useEffect(() => {
     // Guard against SSR
     if (typeof window === "undefined") return;
+    if (!userRole && !currentUserId) return; // Wait for cookies to be available
 
     socket.connect();
     
@@ -28,13 +42,18 @@ function NotificationsLayout() {
       refetch();
     };
 
-    socket.on("notification", handleNotification);
+    const eventName =
+      userRole === "admin" || userRole === "super_admin"
+        ? "notification"
+        : `notification::${currentUserId}`;
+  
+    socket.on(eventName, handleNotification);
 
     return () => {
-      socket.off("notification", handleNotification);
+      socket.off(eventName, handleNotification);
       socket.disconnect();
     };
-  }, [refetch]);
+  }, [refetch, currentUserId, userRole]);
 
   const notifications = notificationsData?.data || [];
   const meta = notificationsData?.meta || { page: 1, limit: 10, total: 0, totalPage: 1 };
