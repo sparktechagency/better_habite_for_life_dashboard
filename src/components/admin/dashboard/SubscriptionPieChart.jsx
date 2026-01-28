@@ -13,11 +13,12 @@ import { BiSolidNetworkChart } from "react-icons/bi";
 
 const renderCustomizedLabel = (props) => <CustomLabel {...props} />;
 
-const data = [
-  { name: "Ascend", value: 60, color: "#3b82f6" },
-  { name: "Accelerate", value: 20, color: "#4ecdc4" },
-  { name: "Elevate", value: 20, color: "#f4a261" },
-  { name: "Ignite", value: 60, color: "#84cc16" },
+const subscriptionColors = [
+  { name: "free", color: "#9ca3af" }, // Gray for free
+  { name: "ascend", color: "#3b82f6" }, // Blue
+  { name: "accelerate", color: "#4ecdc4" }, // Teal
+  { name: "elevate", color: "#f4a261" }, // Orange
+  { name: "ignite", color: "#84cc16" }, // Green
 ];
 
 const CustomTooltip = ({ active, payload }) => {
@@ -38,7 +39,35 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
-export default function SubscriptionPieChart() {
+export default function SubscriptionPieChart({ subscriptionData }) {
+  const subscriptionDataPieChart =
+    subscriptionData && Array.isArray(subscriptionData)
+      ? subscriptionData.map((item) => {
+          const subscriptionName = item.subscription.toLowerCase();
+          const colorData = subscriptionColors.find(
+            (colorItem) => colorItem.name === subscriptionName
+          );
+          // Capitalize first letter for display
+          const displayName =
+            subscriptionName.charAt(0).toUpperCase() +
+            subscriptionName.slice(1);
+
+          return {
+            name: displayName,
+            value: item.purchaseCount,
+            color: colorData?.color || "#9ca3af", // Default gray if not found
+          };
+        })
+      : [];
+
+  // Check if all values are 0
+  const totalValue = subscriptionDataPieChart.reduce(
+    (sum, item) => sum + item.value,
+    0
+  );
+  const hasData = totalValue > 0;
+
+  // console.log("subscriptionDataPieChart:", subscriptionDataPieChart);
   return (
     <Card className="p-0 h-full w-full ">
       <div className="flex items-center gap-2 px-6 mt-5 relative">
@@ -49,33 +78,43 @@ export default function SubscriptionPieChart() {
         style={{ width: "100%", height: 350 }}
         className="flex justify-center items-center"
       >
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              dataKey="value"
-              isAnimationActive={true}
-              data={data}
-              cx="50%"
-              cy="50%"
-              outerRadius={80}
-              labelLine={true}
-              label={renderCustomizedLabel}
-            >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
+        {hasData ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                dataKey="value"
+                isAnimationActive={true}
+                data={subscriptionDataPieChart}
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                labelLine={true}
+                label={renderCustomizedLabel}
+              >
+                {subscriptionDataPieChart.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
 
-            <Legend
-              verticalAlign="middle"
-              align="right"
-              layout="vertical"
-              iconType="circle"
-              wrapperStyle={{ paddingLeft: "20px" }}
-            />
-            <Tooltip content={<CustomTooltip />} />
-          </PieChart>
-        </ResponsiveContainer>
+              <Legend
+                verticalAlign="middle"
+                align="right"
+                layout="vertical"
+                iconType="circle"
+                wrapperStyle={{ paddingLeft: "20px" }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-gray-400">
+            <BiSolidNetworkChart size={48} className="mb-2 opacity-50" />
+            <p className="text-sm font-medium">
+              No subscription data available
+            </p>
+            <p className="text-xs mt-1">All subscription counts are zero</p>
+          </div>
+        )}
       </div>
     </Card>
   );

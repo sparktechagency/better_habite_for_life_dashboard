@@ -10,30 +10,56 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { X, Upload } from "lucide-react";
+import { X, Upload, Loader } from "lucide-react";
 
-function ProfileEdit({ openModal, setOpenModal, onSave, initialData = null }) {
+function ProfileEdit({
+  openModal,
+  setOpenModal,
+  onSave,
+  initialData = null,
+  isLoading = false,
+}) {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    address: "",
+    street: "",
+    city: "",
+    zip: "",
+    country: "",
     profileImage: null,
   });
   const [imagePreview, setImagePreview] = useState("");
   const imageInputRef = useRef(null);
   const imagePreviewRef = useRef("");
 
+  // Parse address string into separate fields (using "?" as separator)
+  const parseAddress = (addressString) => {
+    if (!addressString) {
+      return { street: "", city: "", zip: "", country: "" };
+    }
+    const parts = addressString.split("?").map((part) => part.trim());
+    return {
+      street: parts[0] || "",
+      city: parts[1] || "",
+      zip: parts[2] || "",
+      country: parts[3] || "",
+    };
+  };
+
   // Load data when modal opens
   useEffect(() => {
     if (openModal) {
       if (initialData) {
+        const addressParts = parseAddress(initialData.address);
         setFormData({
           name: initialData.name || "",
           phone: initialData.phone || "",
-          address: initialData.address || "",
+          street: addressParts.street,
+          city: addressParts.city,
+          zip: addressParts.zip,
+          country: addressParts.country,
           profileImage: null,
         });
         if (initialData.profileImageUrl) {
@@ -44,7 +70,10 @@ function ProfileEdit({ openModal, setOpenModal, onSave, initialData = null }) {
         setFormData({
           name: "John Doe",
           phone: "",
-          address: "",
+          street: "",
+          city: "",
+          zip: "",
+          country: "",
           profileImage: null,
         });
         setImagePreview("https://github.com/shadcn.png");
@@ -104,21 +133,31 @@ function ProfileEdit({ openModal, setOpenModal, onSave, initialData = null }) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name.trim()) {
       return;
     }
 
+    // Concatenate address fields with commas
+    const addressParts = [
+      formData.street,
+      formData.city,
+      formData.zip,
+      formData.country,
+    ].filter((part) => part.trim() !== "");
+    const concatenatedAddress = addressParts.join("? ");
+    console.log("concatenatedAddress:", concatenatedAddress);
     const payload = {
-      ...formData,
+      name: formData.name,
+      phone: formData.phone,
+      address: concatenatedAddress,
+      profileImage: formData.profileImage,
       id: initialData?.id,
     };
 
     if (onSave) {
-      onSave(payload);
+      await onSave(payload);
     }
-
-    setOpenModal(false);
   };
 
   return (
@@ -212,33 +251,97 @@ function ProfileEdit({ openModal, setOpenModal, onSave, initialData = null }) {
             />
           </div>
 
-          {/* Address */}
-          <div className="space-y-2">
-            <Label
-              htmlFor="address"
-              className="text-sm font-medium text-gray-700"
-            >
+          {/* Address Fields */}
+          <div className="space-y-4">
+            <Label className="text-sm font-medium text-gray-700">
               Address:
             </Label>
-            <Textarea
-              id="address"
-              value={formData.address}
-              onChange={(e) => updateField("address", e.target.value)}
-              placeholder="Enter your address"
-              className="min-h-[80px] bg-gray-50 border-gray-200"
-            />
+            <div className="grid grid-cols-2 gap-4">
+              {/* Street */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="street"
+                  className="text-sm font-medium text-gray-600"
+                >
+                  Street:
+                </Label>
+                <Input
+                  id="street"
+                  value={formData.street}
+                  onChange={(e) => updateField("street", e.target.value)}
+                  placeholder="Enter street address"
+                  className="bg-gray-50 border-gray-200"
+                />
+              </div>
+
+              {/* City */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="city"
+                  className="text-sm font-medium text-gray-600"
+                >
+                  City:
+                </Label>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => updateField("city", e.target.value)}
+                  placeholder="Enter city"
+                  className="bg-gray-50 border-gray-200"
+                />
+              </div>
+
+              {/* Zip */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="zip"
+                  className="text-sm font-medium text-gray-600"
+                >
+                  Zip:
+                </Label>
+                <Input
+                  id="zip"
+                  value={formData.zip}
+                  onChange={(e) => updateField("zip", e.target.value)}
+                  placeholder="Enter zip code"
+                  className="bg-gray-50 border-gray-200"
+                />
+              </div>
+
+              {/* Country */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="country"
+                  className="text-sm font-medium text-gray-600"
+                >
+                  Country:
+                </Label>
+                <Input
+                  id="country"
+                  value={formData.country}
+                  onChange={(e) => updateField("country", e.target.value)}
+                  placeholder="Enter country"
+                  className="bg-gray-50 border-gray-200"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
         <DialogFooter className="px-6 pb-6 pt-4">
-          <Button variant="outline" onClick={() => setOpenModal(false)}>
+          <Button
+            variant="outline"
+            onClick={() => setOpenModal(false)}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={isLoading}
+            className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save Changes
+            {isLoading ? <>Saving...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></> : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>

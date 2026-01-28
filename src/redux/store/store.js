@@ -7,12 +7,14 @@ import { combineReducers } from "redux";
 import chatSlice from "../features/chat/chatSlice";
 import currentUserSlice from "../features/currentUser/currentuserSlice";
 import userRoleSlice from "../features/role/userRole";
+import { baseApi } from "./baseApi";
 
 // Root reducer
 const rootReducer = combineReducers({
   chat: chatSlice,
   currentUser: currentUserSlice,
   userRole: userRoleSlice,
+  [baseApi.reducerPath]: baseApi.reducer,
   // project: projectSlice,
 });
 
@@ -33,7 +35,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
-    }),
+    }).concat(baseApi.middleware),
   devTools: process.env.NODE_ENV !== "production",
 });
 

@@ -10,15 +10,49 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail } from "lucide-react";
+import { Loader, Mail } from "lucide-react";
+import { useForgotPasswordMutation } from "@/redux/Apis/authApi/authApi";
+import useToast from "@/hooks/useToast";
+import { useRouter } from "next/navigation";
+import { setCookie } from "@/utils/cookies";
 
 export default function ForgotPassword() {
+  const router = useRouter();
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
+  const toast = useToast();
   const [email, setEmail] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Email:", { email });
+
+    try {
+      const response = await forgotPassword({ email }).unwrap();
+
+      // Check if response is successful
+      if (response?.success && response?.data) {
+        const { forgetToken } = response.data;
+
+        // Save forgetToken to cookie
+        if (forgetToken) {
+          setCookie("forgetToken", forgetToken, 1); // 1 day expiry (OTP typically expires quickly)
+        }
+
+        // Show success toast
+        toast.success(response.message || "An OTP sent to your email!");
+
+        // Navigate to OTP verification page (you can adjust this route)
+        router.push("/auth/verify-email");
+      } else {
+        throw new Error(response?.message || "Failed to send OTP");
+      }
+    } catch (error) {
+      // Handle error
+      const errorMessage =
+        error?.data?.message ||
+        error?.message ||
+        "An error occurred. Please try again.";
+      toast.error(errorMessage);
+    }
   };
 
   return (
@@ -53,9 +87,10 @@ export default function ForgotPassword() {
 
           <Button
             type="submit"
-            className="w-full bg-black/70 hover:bg-black text-white hover:text-white  font-medium py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/25"
+            disabled={isLoading}
+            className="w-full bg-black/70 hover:bg-black text-white hover:text-white  font-medium py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Reset Password
+            {isLoading ? <>Sending...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></> : "Reset Password"}
           </Button>
         </form>
       </CardContent>

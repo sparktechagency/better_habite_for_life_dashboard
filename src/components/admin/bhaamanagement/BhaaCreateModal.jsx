@@ -20,27 +20,57 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { useCreateBhaaMutation } from "@/redux/Apis/admin/bhaamanagementApi/bhaamanagementApi";
+import useToast from "@/hooks/useToast";
+import { Loader } from "lucide-react";
 
 const BhaaCreateModal = React.memo(function BhaaCreateModal({
   openModal,
   setOpenModal,
 }) {
+  const [createBhaa, { isLoading }] = useCreateBhaaMutation();
+  const toast = useToast();
   const form = useForm({
     defaultValues: {
       bhaaName: "",
       bhaaEmail: "",
       bhaaPhoneNumber: "",
       bhaaAddress: "",
+      role: "assistant",
     },
   });
 
   const onSubmit = useCallback(
-    (data) => {
-      console.log(data);
-      // Handle form submission here
-      setOpenModal(false);
+    async (data) => {
+      try {
+        // Map form data to API payload format
+        const payload = {
+          fullName: data.bhaaName,
+          email: data.bhaaEmail,
+          phone: data.bhaaPhoneNumber,
+          address: data.bhaaAddress,
+          role: data.role || "assistant", // Default to "assistant" if not specified
+        };
+
+        const response = await createBhaa(payload).unwrap();
+
+        if (response?.success) {
+          toast.success(response.message || "BHAA created successfully");
+          form.reset();
+          setOpenModal(false);
+        } else {
+          throw new Error(response?.message || "Failed to create BHAA");
+        }
+      } catch (error) {
+        const errorMessage =
+          error?.data?.message ||
+          error?.message ||
+          "An error occurred while creating BHAA. Please try again.";
+        toast.error(errorMessage);
+        console.error("Create BHAA error:", error);
+      }
     },
-    [setOpenModal]
+    [createBhaa, form, setOpenModal, toast]
   );
 
   const handleClose = useCallback(() => {
@@ -111,10 +141,18 @@ const BhaaCreateModal = React.memo(function BhaaCreateModal({
               )}
             />
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleClose}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                disabled={isLoading}
+              >
                 Cancel
               </Button>
-              <Button type="submit">Submit</Button>
+              <Button type="submit" disabled={isLoading} >
+                {isLoading ? "Creating..." : "Create"}
+                {isLoading &&  <Loader className="w-4 h-4 animate-spin ml-2" />}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

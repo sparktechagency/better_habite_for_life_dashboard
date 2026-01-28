@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { X } from "lucide-react";
+import { Loader, X } from "lucide-react";
 
 import {
   Dialog,
@@ -18,11 +18,23 @@ import {
   FormLabel,
   FormControl,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useGetAllCategoriesQuery } from "@/redux/Apis/admin/categoryApi/categoryApi";
+import {
+  useCreateCourseMutation,
+  useUpdateCourseMutation,
+} from "@/redux/Apis/admin/courseApi/courseApi";
+import useToast from "@/hooks/useToast";
 
 const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
   openModal,
@@ -34,13 +46,12 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
     defaultValues: {
       materialTitle: "",
       materialDescription: "",
-      tags: [],
+      categoryId: "",
       courseImage: null,
       courseVideo: null,
     },
   });
 
-  const [tagInput, setTagInput] = useState("");
   const [imagePreview, setImagePreview] = useState("");
   const [videoPreview, setVideoPreview] = useState("");
   const imagePreviewRef = useRef("");
@@ -48,7 +59,17 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
   const imageInputRef = useRef(null);
   const videoInputRef = useRef(null);
 
-  const tags = form.watch("tags") || [];
+  // Fetch all categories for dropdown
+  const { data: categoriesData, isLoading: isCategoriesLoading } =
+    useGetAllCategoriesQuery();
+  const categories = categoriesData?.data || [];
+
+  // Mutations for create and update
+  const [createCourse, { isLoading: isCreating }] = useCreateCourseMutation();
+  const [updateCourse, { isLoading: isUpdating }] = useUpdateCourseMutation();
+  const toast = useToast();
+
+  const isSubmitting = isCreating || isUpdating;
 
   // Load material data when in edit mode
   useEffect(() => {
@@ -56,7 +77,7 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
       form.reset({
         materialTitle: materialData.title || "",
         materialDescription: materialData.description || "",
-        tags: materialData.tags || [],
+        categoryId: materialData.categoryId || "",
         courseImage: null, // Keep as null, user can upload new image
         courseVideo: null, // Keep as null, user can upload new video
       });
@@ -121,49 +142,91 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
     [form]
   );
 
-  const handleAddTag = useCallback(
-    (e) => {
-      e.preventDefault();
-      const trimmedTag = tagInput.trim();
-      if (trimmedTag && !tags.includes(trimmedTag)) {
-        form.setValue("tags", [...tags, trimmedTag]);
-        setTagInput("");
-      }
-    },
-    [tagInput, tags, form]
-  );
-
-  const handleRemoveTag = useCallback(
-    (tagToRemove) => {
-      form.setValue(
-        "tags",
-        tags.filter((tag) => tag !== tagToRemove)
-      );
-    },
-    [tags, form]
-  );
-
-  const handleTagInputKeyDown = useCallback(
-    (e) => {
-      if (e.key === "Enter") {
-        handleAddTag(e);
-      }
-    },
-    [handleAddTag]
-  );
-
   const onSubmit = useCallback(
-    (data) => {
-      console.log(isEdit ? "Editing material:" : "Adding material:", data);
-      // Handle form submission here
-      // If isEdit, include materialData.id in the submission
-      if (isEdit && materialData?.id) {
-        console.log("Material ID:", materialData.id);
+    async (data) => {
+      try {
+        // Create FormData for file upload
+        const formData = new FormData();
+
+        // Append title
+        formData.append("title", data.materialTitle || "");
+
+        // Append description
+        formData.append("description", data.materialDescription || "");
+
+        // Append categoryId
+        if (data.categoryId) {
+          formData.append("categoryId", data.categoryId);
+        }
+
+        // Append video file if provided
+        const videoFile = form.getValues("courseVideo");
+        if (videoFile && videoFile instanceof File) {
+          formData.append("video", videoFile);
+        }
+
+        // Append thumbnail (image) file if provided
+        const imageFile = form.getValues("courseImage");
+        if (imageFile && imageFile instanceof File) {
+          formData.append("thumbnail", imageFile);
+        }
+
+        // Debug: Log FormData contents
+        console.log("FormData entries:");
+        for (const [key, value] of formData.entries()) {
+          if (value instanceof File) {
+            console.log(key, "File:", value.name, value.size, "bytes");
+          } else {
+            console.log(key, value);
+          }
+        }
+
+        let response;
+        if (isEdit && materialData?._id) {
+          // Update course
+          response = await updateCourse({
+            id: materialData._id,
+            formData,
+          }).unwrap();
+        } else {
+          // Create course
+          response = await createCourse(formData).unwrap();
+        }
+
+        // Check if response is successful
+        if (response?.success) {
+          toast.success(
+            response.message ||
+              (isEdit
+                ? "Course updated successfully"
+                : "Course created successfully")
+          );
+          setOpenModal(false);
+          // Form will be reset by useEffect when openModal becomes false
+        } else {
+          throw new Error(
+            response?.message || "An error occurred. Please try again."
+          );
+        }
+      } catch (error) {
+        // Handle error
+        const errorMessage =
+          error?.data?.message ||
+          error?.message ||
+          "An error occurred. Please try again.";
+        toast.error(errorMessage);
+        console.error("Course operation error:", error);
       }
-      setOpenModal(false);
-      // Form will be reset by useEffect when openModal becomes false
     },
-    [setOpenModal, isEdit, materialData]
+    [
+      setOpenModal,
+      isEdit,
+      materialData,
+      form,
+      createCourse,
+      updateCourse,
+      toast,
+    ]
   );
 
   const resetForm = useCallback(() => {
@@ -184,11 +247,10 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
     }
     setImagePreview("");
     setVideoPreview("");
-    setTagInput("");
     form.reset({
       materialTitle: "",
       materialDescription: "",
-      tags: [],
+      categoryId: "",
       courseImage: null,
       courseVideo: null,
     });
@@ -268,24 +330,34 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
                 />
                 <FormField
                   control={form.control}
-                  name="tags"
-                  render={() => (
+                  name="categoryId"
+                  render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tags</FormLabel>
-                      <FormControl>
-                        <div className="space-y-2">
-                          <Input
-                            type="text"
-                            placeholder="Enter tags and press Enter"
-                            value={tagInput}
-                            onChange={(e) => setTagInput(e.target.value)}
-                            onKeyDown={handleTagInputKeyDown}
-                          />
-                          {tags.length > 0 && (
-                            <TagList tags={tags} onRemove={handleRemoveTag} />
-                          )}
-                        </div>
-                      </FormControl>
+                      <FormLabel>Category</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        disabled={isCategoriesLoading}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue
+                              placeholder={
+                                isCategoriesLoading
+                                  ? "Loading categories..."
+                                  : "Select a category"
+                              }
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categories.map((category) => (
+                            <SelectItem key={category._id} value={category._id}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormItem>
                   )}
                 />
@@ -386,11 +458,26 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
           </div>
         </ScrollArea>
         <DialogFooter className="flex-shrink-0 border-t px-6 py-4 bg-background">
-          <Button type="button" variant="outline" onClick={handleClose}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleClose}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
-          <Button type="submit" form="upload-course-media-form">
-            {isEdit ? "Update" : "Submit"}
+          <Button
+            type="submit"
+            form="upload-course-media-form"
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? isEdit
+                ? <>Updating...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></>
+                : <>Creating...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></>
+              : isEdit
+              ? "Update"
+              : "Submit"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -399,31 +486,3 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
 });
 
 export default AddNewMaterialModal;
-
-function TagList({ tags, onRemove }) {
-  if (!tags || tags.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      {tags.map((tag) => (
-        <Badge
-          key={tag}
-          variant="secondary"
-          className="flex items-center gap-1 pr-1"
-        >
-          <span>{tag}</span>
-          <button
-            type="button"
-            onClick={() => onRemove(tag)}
-            className="rounded-full hover:bg-secondary-foreground/20 p-0.5 transition-colors"
-            aria-label={`Remove ${tag} tag`}
-          >
-            <X className="h-3 w-3" />
-          </button>
-        </Badge>
-      ))}
-    </div>
-  );
-}

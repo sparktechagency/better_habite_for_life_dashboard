@@ -11,114 +11,66 @@ import {
 import { Button } from "@/components/ui/button";
 import React, { useState, useCallback } from "react";
 import ReportViewModal from "./ReportViewModal";
-import SolveReportModal from "./SolveReportModal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getImageUrl } from "@/utils/getImageUrl";
+import formatDate from "@/utils/FormatDate/formatDate";
+import { useSolveReportMutation } from "@/redux/Apis/admin/reportApi/reportApi";
+import useToast from "@/hooks/useToast";
+import { Badge } from "@/components/ui/badge";
 
-function Reports() {
+function Reports({ reports = [], total = 0 }) {
+  const toast = useToast();
   const [selectedReport, setSelectedReport] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isSolveModalOpen, setIsSolveModalOpen] = useState(false);
-  const [reportToSolve, setReportToSolve] = useState(null);
+  const [solveReport, { isLoading: isSolving }] = useSolveReportMutation();
+  const [solvingReportId, setSolvingReportId] = useState(null);
 
   const handleViewDetails = useCallback((report) => {
     setSelectedReport(report);
     setIsViewModalOpen(true);
   }, []);
 
-  const handleOpenSolveModal = useCallback((report) => {
-    setReportToSolve(report);
-    setIsSolveModalOpen(true);
-    // Close view modal if open
-    setIsViewModalOpen(false);
-  }, []);
+  const handleSolveReport = useCallback(
+    async (report) => {
+      setSolvingReportId(report._id);
+      try {
+        const response = await solveReport({ id: report._id }).unwrap();
+        if (response?.success) {
+          toast.success(response.message || "Report solved successfully");
+        } else {
+          toast.error(response?.message || "Failed to solve report");
+        }
+      } catch (error) {
+        const errorMessage =
+          error?.data?.message || error?.message || "Failed to solve report";
+        toast.error(errorMessage);
+      } finally {
+        setSolvingReportId(null);
+      }
+    },
+    [solveReport, toast]
+  );
 
-  const handleSendAnswer = useCallback((report, answer) => {
-    console.log("Sending answer for report:", report);
-    console.log("Answer:", answer);
-    // Handle send answer logic here
-    // You can update the report status, make API call, etc.
-    // Update the report in the list to mark as solved
-  }, []);
-
-  const recentReports = [
-    {
-      id: 1,
-      name: "Sarah Peterson",
-      email: "sarahpeterson@gmail.com",
-      createDate: "2025-01-15",
-      description:
-        "Dear Sir,\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.\nThank you.",
-      isSolved: false,
-    },
-    {
-      id: 2,
-      name: "John Smith",
-      email: "john.smith@example.com",
-      createDate: "2025-01-14",
-      description:
-        "I am experiencing issues with the login functionality. The system is not accepting my credentials even though I am sure they are correct. Please help resolve this issue as soon as possible.",
-      isSolved: false,
-    },
-    {
-      id: 3,
-      name: "Emily Johnson",
-      email: "emily.johnson@example.com",
-      createDate: "2025-01-13",
-      description:
-        "The dashboard is loading very slowly and sometimes times out. This is affecting my productivity. Can you please investigate and fix the performance issues?",
-      isSolved: false,
-    },
-    {
-      id: 4,
-      name: "Michael Brown",
-      email: "michael.brown@example.com",
-      createDate: "2025-01-12",
-      description:
-        "I cannot access my reports section. Getting a 404 error when trying to navigate to the reports page. Please fix this issue.",
-      isSolved: false,
-    },
-    {
-      id: 5,
-      name: "Lisa Anderson",
-      email: "lisa.anderson@example.com",
-      createDate: "2025-01-11",
-      description:
-        "The notification system is not working properly. I am not receiving any notifications for important updates. Please check and fix this.",
-      isSolved: false,
-    },
-    {
-      id: 6,
-      name: "David Wilson",
-      email: "david.wilson@example.com",
-      createDate: "2025-01-10",
-      description:
-        "There seems to be a data synchronization issue. The data shown in the dashboard does not match the actual data in the database.",
-      isSolved: false,
-    },
-    {
-      id: 7,
-      name: "Maria Garcia",
-      email: "maria.garcia@example.com",
-      createDate: "2025-01-09",
-      description:
-        "I am unable to export my data to CSV format. The export button is not responding when clicked. Please help.",
-      isSolved: false,
-    },
-    {
-      id: 8,
-      name: "Robert Taylor",
-      email: "robert.taylor@example.com",
-      createDate: "2025-01-08",
-      description:
-        "The search functionality is not working correctly. It returns no results even when I know the data exists in the system.",
-      isSolved: false,
-    },
-  ];
+  if (reports.length === 0) {
+    return (
+      <Card className="w-full border shadow-sm rounded-lg">
+        <CardHeader className="pb-4 border-b">
+          <CardTitle className="text-lg font-semibold">Reports (0)</CardTitle>
+        </CardHeader>
+        <CardContent className="p-8">
+          <div className="flex items-center justify-center py-12">
+            <p className="text-gray-500">No reports found</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full border shadow-sm rounded-lg">
       <CardHeader className="pb-4 border-b">
         <CardTitle className="text-lg font-semibold">
-          Reports ({recentReports.length})
+          Reports ({total})
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -127,7 +79,7 @@ function Reports() {
             <TableHeader>
               <TableRow className="bg-[#F9FAFB] hover:bg-[#F9FAFB] border-b">
                 <TableHead className="font-semibold text-gray-700 text-sm py-3 px-4">
-                  Name
+                  User
                 </TableHead>
                 <TableHead className="font-semibold text-gray-700 text-sm py-3 px-4">
                   Email Address
@@ -139,49 +91,85 @@ function Reports() {
                   Report Description
                 </TableHead>
                 <TableHead className="font-semibold text-gray-700 text-sm py-3 px-4">
+                  Status
+                </TableHead>
+                <TableHead className="font-semibold text-gray-700 text-sm py-3 px-4">
                   Actions
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {recentReports.map((report, index) => (
-                <TableRow
-                  key={index}
-                  className="hover:bg-gray-50/50 border-b transition-colors bg-white"
-                >
-                  <TableCell className="text-sm text-gray-900 py-3 px-4">
-                    {report.name}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-900 py-3 px-4">
-                    {report.email}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-900 py-3 px-4">
-                    {report.createDate}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-900 py-3 px-4">
-                    <div className="truncate max-w-md">
-                      {report.description}
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-3 px-4">
-                    <div className="flex gap-2">
-                      <Button
-                        className="bg-green-500 hover:bg-green-600 text-white border border-green-500 rounded-md px-4 py-1.5 text-sm font-medium h-auto"
-                        onClick={() => handleOpenSolveModal(report)}
+              {reports.map((report) => {
+                const user = report.userId || {};
+                const userName = user.fullName || "Unknown User";
+                const userEmail = user.email || "N/A";
+                const userAvatar = getImageUrl(user.profile);
+                const isCurrentlySolving = solvingReportId === report._id;
+                const isPending = report.status === "pending";
+                const isSolved = report.status === "solved";
+
+                return (
+                  <TableRow
+                    key={report._id}
+                    className="hover:bg-gray-50/50 border-b transition-colors bg-white"
+                  >
+                    <TableCell className="text-sm text-gray-900 py-3 px-4">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="size-8">
+                          <AvatarImage src={userAvatar} />
+                          <AvatarFallback>
+                            {userName.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span>{userName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-900 py-3 px-4">
+                      {userEmail}
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-900 py-3 px-4">
+                      {formatDate(report.createdAt)}
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-900 py-3 px-4">
+                      <div className="truncate max-w-md">{report.text}</div>
+                    </TableCell>
+                    <TableCell className="py-3 px-4">
+                      <Badge
+                        className={
+                          isSolved
+                            ? "bg-green-100 text-green-700 hover:bg-green-100"
+                            : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
+                        }
                       >
-                        Solve
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-md px-4 py-1.5 text-sm font-medium h-auto"
-                        onClick={() => handleViewDetails(report)}
-                      >
-                        View Details
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                        {report.status
+                          ? report.status.charAt(0).toUpperCase() +
+                            report.status.slice(1)
+                          : "Pending"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-3 px-4">
+                      <div className="flex gap-2">
+                        {isPending && (
+                          <Button
+                            className="bg-green-500 hover:bg-green-600 text-white border border-green-500 rounded-md px-4 py-1.5 text-sm font-medium h-auto"
+                            onClick={() => handleSolveReport(report)}
+                            disabled={isCurrentlySolving || isSolving}
+                          >
+                            {isCurrentlySolving ? "Solving..." : "Solve"}
+                          </Button>
+                        )}
+                        <Button
+                          variant="outline"
+                          className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-md px-4 py-1.5 text-sm font-medium h-auto"
+                          onClick={() => handleViewDetails(report)}
+                        >
+                          View Details
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
@@ -190,13 +178,7 @@ function Reports() {
         openModal={isViewModalOpen}
         setOpenModal={setIsViewModalOpen}
         report={selectedReport}
-        onSolve={handleOpenSolveModal}
-      />
-      <SolveReportModal
-        openModal={isSolveModalOpen}
-        setOpenModal={setIsSolveModalOpen}
-        report={reportToSolve}
-        onSend={handleSendAnswer}
+        onSolve={handleSolveReport}
       />
     </Card>
   );

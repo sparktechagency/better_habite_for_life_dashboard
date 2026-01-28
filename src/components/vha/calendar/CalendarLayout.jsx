@@ -1,11 +1,35 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import TodaySession from "./TodaySession";
 import SmallPageInfo from "@/components/common/SmallPageInfo";
 import { Calendar } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
-import { HiPlus } from "react-icons/hi";
+import { useGetTodaysSessionDataQuery } from "@/redux/Apis/bha/todaysessionApi/todaysessionApi";
 
 function CalendarLayout() {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  // Format date to ISO string (date only, with T00:00:00.000Z) for API
+  const formatDateForApi = (date) => {
+    if (!date) return new Date().toISOString().split("T")[0] + "T00:00:00.000Z";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}T00:00:00.000Z`;
+  };
+
+  const formattedDate = formatDateForApi(selectedDate);
+
+  const {
+    data: sessionData,
+    isLoading,
+    isFetching,
+  } = useGetTodaysSessionDataQuery({
+    date: formattedDate,
+  });
+
+  const sessions = sessionData?.data || [];
+
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
@@ -14,9 +38,16 @@ function CalendarLayout() {
           description="Here is an overview of your calendar"
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-10 w-full  ">
-        <CalenderComponent />
-        <TodaySession />
+      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-10 w-full">
+        <CalenderComponent
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+        />
+        <TodaySession
+          sessions={sessions}
+          isLoading={isLoading || isFetching}
+          selectedDate={selectedDate}
+        />
       </div>
     </div>
   );
@@ -24,16 +55,18 @@ function CalendarLayout() {
 
 export default CalendarLayout;
 
-const CalenderComponent = () => {
+const CalenderComponent = ({ selectedDate, setSelectedDate }) => {
   return (
-    <>
-      <Calendar
-        className="rounded-lg border w-auto aspect-square size-190"
-        classNames={{
-          today:
-            "bg-yellow-500 text-accent-foreground rounded-md data-[selected=true]:rounded-none",
-        }}
-      />
-    </>
+    <Calendar
+      mode="single"
+      selected={selectedDate}
+      onSelect={(date) => date && setSelectedDate(date)}
+      className="rounded-lg border w-auto aspect-square size-190"
+      classNames={{
+        today:
+          "bg-yellow-500 text-accent-foreground rounded-md data-[selected=true]:rounded-none",
+        day_selected: "bg-sky-500 text-white hover:bg-sky-600 focus:bg-sky-600",
+      }}
+    />
   );
 };

@@ -10,21 +10,25 @@ import {
   CartesianGrid,
 } from "recharts";
 import { BsBarChartFill } from "react-icons/bs";
-function AdminBarChart() {
-  const totalUsersByMonth = [
-    { month: "Jan", users: 120 },
-    { month: "Feb", users: 80 },
-    { month: "Mar", users: 150 },
-    { month: "Apr", users: 100 },
-    { month: "May", users: 200 },
-    { month: "Jun", users: 170 },
-    { month: "Jul", users: 220 },
-    { month: "Aug", users: 190 },
-    { month: "Sep", users: 140 },
-    { month: "Oct", users: 180 },
-    { month: "Nov", users: 210 },
-    { month: "Dec", users: 250 },
-  ];
+function AdminBarChart({ totalUsersByMonth }) {
+  const totalUsersByMonthData =
+    totalUsersByMonth &&
+    Array.isArray(totalUsersByMonth) &&
+    totalUsersByMonth.length > 0
+      ? [
+          ...totalUsersByMonth.map((item) => ({
+            month: item.month,
+            users: item.count,
+          })),
+        ]
+      : [];
+
+  // Check if there's no data or all values are 0
+  const totalValue = totalUsersByMonthData.reduce(
+    (sum, item) => sum + (item.users || 0),
+    0
+  );
+  const hasData = totalUsersByMonthData.length > 0 && totalValue > 0;
 
   return (
     <Card className="p-0">
@@ -34,31 +38,39 @@ function AdminBarChart() {
       </div>
 
       <div className="w-full h-[400px] py-1">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={totalUsersByMonth}
-            margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
-          >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              strokeWidth={0.2}
-              vertical={false}
-            />
-            <XAxis dataKey="month" style={{ fontSize: "14px" }} />
-            <YAxis style={{ fontSize: "14px" }} />
-            <Tooltip
-              content={<CustomTooltip />}
-              isAnimationActive={true}
-              cursor={false}
-            />
-            <Bar
-              dataKey="users"
-              fill="#000000"
-              barSize={30}
-              radius={[4, 4, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+        {hasData ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={totalUsersByMonthData}
+              margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                strokeWidth={0.2}
+                vertical={false}
+              />
+              <XAxis dataKey="month" style={{ fontSize: "14px" }} />
+              <YAxis style={{ fontSize: "14px" }} />
+              <Tooltip
+                content={<CustomTooltip />}
+                isAnimationActive={true}
+                cursor={false}
+              />
+              <Bar
+                dataKey="users"
+                fill="#000000"
+                barSize={30}
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-gray-400">
+            <BsBarChartFill size={48} className="mb-2 opacity-50" />
+            <p className="text-sm font-medium">No user growth data available</p>
+            <p className="text-xs mt-1">All user counts are zero</p>
+          </div>
+        )}
       </div>
     </Card>
   );
