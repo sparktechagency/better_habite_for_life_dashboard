@@ -61,28 +61,29 @@ function VhaaBarChart({ taskEngagementData = [] }) {
               isAnimationActive={true}
               cursor={false}
             />
-            <Legend />
+            {/* <Legend /> */}
             <Bar
               dataKey="totalTasks"
               name="Total Tasks"
               fill="#5c3b1c"
               barSize={25}
               radius={[4, 4, 0, 0]}
-            />
+            /> 
             <Bar
-              dataKey="completedTasks"
-              name="Completed Tasks"
-              fill="#10b981"
-              barSize={25}
-              radius={[4, 4, 0, 0]}
+            dataKey="completedTasks"
+            name="Completed Tasks"
+            fill="#bde680"
+            barSize={25}
+            radius={[4, 4, 0, 0]}
             />
             <Bar
               dataKey="pendingTasks"
               name="Pending Tasks"
-              fill="#dc2626"
+              fill="#e39a3a"
               barSize={25}
               radius={[4, 4, 0, 0]}
             />
+           
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -94,19 +95,56 @@ export default VhaaBarChart;
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
+    // Find the data point for the current index (label is the month)
+    // Order: Total Tasks, Completed Tasks, Pending Tasks
+    const totalTasks = payload.find(p => p.dataKey === "totalTasks");
+    const completedTasks = payload.find(p => p.dataKey === "completedTasks");
+    const pendingTasks = payload.find(p => p.dataKey === "pendingTasks");
+
     return (
       <div className="relative flex flex-col gap-1 p-4 bg-white border border-gray-200 rounded-lg shadow-lg text-sm">
         <div className="font-semibold text-gray-700 mb-2">Month: {label}</div>
-        {payload.map((pld, index) => (
-          <div key={index} className="flex items-center gap-2">
+
+         {/* Completed Tasks */}
+         {completedTasks && (
+          <div className="flex items-center gap-2">
             <span
               className="inline-block w-3 h-3 rounded-full"
-              style={{ backgroundColor: pld.fill }}
+              style={{ backgroundColor: completedTasks.fill }}
             ></span>
-            <span className="text-gray-800 font-medium">{pld.name}: </span>
-            <span className="text-gray-600">{pld.value}</span>
+            <span className="text-gray-800 font-medium">{completedTasks.name}: </span>
+            <span className="text-gray-600">{completedTasks.value}</span>
           </div>
-        ))}
+        )}
+        
+        
+
+
+         {/* Pending Tasks */}
+         {pendingTasks && (
+          <div className="flex items-center gap-2">
+            <span
+              className="inline-block w-3 h-3 rounded-full"
+              style={{ backgroundColor: pendingTasks.fill }}
+            ></span>
+            <span className="text-gray-800 font-medium">{pendingTasks.name}: </span>
+            <span className="text-gray-600">{pendingTasks.value}</span>
+          </div>
+        )}
+        
+       
+        {/* Total Tasks */}
+        {totalTasks && (
+          <div className="flex items-center gap-2">
+            <span
+              className="inline-block w-3 h-3 rounded-full"
+              style={{ backgroundColor: totalTasks.fill }}
+            ></span>
+            <span className="text-gray-800 font-medium">{totalTasks.name}: </span>
+            <span className="text-gray-600">{totalTasks.value}</span>
+          </div>
+        )}
+       
       </div>
     );
   }
