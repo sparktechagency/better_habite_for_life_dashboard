@@ -162,7 +162,7 @@ const BhaaAssignTaskListTable = ({ tasks, onSendReminder, onViewDetails }) => {
             <TableHead className="w-1/6">Category</TableHead>
             <TableHead className="w-1/6">Due Date</TableHead>
             <TableHead className="w-1/6">Status</TableHead>
-            <TableHead className="w-auto flex justify-end gap-2 text-right">
+            <TableHead className="w-auto flex justify-start items-center gap-2">
               Action
             </TableHead>
           </TableRow>
