@@ -18,7 +18,14 @@ export const messageApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Message"],
     }),
+    seenMessage: builder.mutation({
+      query: ({chatId}) => ({
+        url: `/message/seen/${chatId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Message"],
+    }),
   }),
 });
 
-export const { useGetMessagesQuery, useSendMessageMutation } = messageApi;
+export const { useGetMessagesQuery, useSendMessageMutation, useSeenMessageMutation } = messageApi;

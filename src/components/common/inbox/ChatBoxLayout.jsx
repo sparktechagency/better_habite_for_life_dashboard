@@ -12,8 +12,9 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getCookie } from "@/utils/cookies";
 import { FaMagic } from "react-icons/fa";
 import PredefinedMessageModal from "./PredefinedMessage/PredefinedMessageModal";
+import { socket } from "@/socket/socket";
 const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
-  const { data: messagesResponse, isLoading: isMessagesLoading } =
+  const { data: messagesResponse, isLoading: isMessagesLoading, refetch: refetchMessages } =
     useGetMessagesQuery({ chatId }, { skip: !chatId });
   const [sendMessageApi, { isLoading: isSendingMessage }] =
     useSendMessageMutation();
@@ -46,6 +47,27 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
     const timeoutId = setTimeout(scrollToBottom, 100);
     return () => clearTimeout(timeoutId);
   }, [currentMessages]);
+
+  // Listen for new messages via socket and refetch messages
+  useEffect(() => {
+    if (!chatId || typeof window === "undefined") return;
+
+    socket.connect();
+    const eventName = `new-message::${chatId}`;
+    
+    const handleNewMessage = (message) => {
+      console.log("new message received in chat 📡", message);
+      // Refetch messages to get the latest messages
+      refetchMessages();
+    };
+
+    socket.on(eventName, handleNewMessage);
+
+    return () => {
+      socket.off(eventName, handleNewMessage);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatId]);
 
   const handleImageSelect = (e) => {
     const file = e.target.files?.[0];

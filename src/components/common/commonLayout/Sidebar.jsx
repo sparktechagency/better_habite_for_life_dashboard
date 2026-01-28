@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Home, Inbox, LogOut, Search, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import Link from "next/link";
 import {
   Sidebar,
@@ -28,10 +28,11 @@ import { LuFileLock2 } from "react-icons/lu";
 import { RiArticleLine } from "react-icons/ri";
 import { BiCategory } from "react-icons/bi";
 import { FaQuoteRight } from "react-icons/fa6";
-import { LuBotMessageSquare } from "react-icons/lu";
 import { usePathname } from "next/navigation";
 import { IoIosNotificationsOutline } from "react-icons/io";
-
+import { socket } from "@/socket/socket";
+import { useEffect, useState } from "react";
+import { getCookie } from "@/utils/cookies";
 const sidebars = {
   admin: [
     { name: "Dashboard", path: "/admin/dashboard", icon: RxDashboard },
@@ -160,8 +161,10 @@ const sidebars = {
   ],
 };
 export function AppSidebar() {
+  const [showBadge, setShowBadge] = useState(false);
   const pathname = usePathname();
-
+  const [currentUserId, setCurrentUserId] = useState("");
+  
   // Determine which sidebar to show based on pathname
   const getSidebarRole = () => {
     if (pathname.includes("/admin")) return "admin";
@@ -172,6 +175,46 @@ export function AppSidebar() {
 
   const currentRole = getSidebarRole();
   const currentSidebar = sidebars[currentRole] || [];
+
+  // Read user ID from cookie on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userId = getCookie("user_id");
+      setCurrentUserId(userId || "");
+    }
+  }, []);
+
+  // Listen for new messages via socket
+  useEffect(() => {
+    // Guard against SSR and missing userId
+    if (typeof window === "undefined" || !currentUserId) return;
+
+    // Connect socket
+    socket.connect();
+
+    // Listen for new messages
+    const eventName = `new-message::${currentUserId}`;
+    
+    const handleNewMessage = (message) => {
+      console.log("new message received global 📡", message);
+      // Show badge when new message arrives
+      setShowBadge(true);
+    };
+
+    socket.on(eventName, handleNewMessage);
+
+    // Cleanup
+    return () => {
+      socket.off(eventName, handleNewMessage);
+    };
+  }, [currentUserId]);
+
+  // Hide badge when user is on messages page
+  useEffect(() => {
+    if (pathname.includes("/messages")) {
+      setShowBadge(false);
+    }
+  }, [pathname]);
 
   // Check if a path is active (exact match or starts with path)
   const isActive = (path) => {
@@ -259,8 +302,15 @@ export function AppSidebar() {
                         }
                       >
                         <Link href={item.path}>
-                          <item.icon />
-                          <span>{item.name}</span>
+                          <div className="flex items-center gap-2 relative w-full">
+                            <item.icon />
+                            <span className="flex-1">{item.name}</span>
+                            {showBadge && item.path && item.path.includes("messages") && (
+                              <span className="absolute right-0 top-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full w-2 h-2 flex items-center justify-center animate-pulse duration-300">
+                                <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                              </span>
+                            )}
+                          </div>
                         </Link>
                       </SidebarMenuButton>
                     )}

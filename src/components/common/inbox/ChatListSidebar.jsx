@@ -6,12 +6,14 @@ import getImageUrl from "@/utils/getImageUrl";
 import formatTimeAgo from "@/utils/FormatDate/xtimesAgo";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSeenMessageMutation } from "@/redux/Apis/messageApi/messageApi";
 
-function ChatListSidebar({ chatList = [], isLoading = false, currentUserId }) {
+function ChatListSidebar({ chatList = [], isLoading = false, currentUserId, newMessage, newMessageChatId, refetchChatList }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedChatId = searchParams.get("chatId");
   const [searchQuery, setSearchQuery] = useState("");
+  const [seenMessage] = useSeenMessageMutation();
 
   // Transform API chat data to display format
   const transformedChats = useMemo(() => {
@@ -22,6 +24,9 @@ function ChatListSidebar({ chatList = [], isLoading = false, currentUserId }) {
         chat.participants.find((p) => p._id !== currentUserId) ||
         chat.participants[0];
 
+      // Check if this chat has a new message badge
+      const hasNewMessageBadge = newMessage && newMessageChatId === chat._id;
+      
       return {
         id: chat._id,
         name: otherParticipant?.fullName || "Unknown",
@@ -29,14 +34,15 @@ function ChatListSidebar({ chatList = [], isLoading = false, currentUserId }) {
         lastMessage: message?.message || "No messages yet",
         timestamp: message?.createdAt ? formatTimeAgo(message.createdAt) : "",
         unreadCount: unreadMessageCount || 0,
-        hasNewMessage: unreadMessageCount > 0,
+        hasNewMessage: unreadMessageCount > 0 || hasNewMessageBadge,
+        hasNewMessageBadge, // Flag to show badge even if unreadCount is 0
         isOnline: false, // You can add online status logic here
         status: chat.status,
         participants: chat.participants,
         otherParticipant,
       };
     });
-  }, [chatList, currentUserId]);
+  }, [chatList, currentUserId, newMessage, newMessageChatId]);
 
   // Get selected chat from transformed chats
   const selectedChat = useMemo(() => {
@@ -57,7 +63,20 @@ function ChatListSidebar({ chatList = [], isLoading = false, currentUserId }) {
     setSearchQuery(value);
   };
 
-  const handleChatSelect = (chatId) => {
+  const handleChatSelect = async (chatId) => {
+    // Call seenMessage API when user selects a chat
+    if (chatId) {
+      try {
+        await seenMessage({ chatId }).unwrap();
+        // Refetch chat list to update unread counts
+        if (refetchChatList) {
+          refetchChatList();
+        }
+      } catch (error) {
+        console.error("Failed to mark messages as seen:", error);
+      }
+    }
+    
     // Update URL with chatId param
     const params = new URLSearchParams(searchParams);
     params.set("chatId", chatId);
@@ -90,11 +109,13 @@ function ChatListSidebar({ chatList = [], isLoading = false, currentUserId }) {
       {/* Desktop: Vertical Chat List */}
       <div className="flex-1 overflow-y-auto hidden lg:block">
         <ScrollArea className="h-full">
-          <ChatList
+            <ChatList
             chats={filteredChats}
             selectedChat={selectedChat}
             onChatSelect={handleChatSelect}
             isLoading={isLoading}
+            newMessage={newMessage}
+            newMessageChatId={newMessageChatId}
           />
         </ScrollArea>
       </div>
@@ -188,9 +209,9 @@ function HorizontalChatList({ chats, selectedChat, onChatSelect, isLoading }) {
               {chat.isOnline && (
                 <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
               )}
-              {chat.unreadCount > 0 && (
+              {(chat.unreadCount > 0 || chat.hasNewMessageBadge) && (
                 <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-medium w-5 h-5 rounded-full flex items-center justify-center">
-                  {chat.unreadCount}
+                  {chat.unreadCount > 0 ? chat.unreadCount : "!"}
                 </div>
               )}
             </div>
@@ -214,7 +235,7 @@ function HorizontalChatList({ chats, selectedChat, onChatSelect, isLoading }) {
   );
 }
 
-function ChatList({ chats, selectedChat, onChatSelect, isLoading }) {
+function ChatList({ chats, selectedChat, onChatSelect, isLoading, newMessage, newMessageChatId }) {
   if (isLoading) {
     return (
       <div className="p-4">
@@ -297,10 +318,10 @@ function ChatList({ chats, selectedChat, onChatSelect, isLoading }) {
             </p>
           </div>
 
-          {/* Unread count */}
-          {chat.unreadCount > 0 && selectedChat?.id !== chat.id && (
+          {/* Unread count badge */}
+          {((chat.unreadCount > 0 || chat.hasNewMessageBadge) && selectedChat?.id !== chat.id) && (
             <div className="ml-2 bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded-full min-w-[20px] text-center">
-              {chat.unreadCount}
+              {chat.unreadCount > 0 ? chat.unreadCount : "!"}
             </div>
           )}
         </div>
