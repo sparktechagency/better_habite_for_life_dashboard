@@ -24,24 +24,41 @@ import useToast from "@/hooks/useToast";
 export default function Header() {
   const router = useRouter();
   const userRole = getCookie("userRole");
-  const [notifications, setNotifications] = useState({});
+  const [showBadge, setShowBadge] = useState(false);
   const {success} = useToast();
   const { data: myProfile } = useGetMyProfileQuery();
-  const currentUserId = getCookie("user_id");
+  const [currentUserId, setCurrentUserId] = useState("");
+  const [userRoleState, setUserRoleState] = useState("");
+
+  // Read cookies once on mount
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentUserId(getCookie("user_id") || "");
+      setUserRoleState(getCookie("userRole") || "");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!currentUserId && !userRoleState) return;
+    if (typeof window === "undefined") return;
+
     socket.connect();
   
     const eventName =
-      userRole === "admin" || userRole === "super_admin"
+      userRoleState === "admin" || userRoleState === "super_admin"
         ? "notification"
         : `notification::${currentUserId}`;
   
     socket.on(eventName, (notification) => {
-      // store number only
-      setNotifications(notification?.count || 0);
+      // Show badge when notification arrives
+      if (notification) {
+        setShowBadge(true);
+      }
   
       // show message
-      success(notification?.message);
+      if (notification?.message) {
+        success(notification.message);
+      }
   
       // log correct data
       console.log("notification object:", notification);
@@ -49,11 +66,8 @@ export default function Header() {
   
     return () => {
       socket.off(eventName);
-      socket.disconnect();
     };
-  }, [currentUserId, userRole]);
-
-  console.log("notifications 📡", notifications);
+  }, [currentUserId, userRoleState, success]);
 
 
   const handleProfileRedirect = () => {
@@ -87,12 +101,16 @@ export default function Header() {
           <Button
             variant="ghost"
             className="p-0 border bg-transparent relative"
-            onClick={() => router.push(userRole === "admin" || userRole === "super_admin" ? "/admin/notifications" : userRole === "doctor" ? "/bha/notifications" : userRole === "assistant" ? "/bhaa/notifications" : "/auth/login")}
+            onClick={() => {
+              // Hide badge when user clicks on notifications
+              setShowBadge(false);
+              router.push(userRole === "admin" || userRole === "super_admin" ? "/admin/notifications" : userRole === "doctor" ? "/bha/notifications" : userRole === "assistant" ? "/bhaa/notifications" : "/auth/login");
+            }}
           >
             <IoIosNotificationsOutline size={28} className="text-black" />
-            {notifications?.userId  && (
-              <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-2 h-2 text-xs flex items-center justify-center">
-                {notifications}
+            {showBadge && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-3 h-3 flex items-center justify-center">
+                <span className="w-2 h-2 bg-red-500 rounded-full"></span>
               </span>
             )}
           </Button>
