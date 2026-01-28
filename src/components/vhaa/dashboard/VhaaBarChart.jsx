@@ -62,13 +62,7 @@ function VhaaBarChart({ taskEngagementData = [] }) {
               cursor={false}
             />
             {/* <Legend /> */}
-            <Bar
-              dataKey="totalTasks"
-              name="Total Tasks"
-              fill="#5c3b1c"
-              barSize={25}
-              radius={[4, 4, 0, 0]}
-            /> 
+            
             <Bar
             dataKey="completedTasks"
             name="Completed Tasks"
@@ -83,7 +77,13 @@ function VhaaBarChart({ taskEngagementData = [] }) {
               barSize={25}
               radius={[4, 4, 0, 0]}
             />
-           
+           <Bar
+              dataKey="totalTasks"
+              name="Total Tasks"
+              fill="#5c3b1c"
+              barSize={25}
+              radius={[4, 4, 0, 0]}
+            /> 
           </BarChart>
         </ResponsiveContainer>
       </div>
