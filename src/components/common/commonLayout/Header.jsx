@@ -97,10 +97,10 @@ export default function Header() {
         <SidebarTrigger />
 
         <div className="ml-auto flex gap-2">
-          <Input type="text" placeholder="Search" className="w-full max-w-sm" />
+          <Input type="text" placeholder="Search" className="w-full max-w-sm h-10" />
           <Button
             variant="ghost"
-            className="p-0 border bg-transparent relative"
+            className="p-0 h-10 border bg-transparent relative"
             onClick={() => {
               // Hide badge when user clicks on notifications
               setShowBadge(false);
