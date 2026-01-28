@@ -22,7 +22,7 @@ import {
 import useToast from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 import { setCookie, deleteCookie } from "@/utils/cookies";
-
+import { Loader } from "lucide-react";
 export default function VerifyEmail() {
   const router = useRouter();
   const [verifyEmail, { isLoading: isVerifying }] = useVerifyEmailMutation();
@@ -130,13 +130,13 @@ export default function VerifyEmail() {
               </InputOTPGroup>
             </InputOTP>
           </div>
-          <p className="text-sm text-muted-foreground text-center">
+          <p className="text-sm text-muted-foreground text-center flex items-center justify-center gap-2">
             Didn't receive the code?{" "}
             <span
-              className="text-black font-bold cursor-pointer hover:underline"
+              className="text-black font-bold cursor-pointer hover:underline flex items-center gap-2"
               onClick={handleResendOtp}
             >
-              {isResending ? "Resending..." : "Resend"}
+              {isResending ? <>Resending...{" "}<Loader className="w-4 h-4 animate-spin text-black" /></> : "Resend"}
             </span>
           </p>
           <Button
@@ -144,7 +144,7 @@ export default function VerifyEmail() {
             disabled={isVerifying || otp.length !== 6}
             className="w-full bg-black/70 hover:bg-black text-white hover:text-white  font-medium py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-secondary/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isVerifying ? "Verifying..." : "Submit"}
+            {isVerifying ? <>Verifying...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></> : "Submit"}
           </Button>
         </form>
       </CardContent>

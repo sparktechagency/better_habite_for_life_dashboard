@@ -46,13 +46,21 @@ export const sessionmanagementApi = baseApi.injectEndpoints({
       }),
       providesTags: ["SessionManagement"],
     }),
-
-    getTimeSlotsForReschedule: builder.query({
+    getAvialableSlotsForReschedule: builder.query({
       query: ({ date }) => ({
         url: `/doctor-booking/my-doctor-available-slots?date=${date}`,
         method: "GET",
       }),
       providesTags: ["SessionManagement"],
+    }),
+    rescheduleSession: builder.mutation({
+      query: ({ bookingId, data }) => ({
+        url: `/doctor-booking/reschedule-booking/${bookingId}`,
+        method: "PATCH",
+        body: data,
+      }),
+      
+      invalidatesTags: ["SessionManagement"],
     }),
   }),
 });
@@ -60,5 +68,6 @@ export const sessionmanagementApi = baseApi.injectEndpoints({
 export const {
   useGetSessionManagementDataQuery,
   useGetSessionManagementDataByIdQuery,
-  useGetTimeSlotsForRescheduleQuery,
+  useGetAvialableSlotsForRescheduleQuery,
+  useRescheduleSessionMutation,
 } = sessionmanagementApi;

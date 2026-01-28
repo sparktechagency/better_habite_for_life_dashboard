@@ -50,3 +50,4 @@ export const getImageUrl = (imagePath, fallback = "") => {
 };
 
 export default getImageUrl;
+

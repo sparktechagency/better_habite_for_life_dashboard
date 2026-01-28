@@ -1,9 +1,23 @@
 // Cookie utility functions
 
 export const setCookie = (name, value, days = 7) => {
+  if (typeof document === "undefined") return;
+  
   const expires = new Date();
   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+  
+  // Build cookie string - only add Secure flag if HTTPS
+  const isSecure = window.location.protocol === 'https:';
+  let cookieString = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+  if (isSecure) {
+    cookieString += ";Secure";
+  }
+  
+  document.cookie = cookieString;
+  
+  // Verify cookie was set immediately
+  const verify = getCookie(name);
+  console.log(`Cookie ${name} set:`, verify === value ? "✓" : "✗", "Value:", verify);
 };
 
 export const getCookie = (name) => {
@@ -24,3 +38,4 @@ export const getCookie = (name) => {
 export const deleteCookie = (name) => {
   document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
 };
+

@@ -18,7 +18,27 @@ export const bhaScheduleSlotApi = baseApi.injectEndpoints({
         method: "POST",
         body: availability,
       }),
-      invalidatesTags: ["BhaScheduleSlot"],
+      invalidatesTags: ["BhaScheduleSlot", "SessionManagement"],
+    }),
+
+    // Join the session
+    joinSessionNow: builder.mutation({
+      query: ({ bookingId }) => ({
+        url: `/doctor-booking/agora-token`,
+        method: "POST",
+        body: {
+          bookingSheduleId: bookingId,
+        },
+      }),
+      invalidatesTags: ["SessionManagement", "BhaScheduleSlot"],
+    }),
+
+    leaveSessionNow: builder.mutation({
+      query: ({ bookingId }) => ({
+        url: `/doctor-booking/booking-session-close/${bookingId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["SessionManagement", "BhaScheduleSlot"],
     }),
   }),
 });
@@ -26,4 +46,6 @@ export const bhaScheduleSlotApi = baseApi.injectEndpoints({
 export const {
   useGetBhaScheduleSlotDataQuery,
   useUpdateBhaAvailabilityMutation,
+  useJoinSessionNowMutation,
+  useLeaveSessionNowMutation,
 } = bhaScheduleSlotApi;

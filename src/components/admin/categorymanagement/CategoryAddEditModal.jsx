@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Loader, Upload } from "lucide-react";
 import Image from "next/image";
 import {
   useCreateCategoryMutation,
@@ -359,7 +359,7 @@ function CategoryAddEditModal({
                 disabled={isCreating || isUpdating}
               >
                 {isCreating || isUpdating
-                  ? "Processing..."
+                  ? <> Processing...{" "}<Loader className="w-4 h-4 animate-spin ml-2 text-white" /></>
                   : isEdit
                   ? "Update"
                   : "Add"}

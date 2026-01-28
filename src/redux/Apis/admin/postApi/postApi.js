@@ -41,6 +41,13 @@ export const postApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Post"],
     }),
+    highlightPost: builder.mutation({
+      query: ({ postId }) => ({
+        url: `/post/highlight/${postId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Post"],
+    }),
     updateCourse: builder.mutation({
       query: ({ id, formData }) => ({
         url: `/post/view-count/${id}`,
@@ -65,4 +72,5 @@ export const {
   useUpdatePostMutation,
   useDeletePostMutation,
   useGetPostByIdQuery,
+  useHighlightPostMutation,
 } = postApi;

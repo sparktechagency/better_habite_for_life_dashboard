@@ -17,14 +17,31 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GoHeart } from "react-icons/go";
 import formatDate from "@/utils/FormatDate/formatDate";
 import { getImageUrl } from "@/utils/getImageUrl";
+import useToast from "@/hooks/useToast";
 import Link from "next/link";
 import { LuArrowRight } from "react-icons/lu";
+import { useHighlightPostMutation } from "@/redux/Apis/admin/postApi/postApi";
 
 function PostCard({ post }) {
   const router = useRouter();
-
+  const [highlightPost, { isLoading }] = useHighlightPostMutation();
+  const { success, error } = useToast();
   const handleCardClick = () => {
     router.push(`/admin/community/post/${post._id}`);
+  };
+
+  console.log(post);
+
+  const handleHighlightPost =async (e) => {
+    e.stopPropagation();
+    try {
+      const response = await highlightPost({ postId: post._id }).unwrap();
+      if (response.success) {
+          success(response.message);
+      }
+    } catch (error) {
+      error(error.data.message);
+    }
   };
 
   return (
@@ -37,37 +54,37 @@ function PostCard({ post }) {
           <CardTitle className="flex items-center gap-2">
             <Avatar className="size-10">
               <AvatarImage
-                src={getImageUrl(post.userId.avatar, "/admin/article/adhd.png")}
+                src={getImageUrl(post?.userId?.profile, "/admin/article/adhd.png")}
               />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
               <span className="text-sm font-medium">
-                {post.userId.fullName}
+                {post?.userId?.fullName}
               </span>
               <span className="text-xs text-gray-500">
-                {formatDate(post.createdAt)}
+                {formatDate(post?.createdAt)}
               </span>
             </div>
           </CardTitle>
 
           <CardAction
             className="border border-gray-200 rounded-full p-1 hover:bg-gray-100 hover:scale-110 transition-all duration-300 cursor-pointer"
-            onClick={(e) => e.stopPropagation()}
+            onClick={handleHighlightPost}
           >
             <PiHighlighterFill
               size={20}
               className={` ${
-                post.highlights === true ? "text-yellow-500" : "text-gray-300"
+                post?.highlights === true ? "text-yellow-500" : "text-gray-300"
               }`}
             />
           </CardAction>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-gray-500">
-            {post.description.length > 350
+            {post?.description?.length > 350
               ? post.description.slice(0, 350) + "..."
-              : post.description}
+              : post?.description}
           </p>
 
           {post.description.length > 350 && (

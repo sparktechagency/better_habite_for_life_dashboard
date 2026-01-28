@@ -91,6 +91,7 @@ export const baseApi = createApi({
     "Report",
     "BhaManagement",
     "BhaaManagement",
+    "BhaaClient",
     "BHaDashboard",
     "BHaaOverview",
     "SessionManagement",
@@ -99,7 +100,9 @@ export const baseApi = createApi({
     "TodaysSession",
     "BhaScheduleSlot",
     "Chat",
+    "task",
     "Message",
+    "Notification",
   ],
   endpoints: () => ({}),
 });

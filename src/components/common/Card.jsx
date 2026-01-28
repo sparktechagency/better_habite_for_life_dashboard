@@ -1,12 +1,10 @@
-import React from "react";
 import {
   Card,
   CardAction,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 
 function CardComponent({
@@ -24,26 +22,27 @@ function CardComponent({
     <div>
       <Card>
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription className="text-2xl font-bold text-gray-500 mt-2">
+          <CardTitle className="text-sm font-medium text-gray-600">
+            {title}
+          </CardTitle>
+          <CardDescription className="text-3xl font-bold text-gray-800 mt-2">
             {value}
           </CardDescription>
           <CardAction
-            className={`p-4 rounded-lg ${iconBgColor} ${iconTextColor}`}
+            className={`p-3 rounded-lg ${iconBgColor} ${iconTextColor} inline-block w-fit mt-4`}
           >
             {icon}
           </CardAction>
         </CardHeader>
         {footer && (
-          <CardFooter>
-            {status && <p className="text-sm text-green-500">{status}</p>}
+          <CardFooter className="pt-0">
+            {status && <p className="text-sm text-gray-500">{status}</p>}
             {goto && (
               <p
-                className={`${
-                  underline
-                    ? "text-sm underline cursor-pointer text-green-600"
+                className={`${underline
+                    ? "text-sm underline cursor-pointer text-blue-600"
                     : "text-sm"
-                }`}
+                  }`}
               >
                 {goto}
               </p>
@@ -59,7 +58,7 @@ export default CardComponent;
 
 export const CardSection = ({ cards, footer }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {cards?.map((card, index) => (
         <CardComponent key={index} {...card} footer={footer} />
       ))}
