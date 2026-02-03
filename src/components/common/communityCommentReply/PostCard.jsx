@@ -23,6 +23,7 @@ import { useHighlightPostMutation } from "@/redux/Apis/admin/postApi/postApi";
 import { Trash2 } from "lucide-react";
 import { useDeletePostMutation } from "@/redux/Apis/admin/postApi/postApi";
 import DeleteConfirmationModal from "../deleteconfirmation/deleteConfirmationModal";
+import { Button } from "@/components/ui/button";
 
 function PostCard({ post }) {
   const router = useRouter();
@@ -30,9 +31,7 @@ function PostCard({ post }) {
   const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
   const { success, error } = useToast();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const handleCardClick = () => {
-    router.push(`/admin/community/post/${post._id}`);
-  };
+  const postUrl = `/admin/community/post/${post._id}`;
 
   console.log(post);
 
@@ -49,7 +48,7 @@ function PostCard({ post }) {
   };
 
   const handleDeleteClick = (e) => {
-    e?.stopPropagation?.();
+    // e.stopPropagation();
     setOpenDeleteModal(true);
   };
 
@@ -71,30 +70,35 @@ function PostCard({ post }) {
 
   return (
     <>
-      <Card
-        className="border-none shadow-xs hover:cursor-pointer group"
-        onClick={handleCardClick}
-      >
+      <Card className="border-none shadow-xs group">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Avatar className="size-10">
-              <AvatarImage
-                src={getImageUrl(
-                  post?.userId?.profile,
-                  "/admin/article/adhd.png"
-                )}
-              />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">
-                {post?.userId?.fullName}
-              </span>
-              <span className="text-xs text-gray-500">
-                {formatDate(post?.createdAt)}
-              </span>
-            </div>
-          </CardTitle>
+          <div
+            className="cursor-pointer min-w-0"
+            onClick={() => router.push(postUrl)}
+            onKeyDown={(e) => e.key === "Enter" && router.push(postUrl)}
+            role="button"
+            tabIndex={0}
+          >
+            <CardTitle className="flex items-center gap-2">
+              <Avatar className="size-10">
+                <AvatarImage
+                  src={getImageUrl(
+                    post?.userId?.profile,
+                    "/admin/article/adhd.png"
+                  )}
+                />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium">
+                  {post?.userId?.fullName}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {formatDate(post?.createdAt)}
+                </span>
+              </div>
+            </CardTitle>
+          </div>
 
           <CardAction
             className="border border-gray-200 rounded-full p-1 hover:bg-gray-100 hover:scale-110 transition-all duration-300 cursor-pointer"
@@ -108,24 +112,30 @@ function PostCard({ post }) {
             />
           </CardAction>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-500">
-            {post?.description?.length > 350
-              ? post.description.slice(0, 350) + "..."
-              : post?.description}
-          </p>
+        <div
+          className="cursor-pointer px-6"
+          onClick={() => router.push(postUrl)}
+          onKeyDown={(e) => e.key === "Enter" && router.push(postUrl)}
+          role="button"
+          tabIndex={0}
+        >
+          <CardContent className="px-0">
+            <p className="text-sm text-gray-500">
+              {post?.description?.length > 350
+                ? post.description.slice(0, 350) + "..."
+                : post?.description}
+            </p>
 
-          {post?.description?.length > 350 && (
-            <Link href={`/admin/community/post/${post._id}`}>
+            {post?.description?.length > 350 && (
               <span className="text-sm text-black hover:font-bold hover:underline flex items-center gap-2 mt-2">
                 Read More <LuArrowRight size={15} />
               </span>
-            </Link>
-          )}
-        </CardContent>
+            )}
+          </CardContent>
+        </div>
         <CardFooter className="border-t border-transparent h-8 flex items-center gap-x-4 relative group">
-          <div className="absolute top-0 right-0 border-t border-gray-200 w-[90%] h-full left-1/2 -translate-x-1/2"></div>
-          <div className="flex items-center gap-2 justify-between w-full">
+          {/* <div className="absolute top-0 right-0 border-t border-gray-200 w-[90%] h-full left-1/2 -translate-x-1/2"></div> */}
+          <div className="flex items-center gap-2 justify-between w-full border-t border-gray-200 pt-2">
             <div className="flex items-center gap-2">
               <p className="flex items-center gap-2">
                 <GoHeart size={20} className="text-red-500" />
@@ -139,12 +149,15 @@ function PostCard({ post }) {
               </p>
             </div>
 
-            <Trash2
-              size={15}
-              className="text-red-500 group-hover:visible invisible transition-all duration-200 cursor-pointer  rounded-lg"
+            <Button
+              variant="ghost"
+              size="icon"
+              className="flex items-center justify-center rounded-lg group-hover:visible invisible cursor-pointer hover:bg-red-50 p-1 -m-1"
               onClick={handleDeleteClick}
               aria-label="Delete post"
-            />
+            >
+              <Trash2 size={20} className="text-red-500" />
+            </Button>
           </div>
         </CardFooter>
       </Card>
