@@ -31,6 +31,7 @@ import { FaQuoteRight } from "react-icons/fa6";
 import { usePathname } from "next/navigation";
 import { RiAdminLine } from "react-icons/ri";
 import { TbFishHook } from "react-icons/tb";
+import { TbAB2 } from "react-icons/tb";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { socket } from "@/socket/socket";
 import { useEffect, useState } from "react";
@@ -48,10 +49,16 @@ const sidebars = {
       path: "/admin/bhaa-management",
       icon: LuSquareUserRound,
     },
+
     {
       name: "Client Management",
       path: "/admin/client-management",
       icon: LuSquareUserRound,
+    },
+    {
+      name: "Reassign BHA & BHAA",
+      path: "/admin/reassign-bha-bhaa",
+      icon: TbAB2,
     },
     {
       name: "Admin Management",
@@ -63,6 +70,7 @@ const sidebars = {
       path: "/admin/reports",
       icon: CgFileDocument,
     },
+
     {
       name: "Community",
       path: "/admin/community",
