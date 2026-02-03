@@ -10,7 +10,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Loader } from "lucide-react";
 
 function DeleteConfirmationModal({
   openModal,
@@ -65,7 +65,14 @@ function DeleteConfirmationModal({
             disabled={isLoading}
             className="bg-red-600 hover:bg-red-700 text-white"
           >
-            {isLoading ? "Deleting..." : confirmText}
+            {isLoading ? (
+              <>
+                Deleting...
+                <Loader className="w-4 h-4 animate-spin ml-2 text-white" />
+              </>
+            ) : (
+              confirmText
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

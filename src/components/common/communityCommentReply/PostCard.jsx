@@ -1,11 +1,10 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardAction,
   CardContent,
   CardFooter,
@@ -21,11 +20,16 @@ import useToast from "@/hooks/useToast";
 import Link from "next/link";
 import { LuArrowRight } from "react-icons/lu";
 import { useHighlightPostMutation } from "@/redux/Apis/admin/postApi/postApi";
+import { Trash2 } from "lucide-react";
+import { useDeletePostMutation } from "@/redux/Apis/admin/postApi/postApi";
+import DeleteConfirmationModal from "../deleteconfirmation/deleteConfirmationModal";
 
 function PostCard({ post }) {
   const router = useRouter();
   const [highlightPost, { isLoading }] = useHighlightPostMutation();
+  const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
   const { success, error } = useToast();
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const handleCardClick = () => {
     router.push(`/admin/community/post/${post._id}`);
   };
@@ -44,10 +48,31 @@ function PostCard({ post }) {
     }
   };
 
+  const handleDeleteClick = (e) => {
+    e?.stopPropagation?.();
+    setOpenDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await deletePost({ id: post._id }).unwrap();
+      if (response?.success) {
+        success(response?.message || "Post deleted successfully");
+        setOpenDeleteModal(false);
+      } else {
+        error(response?.message || "Failed to delete post");
+      }
+    } catch (err) {
+      error(err?.data?.message || err?.message || "Failed to delete post");
+    } finally {
+      setOpenDeleteModal(false);
+    }
+  };
+
   return (
     <>
       <Card
-        className="border-none shadow-xs hover:cursor-pointer"
+        className="border-none shadow-xs hover:cursor-pointer group"
         onClick={handleCardClick}
       >
         <CardHeader>
@@ -90,7 +115,7 @@ function PostCard({ post }) {
               : post?.description}
           </p>
 
-          {post.description.length > 350 && (
+          {post?.description?.length > 350 && (
             <Link href={`/admin/community/post/${post._id}`}>
               <span className="text-sm text-black hover:font-bold hover:underline flex items-center gap-2 mt-2">
                 Read More <LuArrowRight size={15} />
@@ -98,18 +123,41 @@ function PostCard({ post }) {
             </Link>
           )}
         </CardContent>
-        <CardFooter className="border-t border-transparent h-8 flex items-center gap-x-4 relative">
+        <CardFooter className="border-t border-transparent h-8 flex items-center gap-x-4 relative group">
           <div className="absolute top-0 right-0 border-t border-gray-200 w-[90%] h-full left-1/2 -translate-x-1/2"></div>
-          <p className="flex items-center gap-2">
-            <GoHeart size={20} className="text-red-500" />
-            <span className="text-sm text-gray-500">{post.likesCount}</span>
-          </p>
-          <p className="flex items-center gap-2">
-            <BiCommentDetail size={20} className="text-gray-500" />
-            <span className="text-sm text-gray-500">{post.commentsCount}</span>
-          </p>
+          <div className="flex items-center gap-2 justify-between w-full">
+            <div className="flex items-center gap-2">
+              <p className="flex items-center gap-2">
+                <GoHeart size={20} className="text-red-500" />
+                <span className="text-sm text-gray-500">{post.likesCount}</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <BiCommentDetail size={20} className="text-gray-500" />
+                <span className="text-sm text-gray-500">
+                  {post.commentsCount}
+                </span>
+              </p>
+            </div>
+
+            <Trash2
+              size={15}
+              className="text-red-500 group-hover:visible invisible transition-all duration-200 cursor-pointer  rounded-lg"
+              onClick={handleDeleteClick}
+              aria-label="Delete post"
+            />
+          </div>
         </CardFooter>
       </Card>
+      <DeleteConfirmationModal
+        openModal={openDeleteModal}
+        setOpenModal={setOpenDeleteModal}
+        onConfirm={handleConfirmDelete}
+        body="Are you sure you want to delete this post? This action cannot be undone."
+        title="Delete Post"
+        isLoading={isDeleting}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </>
   );
 }

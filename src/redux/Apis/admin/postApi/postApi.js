@@ -56,7 +56,7 @@ export const postApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Post"],
     }),
-    deleteCourse: builder.mutation({
+    deletePost: builder.mutation({
       query: ({ id }) => ({
         url: `/post/${id}`,
         method: "DELETE",

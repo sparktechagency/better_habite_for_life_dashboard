@@ -18,14 +18,14 @@ import {
 import { useRouter } from "next/navigation";
 import { LogOutIcon } from "lucide-react";
 import { socket } from "@/socket/socket";
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import { useGetMyProfileQuery } from "@/redux/Apis/profileApi/profileApi";
 import useToast from "@/hooks/useToast";
 export default function Header() {
   const router = useRouter();
   const userRole = getCookie("userRole");
   const [showBadge, setShowBadge] = useState(false);
-  const {success} = useToast();
+  const { success } = useToast();
   const { data: myProfile } = useGetMyProfileQuery();
   const [currentUserId, setCurrentUserId] = useState("");
   const [userRoleState, setUserRoleState] = useState("");
@@ -43,32 +43,31 @@ export default function Header() {
     if (typeof window === "undefined") return;
 
     socket.connect();
-  
+
     const eventName =
       userRoleState === "admin" || userRoleState === "super_admin"
         ? "notification"
         : `notification::${currentUserId}`;
-  
+
     socket.on(eventName, (notification) => {
       // Show badge when notification arrives
       if (notification) {
         setShowBadge(true);
       }
-  
+
       // show message
       if (notification?.message) {
         success(notification.message);
       }
-  
+
       // log correct data
       console.log("notification object:", notification);
     });
-  
+
     return () => {
       socket.off(eventName);
     };
   }, [currentUserId, userRoleState, success]);
-
 
   const handleProfileRedirect = () => {
     if (userRole === "admin" || userRole === "super_admin") {
@@ -97,14 +96,22 @@ export default function Header() {
         <SidebarTrigger />
 
         <div className="ml-auto flex gap-2">
-          <Input type="text" placeholder="Search" className="w-full max-w-sm h-10" />
+          {/* <Input type="text" placeholder="Search" className="w-full max-w-sm h-10" /> */}
           <Button
             variant="ghost"
             className="p-0 h-10 border bg-transparent relative"
             onClick={() => {
               // Hide badge when user clicks on notifications
               setShowBadge(false);
-              router.push(userRole === "admin" || userRole === "super_admin" ? "/admin/notifications" : userRole === "doctor" ? "/bha/notifications" : userRole === "assistant" ? "/bhaa/notifications" : "/auth/login");
+              router.push(
+                userRole === "admin" || userRole === "super_admin"
+                  ? "/admin/notifications"
+                  : userRole === "doctor"
+                  ? "/bha/notifications"
+                  : userRole === "assistant"
+                  ? "/bhaa/notifications"
+                  : "/auth/login"
+              );
             }}
           >
             <IoIosNotificationsOutline size={28} className="text-black" />
@@ -114,7 +121,6 @@ export default function Header() {
               </span>
             )}
           </Button>
-     
 
           {/* Shadcn Dropdown Menu */}
           <DropdownMenu>
@@ -125,8 +131,16 @@ export default function Header() {
               >
                 <div className="flex items-center gap-2">
                   <Avatar className="h-6 w-6">
-                    <AvatarImage src={myProfile?.data?.profile || "https://github.com/shadcn.png"}  alt={myProfile?.data?.fullName || "User"} />
-                    <AvatarFallback>{myProfile?.data?.fullName?.charAt(0) || "CN"}</AvatarFallback>
+                    <AvatarImage
+                      src={
+                        myProfile?.data?.profile ||
+                        "https://github.com/shadcn.png"
+                      }
+                      alt={myProfile?.data?.fullName || "User"}
+                    />
+                    <AvatarFallback>
+                      {myProfile?.data?.fullName?.charAt(0) || "CN"}
+                    </AvatarFallback>
                   </Avatar>
                   <span className="text-sm">Profile</span>
                 </div>
@@ -155,7 +169,10 @@ export default function Header() {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-500 focus:text-red-500">
-                <Button  className="w-full justify-start bg-red-500 text-white hover:bg-red-600 cursor-pointer" onClick={handleLogout}>
+                <Button
+                  className="w-full justify-start bg-red-500 text-white hover:bg-red-600 cursor-pointer"
+                  onClick={handleLogout}
+                >
                   <LogOutIcon className="w-4 h-4 mr-2" />
                   Log Out
                 </Button>
