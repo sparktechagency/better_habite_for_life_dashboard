@@ -30,6 +30,7 @@ import { BiCategory } from "react-icons/bi";
 import { FaQuoteRight } from "react-icons/fa6";
 import { usePathname } from "next/navigation";
 import { RiAdminLine } from "react-icons/ri";
+import { TbFishHook } from "react-icons/tb";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { socket } from "@/socket/socket";
 import { useEffect, useState } from "react";
@@ -81,6 +82,11 @@ const sidebars = {
       name: "Category Management",
       path: "/admin/category-management",
       icon: BiCategory,
+    },
+    {
+      name: "Target Domain",
+      path: "/admin/target-domain",
+      icon: TbFishHook,
     },
     {
       name: "Notifications",

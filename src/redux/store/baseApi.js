@@ -104,6 +104,7 @@ export const baseApi = createApi({
     "task",
     "Message",
     "Notification",
+    "TargetDomain",
   ],
   endpoints: () => ({}),
 });
