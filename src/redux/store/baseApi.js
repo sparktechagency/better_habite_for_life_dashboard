@@ -89,6 +89,7 @@ export const baseApi = createApi({
     "Faq",
     "Policy",
     "Report",
+    "AdminManagement",
     "BhaManagement",
     "BhaaManagement",
     "BhaaClient",

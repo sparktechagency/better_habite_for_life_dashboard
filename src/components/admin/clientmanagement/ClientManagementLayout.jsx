@@ -47,21 +47,21 @@ function ClientManagementLayout() {
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row gap-2 items-start justify-between">
         <SmallPageInfo
-          title="User Management"
-          description="Here is an overview of your user management"
+          title="Client Management"
+          description="Here is an overview of your client management"
         />
       </div>
       <SearchFilterButton
         showAddButton={false}
         selectOptions={["All Status", "Active", "Inactive"]}
-        placeholder="Search User By Name or Email"
+        placeholder="Search Client By Name or Email"
         searchText={search}
         setSearchText={handleSearchChange}
         status={status}
         setStatus={handleStatusChange}
       />
       <ClientManagementTable
-        userInfoData={userInfoData}
+        userInfoData={userInfoData.filter((item) => item.role === "user")}
         isLoading={isUserManagementLoading}
         paginationMeta={paginationMeta}
         currentPage={currentPage}

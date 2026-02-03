@@ -32,15 +32,15 @@ function PostCard({ post }) {
 
   console.log(post);
 
-  const handleHighlightPost =async (e) => {
+  const handleHighlightPost = async (e) => {
     e.stopPropagation();
     try {
       const response = await highlightPost({ postId: post._id }).unwrap();
       if (response.success) {
-          success(response.message);
+        success(response.message);
       }
     } catch (error) {
-      error(error.data.message);
+      console.log(error);
     }
   };
 
@@ -54,7 +54,10 @@ function PostCard({ post }) {
           <CardTitle className="flex items-center gap-2">
             <Avatar className="size-10">
               <AvatarImage
-                src={getImageUrl(post?.userId?.profile, "/admin/article/adhd.png")}
+                src={getImageUrl(
+                  post?.userId?.profile,
+                  "/admin/article/adhd.png"
+                )}
               />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>

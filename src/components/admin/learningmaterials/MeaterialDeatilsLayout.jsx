@@ -51,7 +51,7 @@ function MeaterialDeatilsLayout() {
       const response = await deleteCourse({ id: materialId }).unwrap();
       if (response?.success) {
         toast.success(response.message || "Course deleted successfully");
-        router.push("/admin/learning-management/materials");
+        router.push("/admin/learning-management");
       } else {
         toast.error(response?.message || "Failed to delete course");
       }

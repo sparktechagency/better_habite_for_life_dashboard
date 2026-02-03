@@ -29,6 +29,7 @@ import { RiArticleLine } from "react-icons/ri";
 import { BiCategory } from "react-icons/bi";
 import { FaQuoteRight } from "react-icons/fa6";
 import { usePathname } from "next/navigation";
+import { RiAdminLine } from "react-icons/ri";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { socket } from "@/socket/socket";
 import { useEffect, useState } from "react";
@@ -50,6 +51,11 @@ const sidebars = {
       name: "Client Management",
       path: "/admin/client-management",
       icon: LuSquareUserRound,
+    },
+    {
+      name: "Admin Management",
+      path: "/admin/admin-management",
+      icon: RiAdminLine,
     },
     {
       name: "Reports",
@@ -164,7 +170,7 @@ export function AppSidebar() {
   const [showBadge, setShowBadge] = useState(false);
   const pathname = usePathname();
   const [currentUserId, setCurrentUserId] = useState("");
-  
+
   // Determine which sidebar to show based on pathname
   const getSidebarRole = () => {
     if (pathname.includes("/admin")) return "admin";
@@ -194,7 +200,7 @@ export function AppSidebar() {
 
     // Listen for new messages
     const eventName = `new-message::${currentUserId}`;
-    
+
     const handleNewMessage = (message) => {
       console.log("new message received global 📡", message);
       // Show badge when new message arrives
@@ -305,11 +311,13 @@ export function AppSidebar() {
                           <div className="flex items-center gap-2 relative w-full">
                             <item.icon />
                             <span className="flex-1">{item.name}</span>
-                            {showBadge && item.path && item.path.includes("messages") && (
-                              <span className="absolute right-0 top-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full w-2 h-2 flex items-center justify-center animate-pulse duration-300">
-                                <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                              </span>
-                            )}
+                            {showBadge &&
+                              item.path &&
+                              item.path.includes("messages") && (
+                                <span className="absolute right-0 top-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full w-2 h-2 flex items-center justify-center animate-pulse duration-300">
+                                  <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                </span>
+                              )}
                           </div>
                         </Link>
                       </SidebarMenuButton>

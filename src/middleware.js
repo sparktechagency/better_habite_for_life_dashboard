@@ -3,12 +3,13 @@ import { NextResponse } from "next/server";
 /**
  * Next.js Middleware for route protection
  * This runs on the edge and can prevent unauthorized access before the page loads
- * 
+ *
  * @param {Request} request - The incoming request
  * @returns {NextResponse} Response or redirect
  */
 export function middleware(request) {
   const { pathname } = request.nextUrl;
+  console.log("Middleware called for path:", pathname);
 
   // Public routes that don't require authentication
   const publicRoutes = [
@@ -31,7 +32,8 @@ export function middleware(request) {
 
   // Get tokens from cookies
   const accessToken = request.cookies.get("accessToken")?.value;
-  const userRole = request.cookies.get("userRole")?.value || 
+  const userRole =
+    request.cookies.get("userRole")?.value ||
     // Fallback: try to get from headers if set by client
     request.headers.get("x-user-role");
 
@@ -41,7 +43,7 @@ export function middleware(request) {
     hasAccessToken: !!accessToken,
     userRole,
     allCookies: Object.fromEntries(
-      request.cookies.getAll().map(c => [c.name, c.value])
+      request.cookies.getAll().map((c) => [c.name, c.value])
     ),
   });
 
@@ -78,8 +80,15 @@ export function middleware(request) {
   // BHAA (assistant) routes
   if (pathname.startsWith("/bhaa")) {
     if (userRole !== "assistant") {
-      console.log("BHAA route blocked - userRole:", userRole, "expected: assistant");
-      console.log("All available cookies:", Array.from(request.cookies.getAll()).map(c => `${c.name}=${c.value}`));
+      console.log(
+        "BHAA route blocked - userRole:",
+        userRole,
+        "expected: assistant"
+      );
+      console.log(
+        "All available cookies:",
+        Array.from(request.cookies.getAll()).map((c) => `${c.name}=${c.value}`)
+      );
       const redirectUrl = new URL("/auth/login", request.url);
       redirectUrl.searchParams.set("error", "unauthorized");
       redirectUrl.searchParams.set("redirect", pathname);
@@ -105,5 +114,3 @@ export const config = {
     "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
-
-// 

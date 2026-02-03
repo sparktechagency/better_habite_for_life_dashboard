@@ -27,7 +27,7 @@ export const courseApi = baseApi.injectEndpoints({
     }),
     updateCourse: builder.mutation({
       query: ({ id, formData }) => ({
-        url: `/course/view-count/${id}`,
+        url: `/course/${id}`,
         method: "PATCH",
         body: formData,
       }),

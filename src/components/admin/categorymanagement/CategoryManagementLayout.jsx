@@ -260,7 +260,7 @@ const CategorySection = ({
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 items-stretch">
             {categories.map((category) => (
               <CategoryCard
                 key={category._id}
@@ -346,36 +346,42 @@ const CategoryCard = ({ category, onEditClick, onDeleteClick }) => {
   };
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg shadow-md group hover:shadow-lg transition-shadow relative">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold">{category.name}</h1>
-        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+    <div className="bg-gray-100 p-4 rounded-lg shadow-md group hover:shadow-lg transition-shadow relative flex flex-col h-full min-h-[220px]">
+      {/* Title row: fixed min-height so all cards align; title and actions in one line */}
+      <div className="flex items-start justify-end gap-2  shrink-0 ">
+        <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <button
             onClick={handleEdit}
-            className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+            className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer p-1"
+            aria-label="Edit category"
           >
-            <LuPencilLine />
+            <LuPencilLine className="size-4" />
           </button>
           <button
             onClick={handleDelete}
-            className="text-gray-500 hover:text-red-400 transition-colors cursor-pointer"
+            className="text-gray-500 hover:text-red-400 transition-colors cursor-pointer p-1"
+            aria-label="Delete category"
           >
-            <HiTrash />
+            <HiTrash className="size-4" />
           </button>
         </div>
       </div>
 
-      <div className="flex items-center justify-center">
-        <img
+      {/* Icon area: same height on every card, image centered */}
+      <div className="flex-1 flex items-start justify-center w-full py-2 max-h-[7rem] ">
+        <Image
           src={getImageUrl()}
           alt={category.name}
-          width={100}
-          height={100}
-          className="w-20 h-20 object-cover rounded-full"
+          width={80}
+          height={80}
+          className="w-20 h-20 object-cover object-center rounded-full mx-auto block"
           onError={(e) => {
             e.target.src = "/admin/category/cat_1.ico";
           }}
         />
+      </div>
+      <div className="flex items-center justify-center">
+        <p className="text-md font-semibold">{category.name}</p>
       </div>
     </div>
   );

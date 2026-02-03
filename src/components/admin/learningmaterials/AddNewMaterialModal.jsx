@@ -215,7 +215,7 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
           error?.message ||
           "An error occurred. Please try again.";
         toast.error(errorMessage);
-        console.error("Course operation error:", error);
+        console.log("Course operation error:", error);
       }
     },
     [
@@ -412,7 +412,12 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
                   name="courseVideo"
                   render={() => (
                     <FormItem>
-                      <FormLabel>Course Video</FormLabel>
+                      <FormLabel>
+                        Course Video{" "}
+                        <span className="text-xs text-gray-500">
+                          Maximum file size: 300MB
+                        </span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           ref={videoInputRef}
@@ -471,13 +476,23 @@ const AddNewMaterialModal = React.memo(function AddNewMaterialModal({
             form="upload-course-media-form"
             disabled={isSubmitting}
           >
-            {isSubmitting
-              ? isEdit
-                ? <>Updating...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></>
-                : <>Creating...{" "}<Loader className="w-4 h-4 animate-spin text-white" /></>
-              : isEdit
-              ? "Update"
-              : "Submit"}
+            {isSubmitting ? (
+              isEdit ? (
+                <>
+                  Updating...{" "}
+                  <Loader className="w-4 h-4 animate-spin text-white" />
+                </>
+              ) : (
+                <>
+                  Creating...{" "}
+                  <Loader className="w-4 h-4 animate-spin text-white" />
+                </>
+              )
+            ) : isEdit ? (
+              "Update"
+            ) : (
+              "Submit"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
