@@ -14,81 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { Badge } from "@/components/ui/badge";
 
-// const tableData = [
-//   {
-//     id: 1,
-//     taskName: "Complete weekly exercise tracking",
-//     taskDescription: "Log daily physical activities for 7 consecutive days",
-//     targetDomain: "Self-Management Domain",
-//     date: "2025-05-12",
-//     startTime: "10:00 AM",
-//     endTime: "11:00 AM",
-//     status: "Completed",
-//   },
-//   {
-//     id: 2,
-//     taskName: "Complete weekly exercise tracking",
-//     taskDescription: "Log daily physical activities for 7 consecutive days",
-//     targetDomain: "Self-Management Domain",
-//     date: "2025-05-12",
-//     startTime: "10:00 AM",
-//     endTime: "11:00 AM",
-//     status: "Completed",
-//   },
-//   {
-//     id: 3,
-//     taskName: "Complete weekly exercise tracking",
-//     taskDescription: "Log daily physical activities for 7 consecutive days",
-//     targetDomain: "Self-Management Domain",
-//     date: "2025-05-12",
-//     startTime: "10:00 AM",
-//     endTime: "11:00 AM",
-//     status: "Completed",
-//   },
-//   {
-//     id: 4,
-//     taskName: "Complete weekly exercise tracking",
-//     taskDescription: "Log daily physical activities for 7 consecutive days",
-//     targetDomain: "Self-Management Domain",
-//     date: "2025-05-12",
-//     startTime: "10:00 AM",
-//     endTime: "11:00 AM",
-//     status: "Completed",
-//   },
-//   {
-//     id: 5,
-//     taskName: "Complete weekly exercise tracking",
-//     taskDescription: "Log daily physical activities for 7 consecutive days",
-//     targetDomain: "Self-Management Domain",
-//     date: "2025-05-12",
-//     startTime: "10:00 AM",
-//     endTime: "11:00 AM",
-//     status: "Pending",
-//   },
-//   {
-//     id: 6,
-//     taskName: "Complete weekly exercise tracking",
-//     taskDescription: "Log daily physical activities for 7 consecutive days",
-//     targetDomain: "Self-Management Domain",
-//     date: "2025-05-12",
-//     startTime: "10:00 AM",
-//     endTime: "11:00 AM",
-//     status: "Pending",
-//   },
-//   {
-//     id: 7,
-//     taskName: "Complete weekly exercise tracking",
-//     taskDescription: "Log daily physical activities for 7 consecutive days",
-//     targetDomain: "Self-Management Domain",
-//     date: "2025-05-12",
-//     startTime: "10:00 AM",
-//     endTime: "11:00 AM",
-//     status: "Completed",
-//   },
-// ];
-
 export function AssignedTaskList({ tableData }) {
-  console.log("tableData:", tableData);
   return (
     <ScrollArea className="w-full rounded-md border whitespace-nowrap">
       <Table>
@@ -97,31 +23,32 @@ export function AssignedTaskList({ tableData }) {
         </TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-1/6">Task Name</TableHead>
-            <TableHead className="w-1/6">Task Description</TableHead>
-            <TableHead className="w-1/6">Target Domain</TableHead>
-            <TableHead className="w-1/6">Start Date</TableHead>
-            <TableHead className="w-1/6">End Date</TableHead>
-            <TableHead className="w-1/6">Status</TableHead>
+            <TableHead>Task Name</TableHead>
+            <TableHead>Task Description</TableHead>
+            <TableHead>Target Domain</TableHead>
+            <TableHead>Start Date</TableHead>
+            <TableHead>Start Time</TableHead>
+            <TableHead>End Date</TableHead>
+            <TableHead>End Time</TableHead>
+            <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {!tableData || tableData.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+              <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                 No tasks assigned yet
               </TableCell>
             </TableRow>
           ) : (
             tableData.map((data) => (
               <TableRow key={data.id}>
-                <TableCell className="font-medium w-1/6">
-                  {data.taskName}
+                <TableCell className="font-medium">{data.taskName}</TableCell>
+                <TableCell className="font-medium">
+                  {data.taskDescription?.slice(0, 50)}
+                  {(data.taskDescription?.length ?? 0) > 50 ? "..." : ""}
                 </TableCell>
-                <TableCell className="font-medium w-1/6">
-                  {data.taskDescription.slice(0, 50)}...
-                </TableCell>
-                <TableCell className="w-1/6">
+                <TableCell>
                   <Badge
                     variant="outline"
                     className="bg-red-500/50 text-black h-7"
@@ -129,9 +56,11 @@ export function AssignedTaskList({ tableData }) {
                     {data.targetDomain}
                   </Badge>
                 </TableCell>
-                <TableCell className="w-1/6">{data.startDate}</TableCell>
-                <TableCell className="w-1/6">{data.endDate}</TableCell>
-                <TableCell className="w-1/6">
+                <TableCell>{data.startDate}</TableCell>
+                <TableCell>{data.startTime}</TableCell>
+                <TableCell>{data.endDate}</TableCell>
+                <TableCell>{data.endTime}</TableCell>
+                <TableCell>
                   <Badge
                     variant="outline"
                     className={`${

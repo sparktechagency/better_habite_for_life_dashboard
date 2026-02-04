@@ -16,8 +16,6 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Scrollbar } from "@radix-ui/react-scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { FiEdit3 } from "react-icons/fi";
-import { FiTrash2 } from "react-icons/fi";
 import AddEditTaskModal from "./viewdetails/AddEditTaskModal";
 import { useParams } from "next/navigation";
 import {
@@ -45,16 +43,31 @@ function AssignTaskLayout() {
   const [editingTask, setEditingTask] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
 
+  const formatTime = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      return new Date(dateString).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } catch {
+      return "N/A";
+    }
+  };
+
   // Map API data to table format
   const tasks =
     assignTaskData?.data?.map((task) => ({
       id: task._id,
       taskName: task.title,
       taskDescription: task.description,
-      targetDomain: task.category,
-      categoryId: task.categoryId,
+      targetDomain: task.targetDomain,
+      targetDomainId: task.targetDomainId,
       startDate: formatDate(task.startDate),
       endDate: formatDate(task.endDate),
+      startTime: formatTime(task.startDate),
+      endTime: formatTime(task.endDate),
       status: task.status,
       userId: task.userId?._id,
       userName: task.userId?.fullName,
@@ -94,7 +107,7 @@ function AssignTaskLayout() {
         doctorBookingId: id,
         title: taskData.title,
         description: taskData.description,
-        categoryId: taskData.categoryId,
+        targetDomainId: taskData.targetDomainId,
         startDate: taskData.startDate,
         endDate: taskData.endDate,
       };
@@ -157,32 +170,33 @@ export function TaskDetailsTable({ tasks, onEdit, onDelete, deletingId }) {
         </TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-1/6">Task Name</TableHead>
-            <TableHead className="w-1/6">Task Description</TableHead>
-            <TableHead className="w-1/6">Target Domain</TableHead>
-            <TableHead className="w-1/6">Start Date</TableHead>
-            <TableHead className="w-1/6">End Date</TableHead>
-            <TableHead className="w-1/6">Status</TableHead>
-            <TableHead className="w-1/6">Action</TableHead>
+            <TableHead>Task Name</TableHead>
+            <TableHead>Task Description</TableHead>
+            <TableHead>Target Domain</TableHead>
+            <TableHead>Start Date</TableHead>
+            <TableHead>Start Time</TableHead>
+            <TableHead>End Date</TableHead>
+            <TableHead>End Time</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {tasks.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+              <TableCell colSpan={9} className="text-center py-8 text-gray-500">
                 No tasks assigned yet
               </TableCell>
             </TableRow>
           ) : (
             tasks.map((data) => (
               <TableRow key={data.id}>
-                <TableCell className="font-medium w-1/6">
-                  {data.taskName}
+                <TableCell className="font-medium">{data.taskName}</TableCell>
+                <TableCell className="font-medium">
+                  {data.taskDescription?.slice(0, 50)}
+                  {(data.taskDescription?.length ?? 0) > 50 ? "..." : ""}
                 </TableCell>
-                <TableCell className="font-medium w-1/6">
-                  {data.taskDescription.slice(0, 50)}...
-                </TableCell>
-                <TableCell className="w-1/6">
+                <TableCell>
                   <Badge
                     variant="outline"
                     className="bg-red-500/50 text-black h-7"
@@ -190,9 +204,11 @@ export function TaskDetailsTable({ tasks, onEdit, onDelete, deletingId }) {
                     {data.targetDomain}
                   </Badge>
                 </TableCell>
-                <TableCell className="w-1/6">{data.startDate}</TableCell>
-                <TableCell className="w-1/6">{data.endDate}</TableCell>
-                <TableCell className="w-1/6">
+                <TableCell>{data.startDate}</TableCell>
+                <TableCell>{data.startTime}</TableCell>
+                <TableCell>{data.endDate}</TableCell>
+                <TableCell>{data.endTime}</TableCell>
+                <TableCell>
                   <Badge
                     variant="outline"
                     className={`${

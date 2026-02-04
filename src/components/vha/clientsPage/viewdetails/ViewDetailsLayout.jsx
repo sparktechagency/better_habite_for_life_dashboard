@@ -7,13 +7,13 @@ import { useParams } from "next/navigation";
 import { useGetSessionManagementDataByIdQuery } from "@/redux/Apis/bha/sessionmanagementApi/sessionmanagementApi";
 import getImageUrl from "@/utils/getImageUrl";
 import formatDate from "@/utils/FormatDate/formatDate";
+import formatTime from "@/utils/FormatDate/formateTime";
 function ViewDetailsLayout() {
   const id = useParams().id;
   const {
     data: sessionManagementDataById,
     isLoading: isSessionManagementDataByIdLoading,
   } = useGetSessionManagementDataByIdQuery({ id });
-  console.log("sessionManagementDataById:", sessionManagementDataById);
 
   const sessionManagementInfo = {
     taskData:
@@ -21,9 +21,11 @@ function ViewDetailsLayout() {
         id: task._id,
         taskName: task.title,
         taskDescription: task.description,
-        targetDomain: task.category,
+        targetDomain: task.targetDomain ?? task.category,
         startDate: formatDate(task.startDate),
         endDate: formatDate(task.endDate),
+        startTime: formatTime(task.startDate),
+        endTime: formatTime(task.endDate),
         status: task.status,
       })) || [],
   };

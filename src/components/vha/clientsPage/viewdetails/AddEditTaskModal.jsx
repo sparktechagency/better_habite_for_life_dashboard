@@ -25,9 +25,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { useGetAllCategoriesQuery } from "@/redux/Apis/admin/categoryApi/categoryApi";
-import { Loader } from "lucide-react";
 
+import { Loader, CalendarIcon } from "lucide-react";
+import { useGetAllTargetDomainsQuery } from "@/redux/Apis/admin/targetdomainApi/targetdomainApi";
+import { TimePickerInput } from "@/components/ui/shadcn-io/rating/timepickerinput";
 const AddEditTaskModal = ({
   openModal,
   setOpenModal,
@@ -36,23 +37,34 @@ const AddEditTaskModal = ({
   isLoading = false,
 }) => {
   // Fetch all categories
-  const { data: categoriesData, isLoading: isCategoriesLoading } =
-    useGetAllCategoriesQuery();
+
+  const { data: targetDomainsData, isLoading: isTargetDomainsLoading } =
+    useGetAllTargetDomainsQuery();
   const [formData, setFormData] = useState({
     taskTitle: "",
     taskDescription: "",
     categoryId: "",
-    startDate: null,
-    endDate: null,
+    targetDomainId: "",
+    startDateTime: null,
+    endDateTime: null,
   });
-  const [isStartDateOpen, setIsStartDateOpen] = useState(false);
-  const [isEndDateOpen, setIsEndDateOpen] = useState(false);
+  const [isFromOpen, setIsFromOpen] = useState(false);
+  const [isToOpen, setIsToOpen] = useState(false);
 
-  // Map categories from API
-  const categories = categoriesData?.data || [];
+  const targetDomains = targetDomainsData?.data || [];
 
   const updateField = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const parseDateTime = (dateVal, timeVal) => {
+    if (!dateVal) return null;
+    const d = new Date(dateVal);
+    if (timeVal && /^\d{1,2}:\d{2}$/.test(timeVal)) {
+      const [h, m] = timeVal.split(":").map(Number);
+      d.setHours(h, m, 0, 0);
+    }
+    return d;
   };
 
   // Load data when editing
@@ -62,10 +74,13 @@ const AddEditTaskModal = ({
         taskTitle: initialData?.taskName || "",
         taskDescription: initialData?.taskDescription || "",
         categoryId: initialData?.categoryId || "",
-        startDate: initialData?.startDate
-          ? new Date(initialData.startDate)
-          : null,
-        endDate: initialData?.endDate ? new Date(initialData.endDate) : null,
+        targetDomainId:
+          initialData?.targetDomainId || initialData?.targetedDomainId || "",
+        startDateTime: parseDateTime(
+          initialData?.startDate,
+          initialData?.startTime
+        ),
+        endDateTime: parseDateTime(initialData?.endDate, initialData?.endTime),
       });
     }
   }, [openModal, initialData]);
@@ -77,11 +92,18 @@ const AddEditTaskModal = ({
       title: formData.taskTitle,
       description: formData.taskDescription,
       categoryId: formData.categoryId,
-      startDate: formData.startDate
-        ? format(formData.startDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+      targetDomainId: formData.targetDomainId,
+      startTime: formData.startDateTime
+        ? format(formData.startDateTime, "HH:mm")
         : "",
-      endDate: formData.endDate
-        ? format(formData.endDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+      endTime: formData.endDateTime
+        ? format(formData.endDateTime, "HH:mm")
+        : "",
+      startDate: formData.startDateTime
+        ? format(formData.startDateTime, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        : "",
+      endDate: formData.endDateTime
+        ? format(formData.endDateTime, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         : "",
     };
     if (onSave) onSave(payload);
@@ -133,25 +155,31 @@ const AddEditTaskModal = ({
               Target Domain
             </label>
             <Select
-              value={formData.categoryId}
-              onValueChange={(val) => updateField("categoryId", val)}
+              value={formData.targetDomainId}
+              onValueChange={(val) => updateField("targetDomainId", val)}
             >
               <SelectTrigger className="bg-gray-100 w-full">
-                <SelectValue placeholder="Select Category" />
+                <SelectValue
+                  placeholder={
+                    isTargetDomainsLoading
+                      ? "Loading..."
+                      : "Select target domain"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                {isCategoriesLoading ? (
+                {isTargetDomainsLoading ? (
                   <SelectItem value="" disabled>
-                    Loading categories...
+                    Loading target domains...
                   </SelectItem>
-                ) : categories.length === 0 ? (
+                ) : targetDomains.length === 0 ? (
                   <SelectItem value="" disabled>
-                    No categories available
+                    No target domains available
                   </SelectItem>
                 ) : (
-                  categories.map((category) => (
-                    <SelectItem key={category._id} value={category._id}>
-                      {category.name}
+                  targetDomains.map((domain) => (
+                    <SelectItem key={domain._id} value={domain._id}>
+                      {domain.name}
                     </SelectItem>
                   ))
                 )}
@@ -159,68 +187,132 @@ const AddEditTaskModal = ({
             </Select>
           </div>
 
-          {/* Date Row */}
+          {/* From Date & Time / To Date & Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Start Date */}
+            {/* From Date & Time */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-900">
-                Start Date
+                From Date & Time
               </label>
-              <Popover open={isStartDateOpen} onOpenChange={setIsStartDateOpen}>
+              <Popover open={isFromOpen} onOpenChange={setIsFromOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-between bg-gray-100 border-gray-200 text-left font-normal"
+                    className="w-full justify-start gap-2 bg-gray-100 border-gray-200 text-left font-normal"
                   >
-                    {formData.startDate ? (
-                      format(formData.startDate, "PPP")
+                    <CalendarIcon className="size-4 shrink-0 text-gray-500" />
+                    {formData.startDateTime ? (
+                      format(formData.startDateTime, "PPP HH:mm")
                     ) : (
-                      <span className="text-gray-500">Select start date</span>
+                      <span className="text-gray-500">
+                        Select date and time
+                      </span>
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={formData.startDate}
+                    selected={
+                      formData.startDateTime
+                        ? formData.startDateTime
+                        : undefined
+                    }
                     onSelect={(day) => {
-                      updateField("startDate", day);
-                      setIsStartDateOpen(false);
+                      const base = formData.startDateTime ?? new Date();
+                      const next = day
+                        ? new Date(
+                            day.getFullYear(),
+                            day.getMonth(),
+                            day.getDate(),
+                            base.getHours(),
+                            base.getMinutes(),
+                            base.getSeconds()
+                          )
+                        : new Date();
+                      updateField("startDateTime", next);
                     }}
                     initialFocus
                   />
+                  <div className="flex items-center gap-2 border-t border-gray-200 p-3">
+                    <TimePickerInput
+                      picker="hours"
+                      date={formData.startDateTime ?? new Date()}
+                      setDate={(d) => updateField("startDateTime", d ?? null)}
+                      onRightFocus={() => {}}
+                    />
+                    <span className="text-gray-400 font-medium">:</span>
+                    <TimePickerInput
+                      picker="minutes"
+                      date={formData.startDateTime ?? new Date()}
+                      setDate={(d) => updateField("startDateTime", d ?? null)}
+                      onLeftFocus={() => {}}
+                      onRightFocus={() => {}}
+                    />
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>
 
-            {/* End Date */}
+            {/* To Date & Time */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-900">
-                End Date
+                To Date & Time
               </label>
-              <Popover open={isEndDateOpen} onOpenChange={setIsEndDateOpen}>
+              <Popover open={isToOpen} onOpenChange={setIsToOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-between bg-gray-100 border-gray-200 text-left font-normal"
+                    className="w-full justify-start gap-2 bg-gray-100 border-gray-200 text-left font-normal"
                   >
-                    {formData.endDate ? (
-                      format(formData.endDate, "PPP")
+                    <CalendarIcon className="size-4 shrink-0 text-gray-500" />
+                    {formData.endDateTime ? (
+                      format(formData.endDateTime, "PPP HH:mm")
                     ) : (
-                      <span className="text-gray-500">Select end date</span>
+                      <span className="text-gray-500">
+                        Select date and time
+                      </span>
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={formData.endDate}
+                    selected={
+                      formData.endDateTime ? formData.endDateTime : undefined
+                    }
                     onSelect={(day) => {
-                      updateField("endDate", day);
-                      setIsEndDateOpen(false);
+                      const base = formData.endDateTime ?? new Date();
+                      const next = day
+                        ? new Date(
+                            day.getFullYear(),
+                            day.getMonth(),
+                            day.getDate(),
+                            base.getHours(),
+                            base.getMinutes(),
+                            base.getSeconds()
+                          )
+                        : new Date();
+                      updateField("endDateTime", next);
                     }}
                     initialFocus
                   />
+                  <div className="flex items-center gap-2 border-t border-gray-200 p-3">
+                    <TimePickerInput
+                      picker="hours"
+                      date={formData.endDateTime ?? new Date()}
+                      setDate={(d) => updateField("endDateTime", d ?? null)}
+                      onRightFocus={() => {}}
+                    />
+                    <span className="text-gray-400 font-medium">:</span>
+                    <TimePickerInput
+                      picker="minutes"
+                      date={formData.endDateTime ?? new Date()}
+                      setDate={(d) => updateField("endDateTime", d ?? null)}
+                      onLeftFocus={() => {}}
+                      onRightFocus={() => {}}
+                    />
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>
@@ -233,7 +325,16 @@ const AddEditTaskModal = ({
             className="bg-blue-600 hover:bg-blue-700 text-white"
             disabled={isLoading}
           >
-            {isLoading ? <>Saving...{" "}<Loader className="w-4 h-4 animate-spin ml-2 text-white" /></> : initialData ? "Update" : "Add"}
+            {isLoading ? (
+              <>
+                Saving...{" "}
+                <Loader className="w-4 h-4 animate-spin ml-2 text-white" />
+              </>
+            ) : initialData ? (
+              "Update"
+            ) : (
+              "Add"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
