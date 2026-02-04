@@ -6,14 +6,18 @@ import VideoTimer from "./VideoTimer";
 import VideoParticipant from "./VideoParticipant";
 import { Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLeaveSessionNowMutation } from "@/redux/Apis/bha/scheuleApi/scheduleApi";
+import {
+  useLeaveSessionNowMutation,
+  useExtendSessionFiveMinutesMutation,
+} from "@/redux/Apis/bha/scheuleApi/scheduleApi";
+import useToast from "@/hooks/useToast";
 
-function VideoContainer({ 
-  isOpen, 
-  onClose, 
+function VideoContainer({
+  isOpen,
+  onClose,
   sessionData,
   currentUser,
-  bookingId
+  bookingId,
 }) {
   const [position, setPosition] = useState({ x: 100, y: 100 });
   const [isDragging, setIsDragging] = useState(false);
@@ -21,7 +25,12 @@ function VideoContainer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [callStartTime] = useState(Date.now());
   const containerRef = useRef(null);
-  const [leaveSessionNow, { isLoading: isLeaving }] = useLeaveSessionNowMutation();
+  const [leaveSessionNow, { isLoading: isLeaving }] =
+    useLeaveSessionNowMutation();
+  const [extendSessionFiveMinutes, { isLoading: isExtending }] =
+    useExtendSessionFiveMinutesMutation();
+  const [isExtended, setIsExtended] = useState(false);
+  const { success, error } = useToast();
   const {
     isJoined,
     isVideoEnabled,
@@ -59,11 +68,12 @@ function VideoContainer({
     if (!isDragging) return;
     const newX = e.clientX - dragOffset.x;
     const newY = e.clientY - dragOffset.y;
-    
+
     // Keep within viewport bounds
     const maxX = window.innerWidth - (containerRef.current?.offsetWidth || 400);
-    const maxY = window.innerHeight - (containerRef.current?.offsetHeight || 300);
-    
+    const maxY =
+      window.innerHeight - (containerRef.current?.offsetHeight || 300);
+
     setPosition({
       x: Math.max(0, Math.min(newX, maxX)),
       y: Math.max(0, Math.min(newY, maxY)),
@@ -87,13 +97,12 @@ function VideoContainer({
 
   const handleEndCall = async () => {
     await leaveChannel();
-    console.log("bookingId-----><---", bookingId);
-    const response = await leaveSessionNow({ bookingId: bookingId });
-    if (response.data?.success) {
-    //   toast.success(response.data.message);
-      onClose?.();
-    } else {
-    //   toast.error(response.data.message);
+    if (bookingId) {
+      try {
+        await leaveSessionNow({ bookingId }).unwrap();
+      } catch {
+        // Still close the modal on error so user can leave the UI
+      }
     }
     onClose?.();
   };
@@ -121,13 +130,30 @@ function VideoContainer({
     console.log("Participants clicked");
   };
 
+  const handleExtendCall = async () => {
+    if (isExtended || !bookingId) return;
+    try {
+      const res = await extendSessionFiveMinutes({ bookingId }).unwrap();
+      if (res?.success) {
+        setIsExtended(true);
+        success(res?.message ?? "Session extended by 5 minutes.");
+      } else {
+        error(res?.message ?? "Failed to extend session.");
+      }
+    } catch (err) {
+      error(err?.data?.message ?? err?.message ?? "Failed to extend session.");
+    }
+  };
+
   if (!isOpen || !sessionData) return null;
 
   return (
     <div
       ref={containerRef}
       className={`fixed z-50 bg-gray-800 border-2 border-gray-600 rounded-lg overflow-hidden shadow-2xl ${
-        isFullscreen ? "w-screen h-screen" : "w-[90vw] sm:w-[500px] h-[400px] sm:h-[500px]"
+        isFullscreen
+          ? "w-screen h-screen"
+          : "w-[90vw] sm:w-[500px] h-[400px] sm:h-[500px]"
       }`}
       style={{
         left: isFullscreen ? 0 : `${position.x}px`,
@@ -149,7 +175,11 @@ function VideoContainer({
           disabled={isLeaving}
           className="w-6 h-6 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLeaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+          {isLeaving ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <X className="w-4 h-4" />
+          )}
         </Button>
       </div>
 
@@ -183,10 +213,15 @@ function VideoContainer({
         )}
 
         {/* Timer */}
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center">
           <div className="bg-black/50 px-3 py-1 rounded">
-            <VideoTimer startTime={callStartTime} />
+            <VideoTimer startTime={callStartTime} isExtended={isExtended} />
           </div>
+          {isExtended && (
+            <span className="text-green-400 font-bold text-lg animate-blow-out absolute top-full mt-0.5">
+              +5
+            </span>
+          )}
         </div>
 
         {/* Controls */}
@@ -199,6 +234,10 @@ function VideoContainer({
           onSettings={handleSettings}
           onFullscreen={handleFullscreen}
           onParticipants={handleParticipants}
+          onExtendCall={handleExtendCall}
+          isExtended={isExtended}
+          isExtending={isExtending}
+          isLeaving={isLeaving}
         />
       </div>
 

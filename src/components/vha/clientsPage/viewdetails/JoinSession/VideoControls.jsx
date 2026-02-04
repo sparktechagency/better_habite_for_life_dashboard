@@ -1,6 +1,16 @@
 "use client";
-import { Video, VideoOff, Mic, MicOff, PhoneOff, Settings, Maximize2, Users } from "lucide-react";
+import {
+  Video,
+  VideoOff,
+  Mic,
+  MicOff,
+  PhoneOff,
+  Settings,
+  Maximize2,
+  Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MdOutlineMoreTime } from "react-icons/md";
 
 export default function VideoControls({
   isVideoEnabled,
@@ -11,6 +21,10 @@ export default function VideoControls({
   onSettings,
   onFullscreen,
   onParticipants,
+  onExtendCall,
+  isExtended = false,
+  isExtending = false,
+  isLeaving = false,
 }) {
   return (
     <>
@@ -44,9 +58,27 @@ export default function VideoControls({
           variant="ghost"
           size="icon"
           onClick={onEndCall}
-          className="rounded-full w-10 h-10 sm:w-12 sm:h-12 bg-red-600 hover:bg-red-700 text-white border-0"
+          disabled={isLeaving}
+          className="rounded-full w-10 h-10 sm:w-12 sm:h-12 bg-red-600 hover:bg-red-700 text-white border-0 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <PhoneOff className="w-5 h-5 sm:w-6 sm:h-6" />
+          {isLeaving ? (
+            <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <PhoneOff className="w-5 h-5 sm:w-6 sm:h-6" />
+          )}
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onExtendCall}
+          disabled={isExtended || isExtending}
+          className="rounded-full w-10 h-10 sm:w-12 sm:h-12 bg-green-600 hover:bg-green-700 text-white border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isExtending ? (
+            <span className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <MdOutlineMoreTime className="w-5 h-5 sm:w-6 sm:h-6" />
+          )}
         </Button>
       </div>
 

@@ -40,6 +40,16 @@ export const bhaScheduleSlotApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["SessionManagement", "BhaScheduleSlot"],
     }),
+    extendSessionFiveMinutes: builder.mutation({
+      query: ({ bookingId }) => ({
+        url: `/doctor-booking/extent-time`,
+        method: "POST",
+        body: {
+          doctorBookingId: bookingId,
+        },
+      }),
+      invalidatesTags: ["SessionManagement", "BhaScheduleSlot"],
+    }),
   }),
 });
 
@@ -48,4 +58,5 @@ export const {
   useUpdateBhaAvailabilityMutation,
   useJoinSessionNowMutation,
   useLeaveSessionNowMutation,
+  useExtendSessionFiveMinutesMutation,
 } = bhaScheduleSlotApi;
