@@ -68,14 +68,16 @@ function ClientManagementTable({
         toast.success(
           isCurrentlyActive
             ? "User blocked successfully"
-            : "User unblocked successfully"
+            : "User unblocked successfully",
         );
       } else {
         toast.error(response?.message || "Failed to update user status");
       }
     } catch (error) {
       toast.error(
-        error?.data?.message || error?.message || "Failed to update user status"
+        error?.data?.message ||
+          error?.message ||
+          "Failed to update user status",
       );
     } finally {
       setBlockingUserId(null);
@@ -95,13 +97,13 @@ function ClientManagementTable({
             variant="outline"
             className={`h-8 w-8 ${
               currentPage === i
-                ? "bg-orange-500 text-white border-orange-500"
+                ? "bg-black text-white border-black"
                 : "bg-gray-100 text-gray-600 border-gray-300"
             }`}
             onClick={() => setCurrentPage(i)}
           >
             {i}
-          </Button>
+          </Button>,
         );
       }
     } else {
@@ -112,13 +114,13 @@ function ClientManagementTable({
           variant="outline"
           className={`h-8 w-8 ${
             currentPage === 1
-              ? "bg-orange-500 text-white border-orange-500"
+              ? "bg-black text-white border-black"
               : "bg-gray-100 text-gray-600 border-gray-300"
           }`}
           onClick={() => setCurrentPage(1)}
         >
           1
-        </Button>
+        </Button>,
       );
 
       // Show ellipsis and pages around current page
@@ -126,7 +128,7 @@ function ClientManagementTable({
         buttons.push(
           <span key="ellipsis1" className="px-2 text-gray-600">
             ...
-          </span>
+          </span>,
         );
       }
 
@@ -141,13 +143,13 @@ function ClientManagementTable({
               variant="outline"
               className={`h-8 w-8 ${
                 currentPage === i
-                  ? "bg-orange-500 text-white border-orange-500"
+                  ? "bg-black text-white border-black"
                   : "bg-gray-100 text-gray-600 border-gray-300"
               }`}
               onClick={() => setCurrentPage(i)}
             >
               {i}
-            </Button>
+            </Button>,
           );
         }
       }
@@ -156,7 +158,7 @@ function ClientManagementTable({
         buttons.push(
           <span key="ellipsis2" className="px-2 text-gray-600">
             ...
-          </span>
+          </span>,
         );
       }
 
@@ -168,13 +170,13 @@ function ClientManagementTable({
             variant="outline"
             className={`h-8 w-8 ${
               currentPage === totalPage
-                ? "bg-orange-500 text-white border-orange-500"
+                ? "bg-black text-white border-black"
                 : "bg-gray-100 text-gray-600 border-gray-300"
             }`}
             onClick={() => setCurrentPage(totalPage)}
           >
             {totalPage}
-          </Button>
+          </Button>,
         );
       }
     }
@@ -327,11 +329,11 @@ function ClientManagementTable({
           </div>
           <Button
             variant="outline"
-            className="bg-orange-500 text-white border-orange-500 hover:bg-orange-600 h-8"
+            className="bg-black text-white border-black hover:bg-black/80 h-8"
             disabled={currentPage === paginationMeta.totalPage}
             onClick={() =>
               setCurrentPage((prev) =>
-                Math.min(paginationMeta.totalPage, prev + 1)
+                Math.min(paginationMeta.totalPage, prev + 1),
               )
             }
           >

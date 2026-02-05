@@ -341,7 +341,10 @@ function BhaManagementTable({
           className="flex flex-col p-0 w-full sm:max-w-md"
         >
           <SheetTitle className="sr-only">Clients</SheetTitle>
-          <BhaClientsSheetContent doctorId={selectedBhaForClients?.id} />
+          <BhaClientsSheetContent
+            doctorId={selectedBhaForClients?.id}
+            doctorName={selectedBhaForClients?.fullName}
+          />
         </SheetContent>
       </Sheet>
       <CommonuserModal

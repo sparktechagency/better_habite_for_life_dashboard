@@ -39,6 +39,15 @@ export const bhaManagementApi = baseApi.injectEndpoints({
         url: `/doctor/users-by-doctor/${id}`,
         method: "GET",
       }),
+      transformResponse: (response) => {
+        if (!response?.data || !Array.isArray(response.data)) return response;
+        response.data = response.data.map((item) => ({
+          ...item,
+          id: item.id ?? item._id ?? item.userId ?? item.user_id,
+          _id: item._id ?? item.id ?? item.userId ?? item.user_id,
+        }));
+        return response;
+      },
       providesTags: ["BhaManagement"],
     }),
     createBha: builder.mutation({
@@ -56,6 +65,14 @@ export const bhaManagementApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["BhaManagement", "Dashboard"],
     }),
+    reassignBha: builder.mutation({
+      query: (body) => ({
+        url: `/bha-bhaa-reassign/reassign-by-admin`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["BhaManagement", "AssignReassign", "BhaaManagement"],
+    }),
   }),
 });
 
@@ -64,4 +81,5 @@ export const {
   useUsersByDoctorIdQuery,
   useBlockBhaMutation,
   useCreateBhaMutation,
+  useReassignBhaMutation,
 } = bhaManagementApi;
