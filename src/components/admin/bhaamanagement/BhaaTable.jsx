@@ -20,6 +20,8 @@ import { useBlockBhaaMutation } from "@/redux/Apis/admin/bhaamanagementApi/bhaam
 import useToast from "@/hooks/useToast";
 import CommonuserModal from "@/components/common/commonusermodal/CommonuserModal";
 import { ClientDetailsModal } from "../dashboard/ClinetStatusOverview";
+import { GrGroup } from "react-icons/gr";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 function BhaaTable({
   bhaaInfoData = [],
@@ -63,14 +65,16 @@ function BhaaTable({
         toast.success(
           isCurrentlyActive
             ? "BHAA blocked successfully"
-            : "BHAA unblocked successfully"
+            : "BHAA unblocked successfully",
         );
       } else {
         toast.error(response?.message || "Failed to update BHAA status");
       }
     } catch (error) {
       toast.error(
-        error?.data?.message || error?.message || "Failed to update BHAA status"
+        error?.data?.message ||
+          error?.message ||
+          "Failed to update BHAA status",
       );
     } finally {
       setBlockingUserId(null);
@@ -95,7 +99,7 @@ function BhaaTable({
             onClick={() => setCurrentPage(i)}
           >
             {i}
-          </Button>
+          </Button>,
         );
       }
     } else {
@@ -111,14 +115,14 @@ function BhaaTable({
           onClick={() => setCurrentPage(1)}
         >
           1
-        </Button>
+        </Button>,
       );
 
       if (currentPage > 3) {
         buttons.push(
           <span key="ellipsis1" className="px-2 text-gray-600">
             ...
-          </span>
+          </span>,
         );
       }
 
@@ -139,7 +143,7 @@ function BhaaTable({
               onClick={() => setCurrentPage(i)}
             >
               {i}
-            </Button>
+            </Button>,
           );
         }
       }
@@ -148,7 +152,7 @@ function BhaaTable({
         buttons.push(
           <span key="ellipsis2" className="px-2 text-gray-600">
             ...
-          </span>
+          </span>,
         );
       }
 
@@ -165,7 +169,7 @@ function BhaaTable({
             onClick={() => setCurrentPage(totalPage)}
           >
             {totalPage}
-          </Button>
+          </Button>,
         );
       }
     }
@@ -237,6 +241,7 @@ function BhaaTable({
                         {isActive ? "Active" : "Blocked"}
                       </p>
                     </TableCell>
+
                     <TableCell className="w-1/6 text-right">
                       <div className="flex gap-2 justify-end">
                         <Button
@@ -305,7 +310,7 @@ function BhaaTable({
             disabled={currentPage === paginationMeta.totalPage}
             onClick={() =>
               setCurrentPage((prev) =>
-                Math.min(paginationMeta.totalPage, prev + 1)
+                Math.min(paginationMeta.totalPage, prev + 1),
               )
             }
           >
@@ -313,6 +318,7 @@ function BhaaTable({
           </Button>
         </div>
       )}
+
       <CommonuserModal
         openModal={openModal}
         setOpenModal={handleCloseModal}

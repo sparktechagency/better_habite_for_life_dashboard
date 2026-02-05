@@ -34,6 +34,13 @@ export const bhaManagementApi = baseApi.injectEndpoints({
       },
       providesTags: ["BhaManagement"],
     }),
+    usersByDoctorId: builder.query({
+      query: ({ id }) => ({
+        url: `/doctor/users-by-doctor/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["BhaManagement"],
+    }),
     createBha: builder.mutation({
       query: (data) => ({
         url: `/users/create-doctor-assistant`,
@@ -52,5 +59,9 @@ export const bhaManagementApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetBhaManagementDataQueryQuery, useBlockBhaMutation, useCreateBhaMutation } =
-  bhaManagementApi;
+export const {
+  useGetBhaManagementDataQueryQuery,
+  useUsersByDoctorIdQuery,
+  useBlockBhaMutation,
+  useCreateBhaMutation,
+} = bhaManagementApi;

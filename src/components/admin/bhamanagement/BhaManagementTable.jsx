@@ -20,7 +20,9 @@ import { useBlockBhaMutation } from "@/redux/Apis/admin/bhamanagementApi/bhamana
 import useToast from "@/hooks/useToast";
 import CommonuserModal from "@/components/common/commonusermodal/CommonuserModal";
 import { ClientDetailsModal } from "../dashboard/ClinetStatusOverview";
-
+import { GrGroup } from "react-icons/gr";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import BhaClientsSheetContent from "./BhaClientsSheetContent";
 function BhaManagementTable({
   bhaInfoData = [],
   isLoading = false,
@@ -33,7 +35,8 @@ function BhaManagementTable({
   const [blockingUserId, setBlockingUserId] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [selectedBha, setSelectedBha] = useState(null);
-
+  const [clientsSheetOpen, setClientsSheetOpen] = useState(false);
+  const [selectedBhaForClients, setSelectedBhaForClients] = useState(null);
   const handleViewDetails = (bha) => {
     setSelectedBha(bha);
     setOpenModal(true);
@@ -63,14 +66,14 @@ function BhaManagementTable({
         toast.success(
           isCurrentlyActive
             ? "BHA blocked successfully"
-            : "BHA unblocked successfully"
+            : "BHA unblocked successfully",
         );
       } else {
         toast.error(response?.message || "Failed to update BHA status");
       }
     } catch (error) {
       toast.error(
-        error?.data?.message || error?.message || "Failed to update BHA status"
+        error?.data?.message || error?.message || "Failed to update BHA status",
       );
     } finally {
       setBlockingUserId(null);
@@ -95,7 +98,7 @@ function BhaManagementTable({
             onClick={() => setCurrentPage(i)}
           >
             {i}
-          </Button>
+          </Button>,
         );
       }
     } else {
@@ -111,14 +114,14 @@ function BhaManagementTable({
           onClick={() => setCurrentPage(1)}
         >
           1
-        </Button>
+        </Button>,
       );
 
       if (currentPage > 3) {
         buttons.push(
           <span key="ellipsis1" className="px-2 text-gray-600">
             ...
-          </span>
+          </span>,
         );
       }
 
@@ -139,7 +142,7 @@ function BhaManagementTable({
               onClick={() => setCurrentPage(i)}
             >
               {i}
-            </Button>
+            </Button>,
           );
         }
       }
@@ -148,7 +151,7 @@ function BhaManagementTable({
         buttons.push(
           <span key="ellipsis2" className="px-2 text-gray-600">
             ...
-          </span>
+          </span>,
         );
       }
 
@@ -165,7 +168,7 @@ function BhaManagementTable({
             onClick={() => setCurrentPage(totalPage)}
           >
             {totalPage}
-          </Button>
+          </Button>,
         );
       }
     }
@@ -185,6 +188,7 @@ function BhaManagementTable({
               <TableHead className="w-1/6">Contact Number</TableHead>
               <TableHead className="w-1/6">Join Date</TableHead>
               <TableHead className="w-1/6">Status</TableHead>
+              <TableHead className="w-1/6">View Clients</TableHead>
               <TableHead className="w-1/6 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -236,6 +240,18 @@ function BhaManagementTable({
                       >
                         {isActive ? "Active" : "Blocked"}
                       </p>
+                    </TableCell>
+                    <TableCell className="w-1/6">
+                      <Button
+                        variant="ghost"
+                        className="hover:bg-gray-200 h-8"
+                        onClick={() => {
+                          setSelectedBhaForClients(data);
+                          setClientsSheetOpen(true);
+                        }}
+                      >
+                        <GrGroup size={16} />
+                      </Button>
                     </TableCell>
                     <TableCell className="w-1/6 text-right">
                       <div className="flex gap-2 justify-end">
@@ -305,7 +321,7 @@ function BhaManagementTable({
             disabled={currentPage === paginationMeta.totalPage}
             onClick={() =>
               setCurrentPage((prev) =>
-                Math.min(paginationMeta.totalPage, prev + 1)
+                Math.min(paginationMeta.totalPage, prev + 1),
               )
             }
           >
@@ -313,6 +329,21 @@ function BhaManagementTable({
           </Button>
         </div>
       )}
+      <Sheet
+        open={clientsSheetOpen}
+        onOpenChange={(open) => {
+          setClientsSheetOpen(open);
+          if (!open) setSelectedBhaForClients(null);
+        }}
+      >
+        <SheetContent
+          side="right"
+          className="flex flex-col p-0 w-full sm:max-w-md"
+        >
+          <SheetTitle className="sr-only">Clients</SheetTitle>
+          <BhaClientsSheetContent doctorId={selectedBhaForClients?.id} />
+        </SheetContent>
+      </Sheet>
       <CommonuserModal
         openModal={openModal}
         setOpenModal={handleCloseModal}

@@ -25,7 +25,7 @@ export const assignreassingApi = baseApi.injectEndpoints({
         }
 
         return {
-          url: `/bha-bhaa-reassign-request?${params.toString()}`,
+          url: `/bha-bhaa-reassign?${params.toString()}`,
           method: "GET",
         };
       },
@@ -68,14 +68,14 @@ export const assignreassingApi = baseApi.injectEndpoints({
 
     getRequestForAssignReassignById: builder.query({
       query: ({ id }) => ({
-        url: `/bha-bhaa-reassign-request/${id}`,
+        url: `/bha-bhaa-reassign/${id}`,
         method: "GET",
       }),
       providesTags: ["AssignReassign"],
     }),
     approveRequestForAssignReassign: builder.mutation({
       query: ({ id, assignId }) => ({
-        url: `/bha-bhaa-reassign-request/assign/${id}`,
+        url: `/bha-bhaa-reassign/assign/${id}`,
         method: "PATCH",
         body: { assignId },
       }),
