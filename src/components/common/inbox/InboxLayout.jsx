@@ -6,12 +6,15 @@ import { useGetChatListQuery } from "@/redux/Apis/chatApi/chatApi";
 import { useAppSelector } from "@/redux/hooks";
 import { useSearchParams } from "next/navigation";
 import getImageUrl from "@/utils/getImageUrl";
-  import { socket } from "@/socket/socket";
-  import { useEffect } from "react";
+import { socket } from "@/socket/socket";
+import { useEffect } from "react";
 
 function InboxLayout() {
-  const { data: chatListResponse, isLoading: isChatListLoading, refetch: refetchChatList } =
-    useGetChatListQuery();
+  const {
+    data: chatListResponse,
+    isLoading: isChatListLoading,
+    refetch: refetchChatList,
+  } = useGetChatListQuery();
   const searchParams = useSearchParams();
   const selectedChatId = searchParams.get("chatId");
   const [newMessage, setNewMessage] = useState(false);
@@ -54,10 +57,10 @@ function InboxLayout() {
   // Listen for messages in the selected chat
   useEffect(() => {
     if (!selectedChatId) return;
-    
+
     socket.connect();
     const eventName = `new-message::${selectedChatId}`;
-    
+
     const handleNewMessage = (message) => {
       console.log("new message received-----selected chat 📡", message);
       setNewMessage(true);
@@ -79,17 +82,17 @@ function InboxLayout() {
 
     socket.connect();
     const globalEventName = `new-message::${currentUserId}`;
-    
+
     const handleGlobalMessage = (message) => {
       console.log("new message received ----- global 📡", message);
-      
+
       // Extract chatId from message if available
       const chatId = message?.chatId || message?.chat?._id || null;
-      
+
       // Set badge state
       setNewMessage(true);
       setNewMessageChatId(chatId);
-      
+
       // Refetch chat list to get updated unread counts
       refetchChatList();
     };

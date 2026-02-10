@@ -13,18 +13,65 @@ import { getCookie } from "@/utils/cookies";
 import { FaMagic } from "react-icons/fa";
 import PredefinedMessageModal from "./PredefinedMessage/PredefinedMessageModal";
 import { socket } from "@/socket/socket";
+const MESSAGES_PAGE_SIZE = 20;
+
 const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
-  const { data: messagesResponse, isLoading: isMessagesLoading, refetch: refetchMessages } =
-    useGetMessagesQuery({ chatId }, { skip: !chatId });
+  const [page, setPage] = useState(1);
+  const [accumulatedMessages, setAccumulatedMessages] = useState([]);
+
+  const {
+    data: messagesResponse,
+    isLoading: isMessagesLoading,
+    isFetching: isMessagesFetching,
+    refetch: refetchMessages,
+  } = useGetMessagesQuery(
+    { chatId, page, limit: MESSAGES_PAGE_SIZE },
+    { skip: !chatId }
+  );
+  const isLoadingMore = isMessagesFetching && accumulatedMessages.length > 0;
+
+  const meta = messagesResponse?.data?.meta;
+  const totalPage = meta?.totalPage ?? 1;
+  const hasMore = page < totalPage;
+
   const [sendMessageApi, { isLoading: isSendingMessage }] =
     useSendMessageMutation();
   const receiverId = getCookie("user_id");
-  // Get messages from API response - reverse to show oldest first
-  const currentMessages = useMemo(() => {
-    const messages = messagesResponse?.data?.newResult?.result || [];
-    // Reverse to show oldest messages first (API returns newest first)
-    return [...messages].reverse();
+
+  // Reset pagination when chat changes
+  useEffect(() => {
+    if (chatId) {
+      setPage(1);
+      setAccumulatedMessages([]);
+    }
+  }, [chatId]);
+
+  // Merge API result into accumulated messages (page 1 = replace, page > 1 = prepend older)
+  useEffect(() => {
+    if (!messagesResponse?.data?.newResult?.result) return;
+    const result = messagesResponse.data.newResult.result;
+    const reversed = [...result].reverse();
+    const currentPage = messagesResponse.data.meta?.page ?? 1;
+    if (currentPage === 1) {
+      setAccumulatedMessages(reversed);
+    } else {
+      if (messagesContainerRef.current) {
+        loadMoreScrollRestore.current = {
+          scrollTop: messagesContainerRef.current.scrollTop,
+          scrollHeight: messagesContainerRef.current.scrollHeight,
+        };
+      }
+      setAccumulatedMessages((prev) => {
+        const isRefetch = prev.length > 0 && reversed.length > 0 && reversed[0]._id === prev[0]._id;
+        if (isRefetch) {
+          return [...reversed, ...prev.slice(reversed.length)];
+        }
+        return [...reversed, ...prev];
+      });
+    }
   }, [messagesResponse]);
+
+  const currentMessages = accumulatedMessages;
 
   const [newMessage, setNewMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState(null);
@@ -32,6 +79,8 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
   const [isPredefinedModalOpen, setIsPredefinedModalOpen] = useState(false);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+  const loadMoreScrollRestore = useRef(null);
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -43,7 +92,19 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
   };
 
   useEffect(() => {
-    // Add a small delay to ensure DOM is updated
+    if (!messagesContainerRef.current) return;
+    if (loadMoreScrollRestore.current) {
+      const { scrollTop, scrollHeight } = loadMoreScrollRestore.current;
+      loadMoreScrollRestore.current = null;
+      const container = messagesContainerRef.current;
+      requestAnimationFrame(() => {
+        if (container) {
+          const heightDelta = container.scrollHeight - scrollHeight;
+          container.scrollTop = scrollTop + heightDelta;
+        }
+      });
+      return;
+    }
     const timeoutId = setTimeout(scrollToBottom, 100);
     return () => clearTimeout(timeoutId);
   }, [currentMessages]);
@@ -213,7 +274,10 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
       <ChatHeader selectedChat={selectedChat} />
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0">
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0"
+      >
         {!selectedChat ? (
           <div className="flex items-center justify-center h-full min-h-[200px]">
             <div className="text-center">
@@ -226,7 +290,7 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
               </p>
             </div>
           </div>
-        ) : isMessagesLoading ? (
+        ) : isMessagesLoading && accumulatedMessages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-gray-500">Loading messages...</p>
           </div>
@@ -240,7 +304,20 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
             </div>
           </div>
         ) : (
-          groupMessages.map((group, groupIndex) => (
+          <>
+            {hasMore && (
+              <div className="flex justify-center py-2">
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={isLoadingMore}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50"
+                >
+                  {isLoadingMore ? "Loading..." : "Load more messages"}
+                </button>
+              </div>
+            )}
+            {groupMessages.map((group, groupIndex) => (
             <div
               key={groupIndex}
               className={`flex ${
@@ -330,7 +407,8 @@ const ChatInterface = ({ selectedChat, chatId, currentUserId }) => {
                 </Avatar>
               )}
             </div>
-          ))
+          ))}
+          </>
         )}
         <div ref={messagesEndRef} />
       </div>

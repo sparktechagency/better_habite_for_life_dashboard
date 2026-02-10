@@ -4,11 +4,14 @@ export const messageApi = baseApi.injectEndpoints({
   overrideExisting: true,
   endpoints: (builder) => ({
     getMessages: builder.query({
-      query: ({ chatId }) => ({
+      query: ({ chatId, page = 1, limit = 20 }) => ({
         url: `/message/my-messages/${chatId}`,
         method: "GET",
+        params: { page, limit },
       }),
-      providesTags: ["Message"],
+      providesTags: (result, error, { chatId }) => [
+        { type: "Message", id: chatId },
+      ],
     }),
     sendMessage: builder.mutation({
       query: (message) => ({
@@ -19,13 +22,17 @@ export const messageApi = baseApi.injectEndpoints({
       invalidatesTags: ["Message"],
     }),
     seenMessage: builder.mutation({
-      query: ({chatId}) => ({
+      query: ({ chatId }) => ({
         url: `/message/seen/${chatId}`,
         method: "PATCH",
       }),
-      invalidatesTags: ["Message"],
+      invalidatesTags: ["Chat", "Message"],
     }),
   }),
 });
 
-export const { useGetMessagesQuery, useSendMessageMutation, useSeenMessageMutation } = messageApi;
+export const {
+  useGetMessagesQuery,
+  useSendMessageMutation,
+  useSeenMessageMutation,
+} = messageApi;
